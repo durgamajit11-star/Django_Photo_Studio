@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Studio Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/studio/studio.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<!-- ===== HEADER ===== -->
+<header class="studio-header">
+    <div class="studio-header-content">
+        <div class="studio-logo">
+            <i class="bi bi-camera"></i> Studio Panel
+        </div>
+
+        <div class="studio-header-right">
+            <span>Welcome, <strong>{{ user.username }}</strong></span>
+
+            <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light ms-3">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+</header>
+
+
+<div class="studio-wrapper">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="studio-sidebar" id="studioSidebar">
+
+        <a href="#" onclick="toggleStudioSidebar()">
+            <i class="bi bi-list fs-4"></i>
+            <span>Menu</span>
+        </a>
+
+        <a href="{% url 'studio_dashboard' %}"
+            class="{% if request.resolver_match.url_name == 'studio_dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="#">
+            <i class="bi bi-camera"></i>
+            <span>Portfolio</span>
+        </a>
+
+        <a href="#">
+            <i class="bi bi-calendar-event"></i>
+            <span>Bookings</span>
+        </a>
+
+        <a href="#">
+            <i class="bi bi-wallet2"></i>
+            <span>Earnings</span>
+        </a>
+
+        <a href="#">
+            <i class="bi bi-star-half"></i>
+            <span>Reviews</span>
+        </a>
+
+        <a href="{% url 'logout' %}">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+
+    </aside>
+
+   
+
+        <!-- ===== MAIN ===== -->
+        <main class="studio-main">
+            {% block studio_content %}
+            {% endblock %}
+        </main>
+
+         <!-- Global Chatbot -->
+    {% include "includes/chatbot.html" %}
+
+    <!-- Footer aligned with content -->
+    {% include "includes/footer.html" %}
+
+    
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'js/studio/studio.js' %}"></script>
+{% endblock %}

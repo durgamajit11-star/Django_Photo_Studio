@@ -1,0 +1,120 @@
+/* ================= CHATBOT ================= */
+
+.chat-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    z-index: 2000;
+    transition: 0.3s ease;
+}
+
+.chat-toggle:hover {
+    transform: scale(1.1);
+}
+
+.chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 360px;
+    height: 500px;
+    background: rgba(15, 23, 42, 0.95);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: 0.3s ease;
+    z-index: 2000;
+}
+
+.chat-window.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.chat-header {
+    padding: 15px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+.chat-close-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-message {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    padding: 10px 14px;
+    border-radius: 15px 15px 5px 15px;
+    max-width: 75%;
+}
+
+.bot-message {
+    align-self: flex-start;
+    background: rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    border-radius: 15px 15px 15px 5px;
+    max-width: 75%;
+}
+
+.chat-time {
+    display: block;
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 4px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+}
+
+.chat-input input {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    outline: none;
+}
+
+.chat-send-btn {
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-left: 8px;
+    color: white;
+    cursor: pointer;
+}

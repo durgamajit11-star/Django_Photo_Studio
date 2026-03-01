@@ -1,0 +1,205 @@
+{% extends  "user/dashboard/user_base.html"  %}
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+{% load static %}
+  <main class="main-content">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Find Studios That Match Your Style</h1>
+                <p class="hero-subtitle">Browse verified studios, compare portfolios, and book with confidence</p>
+
+                <div class="search-bar glass">
+                    <div class="search-container">
+                        <input type="text" id="cityFilter" placeholder="📍 City (e.g. Nagpur)" class="search-input">
+
+                        <select id="typeFilter" class="search-select">
+                            <option value="">All Types</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="events">Events</option>
+                            <option value="product">Product</option>
+                        </select>
+
+                        <select id="ratingFilter" class="search-select">
+                            <option value="">Any Rating</option>
+                            <option value="4">4★ & above</option>
+                            <option value="4.5">4.5★ & above</option>
+                        </select>
+
+                        <select id="priceFilter" class="search-select">
+                            <option value="">Any Price</option>
+                            <option value="low">₹ Budget</option>
+                            <option value="mid">₹₹ Standard</option>
+                            <option value="high">₹₹₹ Premium</option>
+                        </select>
+
+                        <button class="btn btn-primary search-btn" onclick="applyFilters()">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED STUDIOS -->
+        <section class="section">
+            <h3 class="section-title">🌟 Featured Studios</h3>
+            <p class="section-subtitle">Hand-picked studios trusted by thousands</p>
+
+            <div class="studios-grid">
+                <div class="col studio-item" data-city="nagpur" data-type="wedding" data-rating="4.8" data-price="mid">
+                    <div class="studio-card">
+                        <div class="studio-image-wrapper">
+                            <img src="{% static 'images/s1.png' %}" alt="DreamShot Studio" class="studio-image">
+                            <div class="studio-overlay">
+                                <button class="btn btn-light btn-sm">View Portfolio</button>
+                            </div>
+                        </div>
+                        <div class="studio-info">
+                            <h6>DreamShot Studio</h6>
+                            <p class="location">📍 Nagpur</p>
+                            <div class="rating-price">
+                                <span class="rating">⭐ 4.8</span>
+                                <span class="price">₹₹</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100 mt-2">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col studio-item" data-city="mumbai" data-type="wedding" data-rating="4.5" data-price="mid">
+                    <div class="studio-card">
+                        <div class="studio-image-wrapper">
+                            <img src="{% static 'images/s2.png' %}" alt="Wedding Studio" class="studio-image">
+                            <div class="studio-overlay">
+                                <button class="btn btn-light btn-sm">View Portfolio</button>
+                            </div>
+                        </div>
+                        <div class="studio-info">
+                            <h6>Wedding Studio</h6>
+                            <p class="location">📍 Mumbai</p>
+                            <div class="rating-price">
+                                <span class="rating">⭐ 4.5</span>
+                                <span class="price">₹₹</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100 mt-2">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col studio-item" data-city="mumbai" data-type="fashion" data-rating="4.7" data-price="high">
+                    <div class="studio-card">
+                        <div class="studio-image-wrapper">
+                            <img src="{% static 'images/s3.png' %}" alt="Fashion Hub" class="studio-image">
+                            <div class="studio-overlay">
+                                <button class="btn btn-light btn-sm">View Portfolio</button>
+                            </div>
+                        </div>
+                        <div class="studio-info">
+                            <h6>Fashion Hub</h6>
+                            <p class="location">📍 Mumbai</p>
+                            <div class="rating-price">
+                                <span class="rating">⭐ 4.7</span>
+                                <span class="price">₹₹₹</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100 mt-2">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col studio-item" data-city="nagpur" data-type="events" data-rating="4.6" data-price="mid">
+                    <div class="studio-card">
+                        <div class="studio-image-wrapper">
+                            <img src="{% static 'images/s4.jpg' %}" alt="Event Studios" class="studio-image">
+                            <div class="studio-overlay">
+                                <button class="btn btn-light btn-sm">View Portfolio</button>
+                            </div>
+                        </div>
+                        <div class="studio-info">
+                            <h6>Event Studios</h6>
+                            <p class="location">📍 Nagpur</p>
+                            <div class="rating-price">
+                                <span class="rating">⭐ 4.6</span>
+                                <span class="price">₹₹</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100 mt-2">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="section how-works">
+            <h3 class="section-title">🚀 How It Works</h3>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon">🔍</div>
+                    <h5>Discover</h5>
+                    <p>Browse through a curated selection of professional studios</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">📸</div>
+                    <h5>Compare</h5>
+                    <p>View portfolios and compare prices and services</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">📅</div>
+                    <h5>Book</h5>
+                    <p>Reserve your slot at your preferred studio</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">✅</div>
+                    <h5>Shoot</h5>
+                    <p>Enjoy your photoshoot at the booked studio</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACHIEVEMENTS -->
+        <section class="section achievements">
+            <h3 class="section-title">🏆 Our Achievements</h3>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Studios</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.8★</div>
+                    <div class="stat-label">Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24×7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="cta-content">
+                <h3>Ready to Book Your Next Shoot?</h3>
+                <p>Join thousands of happy customers today</p>
+                <button class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-right"></i> Browse Studios Now
+                </button>
+            </div>
+        </section>
+    </main>
+
+{% endblock %}

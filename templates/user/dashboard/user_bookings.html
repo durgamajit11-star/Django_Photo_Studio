@@ -1,0 +1,263 @@
+{% extends "user/dashboard/user_base.html" %}
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+
+<div class="main-content">
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <div class="header-content">
+            <h1>📅 My Bookings</h1>
+            <p>Manage and view all your studio bookings</p>
+        </div>
+    </section>
+
+    <!-- BOOKINGS CONTAINER -->
+    <div class="bookings-container">
+        
+        <!-- TABS -->
+        <div class="bookings-tabs">
+            <button class="tab-btn active" onclick="filterBookings('all')">All Bookings</button>
+            <button class="tab-btn" onclick="filterBookings('upcoming')">Upcoming</button>
+            <button class="tab-btn" onclick="filterBookings('completed')">Completed</button>
+            <button class="tab-btn" onclick="filterBookings('cancelled')">Cancelled</button>
+        </div>
+
+        <!-- BOOKINGS LIST -->
+        <div class="bookings-list">
+            
+            <!-- BOOKING CARD 1 -->
+            <div class="booking-card" data-status="upcoming">
+                <div class="booking-header">
+                    <div class="booking-title">
+                        <h3>DreamShot Studio - Wedding Photography</h3>
+                        <span class="badge badge-upcoming">Upcoming</span>
+                    </div>
+                    <button class="btn-action" onclick="showOptions(this)">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                </div>
+
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <span class="label">Location</span>
+                            <p>Nagpur, Maharashtra</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-calendar-event"></i>
+                        <div>
+                            <span class="label">Date & Time</span>
+                            <p>March 15, 2026 - 10:00 AM to 6:00 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-currency-rupee"></i>
+                        <div>
+                            <span class="label">Price</span>
+                            <p>₹15,000</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-person-circle"></i>
+                        <div>
+                            <span class="label">Studio Owner</span>
+                            <p>Raj Kumar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Invoice
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-chat-left-text"></i> Contact Studio
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelBooking(this)">
+                        Cancel Booking
+                    </button>
+                </div>
+            </div>
+
+            <!-- BOOKING CARD 2 -->
+            <div class="booking-card" data-status="completed">
+                <div class="booking-header">
+                    <div class="booking-title">
+                        <h3>Fashion Hub - Product Photography</h3>
+                        <span class="badge badge-completed">Completed</span>
+                    </div>
+                    <button class="btn-action" onclick="showOptions(this)">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                </div>
+
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <span class="label">Location</span>
+                            <p>Mumbai, Maharashtra</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-calendar-event"></i>
+                        <div>
+                            <span class="label">Date & Time</span>
+                            <p>February 20, 2026 - 2:00 PM to 5:00 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-currency-rupee"></i>
+                        <div>
+                            <span class="label">Price</span>
+                            <p>₹8,000</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-star"></i>
+                        <div>
+                            <span class="label">Your Rating</span>
+                            <p class="rating-display">⭐ 5.0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Invoice
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-image"></i> View Photos
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-pencil"></i> Edit Review
+                    </button>
+                </div>
+            </div>
+
+            <!-- BOOKING CARD 3 -->
+            <div class="booking-card" data-status="upcoming">
+                <div class="booking-header">
+                    <div class="booking-title">
+                        <h3>Event Studios - Corporate Event</h3>
+                        <span class="badge badge-upcoming">Upcoming</span>
+                    </div>
+                    <button class="btn-action" onclick="showOptions(this)">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                </div>
+
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <span class="label">Location</span>
+                            <p>Nagpur, Maharashtra</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-calendar-event"></i>
+                        <div>
+                            <span class="label">Date & Time</span>
+                            <p>March 25, 2026 - 9:00 AM to 5:00 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-currency-rupee"></i>
+                        <div>
+                            <span class="label">Price</span>
+                            <p>₹25,000</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <i class="bi bi-person-circle"></i>
+                        <div>
+                            <span class="label">Studio Owner</span>
+                            <p>Priya Singh</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Invoice
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-chat-left-text"></i> Contact Studio
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelBooking(this)">
+                        Cancel Booking
+                    </button>
+                </div>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="bi bi-inbox"></i>
+                <h3>No bookings found</h3>
+                <p>You don't have any bookings in this category</p>
+                <a href="{% url 'user_dashboard' %}" class="btn btn-primary mt-3">
+                    <i class="bi bi-calendar-plus"></i> Browse Studios
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterBookings(status) {
+    const cards = document.querySelectorAll('.booking-card');
+    const tabs = document.querySelectorAll('.tab-btn');
+    const emptyState = document.getElementById('emptyState');
+    let visibleCount = 0;
+
+    // Update active tab
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Filter cards
+    cards.forEach(card => {
+        if (status === 'all' || card.dataset.status === status) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // Show empty state if no results
+    emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+}
+
+function cancelBooking(button) {
+    if (confirm('Are you sure you want to cancel this booking?')) {
+        const card = button.closest('.booking-card');
+        card.style.opacity = '0.5';
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Cancelled';
+        
+        // Update badge
+        const badge = card.querySelector('.badge');
+        badge.textContent = 'Cancelled';
+        badge.className = 'badge badge-cancelled';
+    }
+}
+
+function showOptions(button) {
+    alert('More options coming soon!');
+}
+</script>
+
+{% endblock %}

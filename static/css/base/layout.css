@@ -1,0 +1,328 @@
+
+/* ===== HEADER ===== */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg,
+            rgba(2, 6, 23, 0.95),
+            rgba(2, 6, 23, 0.75));
+    backdrop-filter: blur(14px);
+    padding: 15px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1100;
+    height: 70px;
+    display: flex;
+    align-items: center;
+}
+
+.top-header,
+.sidebar {
+    background: rgba(2, 6, 23, 0.85);
+
+}
+
+
+.header-content {
+    height: 100%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    width: 100%;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcome-text {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.btn-theme {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #06b6d4;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.btn-theme:hover {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: #06b6d4;
+    transform: scale(1.05);
+}
+
+.mobile-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+}
+
+/* ===== MOBILE MENU ===== */
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    padding: 15px;
+    background: rgba(2, 6, 23, 0.95);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 260px;
+    height: calc(100vh - 70px);
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.35s ease;
+    z-index: 1050;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    transform: translateX(0);
+    /* on small screens we'll hide it by moving left (see media query) */
+}
+
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sidebar-header span {
+    font-weight: 600;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    display: none;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+    color: #ffffff;
+    background: rgba(6, 182, 212, 0.1);
+}
+
+.menu-item.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    font-weight: 600;
+}
+
+.menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 10px 0;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.sidebar-toggle:hover {
+    transform: scale(1.1);
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.sidebar-close:hover {
+    color: #06b6d4;
+}
+
+.sidebar-title {
+    font-weight: 600;
+}
+
+.mobile-sidebar-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+    display: none;
+    margin-right: 10px;
+}
+
+.mobile-sidebar-toggle:hover {
+    color: #06b6d4;
+    transform: scale(1.1);
+}
+.sidebar-menu a:hover {
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+}
+
+.submenu {
+    display: none;
+    padding-left: 15px;
+}
+
+.submenu a {
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+
+/* ===== FOOTER ===== */
+/* ===== PREMIUM FOOTER ===== */
+.footer {
+    position: relative;
+    background: linear-gradient(135deg, #020617, #0f172a, #1e293b);
+    padding: 60px 40px 30px;
+    margin-top: 60px;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 50;
+    width: 100%;
+}
+
+/* Top Gradient Line */
+.footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, #4f46e5, #06b6d4);
+}
+
+/* Footer Grid */
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px;
+}
+
+/* Section Titles */
+.footer-section h5 {
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #ffffff;
+    position: relative;
+}
+
+/* Underline Accent */
+.footer-section h5::after {
+    content: "";
+    width: 40px;
+    height: 2px;
+    background: #06b6d4;
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+}
+
+/* Paragraphs */
+.footer-section p {
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+/* Lists */
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+/* Links */
+.footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer a:hover {
+    color: #06b6d4;
+    transform: translateX(5px);
+}
+
+/* Icons */
+.footer i {
+    margin-right: 8px;
+    color: #06b6d4;
+}
+
+/* Social Icons */
+.social-links a {
+    font-size: 18px;
+    margin-right: 12px;
+    transition: 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #06b6d4;
+    transform: scale(1.2);
+}
+
+/* Bottom Line */
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    opacity: 0.6;
+}
