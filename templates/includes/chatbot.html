@@ -1,41 +1,40 @@
 <!-- ================= GLOBAL CHATBOT ================= -->
+<div id="chatbot-container">
 
-<!-- Chat Toggle Button -->
-<div class="chat-toggle" id="chatToggle" title="Open Chat">
-    <i class="bi bi-chat-dots-fill"></i>
-</div>
-
-<!-- Chat Window -->
-<div class="chat-window glass" id="chatWindow">
-
-    <!-- Header -->
-    <div class="chat-header">
-        <span>
-            <i class="bi bi-robot"></i> StudioSync AI Assistant
-        </span>
-        <button class="chat-close-btn" id="chatCloseBtn">
-            <i class="bi bi-x-lg"></i>
-        </button>
+    <!-- Chat Toggle Button -->
+    <div class="chat-toggle" id="chatToggle" title="Open Chat">
+        <i class="bi bi-chat-dots-fill"></i>
     </div>
 
-    <!-- Messages -->
-    <div class="chat-body" id="chatBody">
-        <div class="bot-message">
-            👋 Hello! How can I help you today?
+    <!-- Chat Window -->
+    <div class="chat-window glass" id="chatWindow">
+
+        <!-- Header -->
+        <div class="chat-header">
+            <span>
+                <i class="bi bi-robot"></i> StudioSync AI Assistant
+            </span>
+            <button class="chat-close-btn" id="chatCloseBtn">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
-    </div>
 
-    <!-- Input -->
-    <div class="chat-input">
-        <input 
-            type="text" 
-            id="chatInput" 
-            placeholder="Type your message..." 
-            autocomplete="off"
-        >
-        <button id="chatSendBtn" class="chat-send-btn" title="Send Message">
-            <i class="bi bi-send-fill"></i>
-        </button>
+        <!-- Messages -->
+        <div class="chat-body" id="chatBody">
+            <div class="bot-message">
+                👋 Hello! How can I help you today?
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input">
+            <input type="text" id="chatInput"
+                placeholder="Type your message..." autocomplete="off">
+            <button id="chatSendBtn" class="chat-send-btn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+
     </div>
 
 </div>

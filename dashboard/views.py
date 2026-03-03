@@ -1,9 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import role_required
 from accounts.forms import UserUpdateForm
 from django.contrib import messages
+from django.db.models import Avg, Avg, Sum
+from .models import Review, Review, Studio, Booking, Portfolio
+from django.shortcuts import get_object_or_404, redirect
 
+
+
+def landing_page(request):
+    return render(request, "landing.html")
 
 @login_required
 @role_required(['USER'])
@@ -65,6 +72,93 @@ def user_notifications(request):
 def studio_dashboard(request):
     return render(request, 'studio/dashboard/studio_dashboard.html')
 
+
+@login_required
+@role_required(['STUDIO'])
+def studio_portfolio(request):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    photos = Portfolio.objects.filter(studio=studio)
+
+    return render(request, 'studio/dashboard/studio_portfolio.html', {
+        'photos': photos
+    })
+
+
+@login_required
+@role_required(['STUDIO'])
+def studio_bookings(request):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    bookings = Booking.objects.filter(studio=studio).order_by('-created_at')
+
+    return render(request, 'studio/dashboard/studio_bookings.html', {
+        'bookings': bookings
+    })
+
+
+@login_required
+@role_required(['STUDIO'])
+def studio_earnings(request):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    from django.db.models import Sum
+    total_earnings = Booking.objects.filter(
+        studio=studio,
+        payment_status="Paid"
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    return render(request, 'studio/dashboard/studio_earnings.html', {
+        'total_earnings': total_earnings
+    })
+
+
+@login_required
+@role_required(['STUDIO'])
+def studio_reviews(request):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    reviews = Review.objects.filter(studio=studio).order_by('-created_at')
+
+    return render(request, 'studio/dashboard/studio_reviews.html', {
+        'reviews': reviews
+    })
+
+
+
+@login_required
+@role_required(['STUDIO'])
+def delete_photo(request, photo_id):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    photo = get_object_or_404(Portfolio, id=photo_id, studio=studio)
+    photo.delete()
+
+    return redirect('studio/dashboard/ studio_portfolio.html')
+
+
+@login_required
+@role_required(['STUDIO'])
+def approve_booking(request, booking_id):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    booking = get_object_or_404(Booking, id=booking_id, studio=studio)
+    booking.status = "Confirmed"
+    booking.save()
+
+    return redirect('studio_bookings')
+
+
+@login_required
+@role_required(['STUDIO'])
+def cancel_booking(request, booking_id):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    booking = get_object_or_404(Booking, id=booking_id, studio=studio)
+    booking.status = "Cancelled"
+    booking.save()
+
+    return redirect('studio_bookings')
 
 @login_required
 @role_required(['ADMIN'])

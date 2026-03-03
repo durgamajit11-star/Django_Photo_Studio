@@ -69,5 +69,4 @@ def auth_view(request):
 # ================= LOGOUT =================
 def logout_view(request):
     logout(request)
-    request.session.flush()
-    return redirect('auth_page')
+    return redirect("landing")   # 👈 THIS IS IMPORTANT

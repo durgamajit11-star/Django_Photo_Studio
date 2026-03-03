@@ -1,0 +1,50 @@
+{% extends "studio/dashboard/studio_base.html" %}
+{% block title %}Bookings{% endblock %}
+
+{% block studio_content %}
+
+<div class="container-fluid">
+    <h3 class="fw-bold mb-4">📅 Studio Bookings</h3>
+
+    <div class="card bg-dark border-0 shadow-sm p-4">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.user.username }}</td>
+                    <td>{{ booking.event_type }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>
+                        <span class="badge bg-success">{{ booking.status }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ booking.payment_status }}</span>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-success">Approve</a>
+                        <a href="#" class="btn btn-sm btn-danger">Cancel</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        No bookings available.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -131,14 +131,17 @@ body {
    MAIN CONTENT
    ========================================= */
 
-.studio-main {
-    margin-left: 250px;
-    padding: 100px 40px 40px 40px;
-    transition: 0.3s ease;
-    min-height: 100vh;
+.studio-wrapper {
+    display: flex;
 }
 
-.studio-sidebar.collapsed ~ .studio-main {
+.studio-main {
+    margin-left: 250px;
+    padding: 30px;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+}
+.studio-sidebar.collapsed + .studio-main {
     margin-left: 85px;
 }
 

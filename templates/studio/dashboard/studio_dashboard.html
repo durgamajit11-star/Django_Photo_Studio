@@ -12,61 +12,122 @@
     <div class="col-md-3 col-sm-6">
         <div class="glass-card text-center">
             <h6>Total Bookings</h6>
-            <h2 class="stat-number" data-target="128">0</h2>
+            <h2 class="stat-number" data-target="{{ total_bookings }}">
+    {{ total_bookings }}
+</h2>
         </div>
     </div>
 
     <div class="col-md-3 col-sm-6">
         <div class="glass-card text-center">
             <h6>Upcoming Shoots</h6>
-            <h2 class="stat-number" data-target="6">0</h2>
+            <h2 class="stat-number" data-target="{{ confirmed_bookings }}">
+    {{ confirmed_bookings }}
+</h2>
         </div>
     </div>
 
     <div class="col-md-3 col-sm-6">
         <div class="glass-card text-center">
             <h6>Total Revenue</h6>
-            <h2 class="stat-number" data-target="850000">0</h2>
+            <h2 class="stat-number" data-target="{{ total_earnings }}">
+     {{ total_earnings }}
+</h2>
         </div>
     </div>
 
     <div class="col-md-3 col-sm-6">
         <div class="glass-card text-center">
             <h6>Average Rating</h6>
-            <h2>4.8 ⭐</h2>
+            <h2>{{ average_rating }} ⭐</h2>
         </div>
     </div>
 
 </div>
 
 
-<!-- ================= REVENUE CHART ================= -->
-<div class="row g-4 mb-4">
+<!-- ================= CHARTS SECTION ================= -->
+<div class="row g-4 mb-4 align-items-stretch">
 
-    <div class="col-lg-8">
-        <div class="glass-card">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8 d-flex">
+        <div class="glass-card p-4 w-100">
             <h5 class="mb-3">📈 Monthly Revenue</h5>
-            <canvas id="revenueChart" height="120"></canvas>
+            <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="glass-card">
-            <h5 class="mb-3">⚡ Quick Actions</h5>
+    <!-- Booking Status -->
+    <div class="col-lg-4 d-flex">
+        <div class="glass-card p-4 w-100">
+            <h5 class="mb-3">📊 Booking Status</h5>
+            <canvas id="bookingStatusChart"></canvas>
+        </div>
+    </div>
 
-            <div class="d-grid gap-3">
-                <a href="#" class="btn btn-primary">
-                    <i class="bi bi-camera"></i> Add Portfolio
-                </a>
+</div>
 
-                <a href="#" class="btn btn-outline-light">
-                    <i class="bi bi-calendar-plus"></i> Manage Bookings
-                </a>
+<!-- ================= SCHEDULE + NOTIFICATIONS ================= -->
+<div class="row g-4 mb-4">
 
-                <a href="#" class="btn btn-outline-light">
-                    <i class="bi bi-wallet2"></i> View Earnings
-                </a>
-            </div>
+    <!-- Today Schedule -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4">
+            <h5 class="mb-3">📅 Today’s Schedule</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent text-light">
+                    10:00 AM – Wedding Shoot
+                </li>
+                <li class="list-group-item bg-transparent text-light">
+                    03:00 PM – Product Shoot
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4">
+            <h5 class="mb-3">🔔 Notifications</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent text-light">
+                    New booking request received.
+                </li>
+                <li class="list-group-item bg-transparent text-light">
+                    Payment pending from Rahul Sharma.
+                </li>
+                <li class="list-group-item bg-transparent text-light">
+                    New 5⭐ review added.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ================= AI INSIGHTS + REVIEWS ================= -->
+<div class="row g-4 mb-4">
+
+    <!-- AI Insights -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4">
+            <h5 class="mb-3">🤖 AI Insights</h5>
+            <ul>
+                <li>Most booked service: Wedding Premium Package</li>
+                <li>Peak booking month: December</li>
+                <li>High demand from Mumbai region</li>
+                <li>Customer satisfaction rate: 92%</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4">
+            <h5 class="mb-3">⭐ Recent Reviews</h5>
+            <p>“Amazing photography quality!” – 5⭐</p>
+            <p>“Very professional team.” – 4⭐</p>
         </div>
     </div>
 
@@ -74,7 +135,7 @@
 
 
 <!-- ================= RECENT BOOKINGS ================= -->
-<div class="glass-card">
+<div class="glass-card p-4">
     <h5 class="mb-3">🗓 Recent Bookings</h5>
 
     <div class="table-responsive">
@@ -89,7 +150,6 @@
                     <th>Amount</th>
                 </tr>
             </thead>
-
             <tbody>
                 <tr>
                     <td>1</td>
@@ -99,7 +159,6 @@
                     <td><span class="badge bg-success">Confirmed</span></td>
                     <td>₹ 45,000</td>
                 </tr>
-
                 <tr>
                     <td>2</td>
                     <td>Anjali Verma</td>
@@ -108,18 +167,67 @@
                     <td><span class="badge bg-warning text-dark">Pending</span></td>
                     <td>₹ 18,000</td>
                 </tr>
-
-                <tr>
-                    <td>3</td>
-                    <td>Corporate Event</td>
-                    <td>Corporate</td>
-                    <td>12 Aug 2026</td>
-                    <td><span class="badge bg-info text-dark">Ongoing</span></td>
-                    <td>₹ 30,000</td>
-                </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+{{ block.super }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    // ================= COUNTER ANIMATION =================
+    document.querySelectorAll('.stat-number').forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        let count = 0;
+        const increment = target / 100;
+
+        const updateCounter = () => {
+            if (count < target) {
+                count += increment;
+                counter.innerText = Math.ceil(count);
+                setTimeout(updateCounter, 20);
+            } else {
+                counter.innerText = target.toLocaleString();
+            }
+        };
+        updateCounter();
+    });
+
+    // ================= REVENUE CHART =================
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Revenue',
+                data: [40000, 55000, 60000, 70000, 85000, 95000],
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6,182,212,0.2)',
+                tension: 0.4,
+                fill: true
+            }]
+        }
+    });
+
+    // ================= BOOKING STATUS CHART =================
+    new Chart(document.getElementById('bookingStatusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Confirmed', 'Pending', 'Cancelled'],
+            datasets: [{
+                data: [80, 30, 18],
+                backgroundColor: ['#10b981', '#facc15', '#ef4444']
+            }]
+        }
+    });
+
+</script>
 
 {% endblock %}

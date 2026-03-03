@@ -1,9 +1,19 @@
-/* ================= CHATBOT ================= */
+/* =========================================
+   GLOBAL CHATBOT - StudioSync
+========================================= */
 
-.chat-toggle {
+#chatbot-container {
     position: fixed;
     bottom: 30px;
     right: 30px;
+    z-index: 9999;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===============================
+   TOGGLE BUTTON
+================================= */
+.chat-toggle {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -11,25 +21,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #fff;
     font-size: 22px;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    z-index: 2000;
-    transition: 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    transition: all 0.3s ease;
 }
 
 .chat-toggle:hover {
     transform: scale(1.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.45);
 }
 
+/* ===============================
+   CHAT WINDOW
+================================= */
 .chat-window {
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
+    position: absolute;
+    bottom: 80px;
+    right: 0;
     width: 360px;
     height: 500px;
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(18px);
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -37,8 +51,8 @@
     opacity: 0;
     transform: translateY(20px);
     pointer-events: none;
-    transition: 0.3s ease;
-    z-index: 2000;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
 }
 
 .chat-window.active {
@@ -47,22 +61,31 @@
     pointer-events: auto;
 }
 
+/* ===============================
+   HEADER
+================================= */
 .chat-header {
     padding: 15px;
     background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
+    font-size: 14px;
 }
 
 .chat-close-btn {
     background: transparent;
     border: none;
-    color: white;
+    color: #fff;
     cursor: pointer;
+    font-size: 14px;
 }
 
+/* ===============================
+   CHAT BODY
+================================= */
 .chat-body {
     flex: 1;
     padding: 15px;
@@ -70,22 +93,41 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    scrollbar-width: thin;
 }
 
+.chat-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+}
+
+/* ===============================
+   MESSAGES
+================================= */
 .user-message {
     align-self: flex-end;
     background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: #fff;
     padding: 10px 14px;
     border-radius: 15px 15px 5px 15px;
     max-width: 75%;
+    font-size: 13px;
+    word-wrap: break-word;
 }
 
 .bot-message {
     align-self: flex-start;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
     padding: 10px 14px;
     border-radius: 15px 15px 15px 5px;
     max-width: 75%;
+    font-size: 13px;
+    word-wrap: break-word;
 }
 
 .chat-time {
@@ -95,10 +137,14 @@
     margin-top: 4px;
 }
 
+/* ===============================
+   INPUT SECTION
+================================= */
 .chat-input {
     display: flex;
     padding: 12px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chat-input input {
@@ -106,6 +152,7 @@
     border: none;
     border-radius: 8px;
     padding: 8px 10px;
+    font-size: 13px;
     outline: none;
 }
 
@@ -115,6 +162,62 @@
     padding: 8px 12px;
     border-radius: 8px;
     margin-left: 8px;
-    color: white;
+    color: #fff;
     cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.chat-send-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ===============================
+   TYPING ANIMATION
+================================= */
+.typing span {
+    animation: blink 1.4s infinite both;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* ===============================
+   RESPONSIVE
+================================= */
+@media (max-width: 768px) {
+
+    #chatbot-container {
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .chat-window {
+        width: 320px;
+        height: 460px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    #chatbot-container {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .chat-window {
+        width: 92vw;
+        height: 70vh;
+        bottom: 80px;
+    }
 }

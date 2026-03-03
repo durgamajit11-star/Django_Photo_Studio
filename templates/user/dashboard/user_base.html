@@ -35,9 +35,13 @@
                 <button class="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
                     <i class="bi bi-moon-stars"></i>
                 </button>
-                <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light ms-3">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                <a href="{% url 'logout' %}" >
+                     {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">
+            Logout
+        </button>
                 </a>
+
             </nav>
         </div>
     </header>
@@ -113,10 +117,14 @@
         </a>
 
         <!-- LOGOUT -->
-        <a href="{% url 'logout' %}" class="menu-item logout-item">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-        </a>
+       <li class="nav-item">
+    <form action="{% url 'logout' %}" method="POST" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm">
+            Logout
+        </button>
+    </form>
+</li>
 
     </nav>
 </aside>

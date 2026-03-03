@@ -1,0 +1,40 @@
+{% extends "studio/dashboard/studio_base.html" %}
+{% block title %}Earnings{% endblock %}
+
+{% block studio_content %}
+
+<div class="container-fluid">
+    <h3 class="fw-bold mb-4">💰 Earnings Overview</h3>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card bg-dark border-0 p-4 shadow-sm">
+                <h6>Total Earnings</h6>
+                <h2 class="fw-bold text-success">₹ {{ total_earnings }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card bg-dark border-0 p-4 shadow-sm">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        datasets: [{
+            label: 'Revenue',
+            data: [50000, 80000, 65000, 90000, 75000]
+        }]
+    }
+});
+</script>
+
+{% endblock %}

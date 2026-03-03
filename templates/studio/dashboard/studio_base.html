@@ -28,7 +28,7 @@
     </div>
 </header>
 
-
+<!-- ===== LAYOUT WRAPPER ===== -->
 <div class="studio-wrapper">
 
     <!-- ===== SIDEBAR ===== -->
@@ -45,22 +45,22 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="#">
+        <a href="{% url 'studio_portfolio' %}">
             <i class="bi bi-camera"></i>
             <span>Portfolio</span>
         </a>
 
-        <a href="#">
+        <a href="{% url 'studio_bookings' %}">
             <i class="bi bi-calendar-event"></i>
             <span>Bookings</span>
         </a>
 
-        <a href="#">
+        <a href="{% url 'studio_earnings' %}">
             <i class="bi bi-wallet2"></i>
             <span>Earnings</span>
         </a>
 
-        <a href="#">
+        <a href="{% url 'studio_reviews' %}">
             <i class="bi bi-star-half"></i>
             <span>Reviews</span>
         </a>
@@ -83,12 +83,9 @@
          <!-- Global Chatbot -->
     {% include "includes/chatbot.html" %}
 
-    <!-- Footer aligned with content -->
-    {% include "includes/footer.html" %}
-
-    
-
 </div>
+ <!-- Footer aligned with content -->
+    {% include "includes/footer.html" %}
 
 {% endblock %}
 
