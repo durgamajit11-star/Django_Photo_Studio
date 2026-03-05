@@ -1,13 +1,51 @@
-{% extends 'user/dashboard/user_base.html' %}
+{% extends 'admin/dashboard/admin_base.html' %}
 {% block title %}Admin Dashboard{% endblock %}
 
-{% block content %}
+{% block admin_content %}
 
-<h2 class="mb-4">Admin Dashboard</h2>
+<h2 class="fw-bold mb-4">📊 Admin Dashboard</h2>
 
-<div class="card shadow p-4">
-    <h5>Welcome Admin</h5>
-    <p>System management area.</p>
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Total Users</h6>
+            <h3>{{ total_users }}</h3>
+            <p class="text-success small">+12% this month</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Total Studios</h6>
+            <h3>{{ total_studios }}</h3>
+            <p class="text-info small">Active listings</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Total Bookings</h6>
+            <h3>{{ total_bookings }}</h3>
+            <p class="text-warning small">Pending approvals</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Total Revenue</h6>
+            <h3>₹ {{ total_revenue }}</h3>
+            <p class="text-primary small">Confirmed payments</p>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-dark text-light p-4 rounded-4">
+    <h5 class="mb-3">Platform Overview</h5>
+    <p>
+        The admin panel provides centralized control over users, studios,
+        bookings, and payment analytics. Use the sidebar to manage
+        platform operations efficiently.
+    </p>
 </div>
 
 {% endblock %}

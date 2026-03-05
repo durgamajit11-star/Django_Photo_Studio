@@ -136,11 +136,19 @@ body {
 }
 
 .studio-main {
-    margin-left: 250px;
-    padding: 30px;
-    width: 100%;
-    min-height: calc(100vh - 70px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    background: #020617;  /* DARK background */
+    color: #ffffff;
 }
+
+/* Footer always bottom */
+.studio-main footer {
+    margin-top: auto;
+}
+
 .studio-sidebar.collapsed + .studio-main {
     margin-left: 85px;
 }

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/admin.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<header class="admin-header">
+    <div class="admin-header-content">
+        <div class="admin-logo">
+            <i class="bi bi-shield-lock"></i> Admin Panel
+        </div>
+
+      <div class="admin-header-content">
+    <div class="d-flex align-items-center">
+        <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-3">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="admin-logo">
+            <i class="bi bi-shield-lock-fill me-2"></i>
+            StudioSync Admin
+        </div>
+    </div>
+    </div>
+</header>
+
+<div class="admin-wrapper">
+
+     <!-- ===== SIDEBAR ===== -->
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <a href="#" onclick="toggleAdminSidebar()">
+            <i class="bi bi-list fs-4"></i>
+            <span>Menu</span>
+        </a>
+
+        <a href="{% url 'admin_dashboard' %}"
+            class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{% url 'manage_users' %}"
+            class="{% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+            <i class="bi bi-people"></i>
+            <span>Manage Users</span>
+        </a>
+
+        <a href="{% url 'manage_studios' %}">
+            <i class="bi bi-building"></i>
+            <span>Manage Studios</span>
+        </a>
+
+        <a href="{% url 'admin_bookings' %}">
+            <i class="bi bi-calendar-event"></i>
+            <span>Bookings</span>
+        </a>
+
+        <a href="{% url 'admin_payments' %}">
+            <i class="bi bi-wallet2"></i>
+            <span>Payments</span>
+        </a>
+
+        <a href="{% url 'logout' %}">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+
+    </aside>
+
+    <main class="admin-main">
+
+        {% block admin_content %}
+        {% endblock %}
+
+        {% include "includes/footer.html" %}
+
+    </main>
+
+</div>
+
+{% include "includes/chatbot.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin/admin.js' %}"></script>
+
+{% endblock %}

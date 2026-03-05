@@ -72,20 +72,23 @@
 
     </aside>
 
-   
 
-        <!-- ===== MAIN ===== -->
-        <main class="studio-main">
-            {% block studio_content %}
-            {% endblock %}
-        </main>
 
-         <!-- Global Chatbot -->
+    <!-- ===== MAIN ===== -->
+    <main class="studio-main">
+        {% block studio_content %}
+
+        {% endblock %}
+        <!-- Footer aligned with content -->
+        {% include "includes/footer.html" %}
+        
+    </main>
+
+    <!-- Global Chatbot -->
     {% include "includes/chatbot.html" %}
 
 </div>
- <!-- Footer aligned with content -->
-    {% include "includes/footer.html" %}
+
 
 {% endblock %}
 

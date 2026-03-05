@@ -4,8 +4,12 @@ from accounts.decorators import role_required
 from accounts.forms import UserUpdateForm
 from django.contrib import messages
 from django.db.models import Avg, Avg, Sum
+
+from accounts.models import CustomUser
 from .models import Review, Review, Studio, Booking, Portfolio
 from django.shortcuts import get_object_or_404, redirect
+from datetime import datetime
+from django.db.models.functions import TruncMonth
 
 
 
@@ -163,4 +167,76 @@ def cancel_booking(request, booking_id):
 @login_required
 @role_required(['ADMIN'])
 def admin_dashboard(request):
-    return render(request, 'admin/dashboard/admin_dashboard.html')
+
+    total_users = CustomUser.objects.count()
+    total_studios = Studio.objects.count()
+    total_bookings = Booking.objects.count()
+
+    total_revenue = Booking.objects.filter(
+        status="Confirmed"
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    context = {
+        'total_users': total_users,
+        'total_studios': total_studios,
+        'total_bookings': total_bookings,
+        'total_revenue': total_revenue,
+    }
+
+    return render(request, "admin/dashboard/admin_dashboard.html", context)
+
+
+@login_required
+@role_required(['ADMIN'])
+def manage_users(request):
+    return render(request, "admin/dashboard/manage_users.html")
+
+
+@login_required
+@role_required(['ADMIN'])
+def manage_studios(request):
+    return render(request, "admin/dashboard/manage_studios.html")
+
+
+@login_required
+@role_required(['ADMIN'])
+def admin_bookings(request):
+
+    bookings = Booking.objects.select_related('user', 'studio').all()
+
+    confirmed_count = bookings.filter(status="Confirmed").count()
+    pending_count = bookings.filter(status="Pending").count()
+    cancelled_count = bookings.filter(status="Cancelled").count()
+
+    # ===== Monthly Revenue Data =====
+    monthly_revenue = (
+        Booking.objects
+        .filter(status="Confirmed")
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(total=Sum("amount"))
+        .order_by("month")
+    )
+
+    labels = []
+    revenue_data = []
+
+    for item in monthly_revenue:
+        labels.append(item["month"].strftime("%b %Y"))
+        revenue_data.append(float(item["total"]))
+
+    context = {
+        'bookings': bookings,
+        'confirmed_count': confirmed_count,
+        'pending_count': pending_count,
+        'cancelled_count': cancelled_count,
+        'revenue_labels': labels,
+        'revenue_data': revenue_data,
+    }
+
+    return render(request, "admin/dashboard/admin_bookings.html", context)
+
+@login_required
+@role_required(['ADMIN'])
+def admin_payments(request):
+    return render(request, "admin/dashboard/admin_payments.html")

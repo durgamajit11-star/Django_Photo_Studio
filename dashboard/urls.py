@@ -34,4 +34,8 @@ urlpatterns = [
 
     # ADMIN
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/users/', views.manage_users, name='manage_users'),
+    path('admin/studios/', views.manage_studios, name='manage_studios'),
+    path('admin/bookings/', views.admin_bookings, name='admin_bookings'),
+    path('admin/payments/', views.admin_payments, name='admin_payments'),
 ]

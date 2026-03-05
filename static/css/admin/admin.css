@@ -1,0 +1,94 @@
+/* ================= ADMIN HEADER ================= */
+.admin-header {
+    background: linear-gradient(90deg, #020617, #0f172a);
+    padding: 15px 30px;
+    color: white;
+}
+
+.admin-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ================= MAIN LAYOUT ================= */
+
+.admin-wrapper {
+    display: flex;
+    min-height: calc(100vh - 70px); /* adjust if header height changes */
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 260px;
+    background: #0f172a;
+    padding-top: 20px;
+}
+
+.admin-sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 25px;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.admin-sidebar a:hover,
+.admin-sidebar a.active {
+    background: rgba(79, 70, 229, 0.3);
+    color: #ffffff;
+}
+
+/* ================= MAIN CONTENT ================= */
+
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    background: #020617;  /* DARK background */
+    color: #ffffff;
+}
+
+/* Footer always bottom */
+.admin-main footer {
+    margin-top: auto;
+}
+
+/* ================= CARDS ================= */
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+}
+
+/* Sidebar collapse */
+.admin-sidebar.collapsed {
+    width: 80px;
+}
+
+.admin-sidebar.collapsed span {
+    display: none;
+}
+
+.admin-wrapper.collapsed .admin-main {
+    margin-left: 0;
+}
+
+/* Mobile */
+@media (max-width: 992px) {
+    .admin-sidebar {
+        position: fixed;
+        left: -260px;
+        height: 100vh;
+        z-index: 1000;
+        transition: 0.3s ease;
+    }
+
+    .admin-sidebar.mobile-show {
+        left: 0;
+    }
+}

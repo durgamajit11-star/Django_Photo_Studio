@@ -7,20 +7,21 @@
     padding: 60px 40px 30px;
     margin-top: 60px;
     overflow: hidden;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: none; /* remove old border */
     z-index: 50;
     width: 100%;
 }
 
-/* Top Gradient Line */
+/* BLUE TOP LINE */
 .footer::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background: linear-gradient(to right, #4f46e5, #06b6d4);
+    height: 5px;
+    background: #0ea5e9 !important;  /* Force Blue */
+    z-index: 999;
 }
 
 /* Footer Grid */
