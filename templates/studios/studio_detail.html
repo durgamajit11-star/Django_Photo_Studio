@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ studio.studio_name }} - StudioSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-hero {
+        height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+    }
+    .info-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .stat {
+        text-align: center;
+        padding: 20px;
+    }
+    .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1, #06b6d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+        color: #cbd5e1;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="studio-wrapper">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="studio-main">
+        <div class="container-fluid">
+            <!-- BACK BUTTON -->
+            <a href="{% url 'studios:studio_list' %}" class="btn btn-outline-secondary mb-4">
+                <i class="bi bi-arrow-left"></i> Back to Studios
+            </a>
+
+            <!-- HERO IMAGE -->
+            {% if studio.profile_image %}
+                <img src="{{ studio.profile_image.url }}" class="detail-hero w-100 mb-4" alt="{{ studio.studio_name }}">
+            {% else %}
+                <div class="detail-hero w-100 mb-4 bg-secondary d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image" style="font-size: 5rem; color: rgba(255,255,255,0.2);"></i>
+                </div>
+            {% endif %}
+
+            <!-- STUDIO INFO -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 class="display-5 mb-2">{{ studio.studio_name }}</h1>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-geo-alt"></i> {{ studio.location }}
+                    </p>
+                    <p class="lead">{{ studio.description }}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="stat">
+                                    <div class="stat-number">{{ avg_rating|floatformat:1 }}</div>
+                                    <div class="stat-label">Rating</div>
+                                    <div class="text-warning" style="margin-top: 5px;">
+                                        {% for i in "12345" %}
+                                            {% if i <= avg_rating %}
+                                                ⭐
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat">
+                                    <div class="stat-number">{{ total_reviews }}</div>
+                                    <div class="stat-label">Reviews</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'studios:book_studio' studio.id %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-calendar-check"></i> Book Now
+                        </a>
+                        <a href="{% url 'studios:add_review' studio.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-chat-left-quote"></i> Write Review
+                        </a>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100 mb-2">
+                        <i class="bi bi-calendar-check"></i> Login to Book
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="portfolio-tab" data-bs-toggle="tab" href="#portfolio" role="tab">
+                        <i class="bi bi-image"></i> Portfolio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab">
+                        <i class="bi bi-star"></i> Reviews
+                    </a>
+                </li>
+            </ul>
+
+            <!-- TAB CONTENT -->
+            <div class="tab-content">
+                <!-- PORTFOLIO TAB -->
+                <div class="tab-pane fade show active" id="portfolio" role="tabpanel">
+                    {% if portfolios %}
+                    <div class="row g-3">
+                        {% for portfolio in portfolios %}
+                        <div class="col-md-4">
+                            <div class="card h-100 overflow-hidden">
+                                <img src="{{ portfolio.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                {% if portfolio.caption %}
+                                <div class="card-body">
+                                    <p class="card-text">{{ portfolio.caption }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No portfolio items yet.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- REVIEWS TAB -->
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="info-card mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-0">{{ review.user.get_full_name|default:review.user.username }}</h6>
+                                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge bg-warning text-dark">
+                                    {% for i in "12345" %}
+                                        {% if i <= review.rating %}⭐{% else %}☆{% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No reviews yet. Be the first to review!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% include 'includes/footer.html' %}
+    </main>
+</div>
+{% endblock %}

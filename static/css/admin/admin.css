@@ -92,3 +92,39 @@
         left: 0;
     }
 }
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 992px) {
+    .admin-main {
+        padding: 100px 25px 25px 25px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .admin-sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+    }
+
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .admin-main {
+        margin-left: 0;
+        padding: 100px 20px 20px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-header-content {
+        padding: 0 15px;
+    }
+
+    .admin-main {
+        padding: 90px 15px 15px 15px;
+    }
+}

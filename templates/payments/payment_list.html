@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payments - StudioSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    .payment-status {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+    .status-completed { background: #22c55e; color: #fff; }
+    .status-pending { background: #eab308; color: #000; }
+    .status-failed { background: #ef4444; color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="studio-wrapper">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="studio-main">
+        <div class="container-fluid">
+            <h1 class="h3 mb-4">Payment History</h1>
+
+            <!-- Summary -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Total Paid</p>
+                                <h4 class="mb-0">${{ total_payments }}</h4>
+                            </div>
+                            <i class="bi bi-credit-card" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments List -->
+            {% if payments %}
+                {% for payment in payments %}
+                <div class="payment-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-2">Booking #{{ payment.booking.id }}</h5>
+                            <p class="text-muted mb-1">
+                                <i class="bi bi-building"></i> {{ payment.booking.studio.studio_name }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-calendar"></i> {{ payment.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <h5>${{ payment.amount }}</h5>
+                            <span class="payment-status status-{{ payment.status|lower }}">
+                                {{ payment.status }}
+                            </span>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <p class="small text-muted mb-2">{{ payment.payment_method }}</p>
+                            {% if payment.transaction_id %}
+                            <p class="small text-muted mb-2">ID: {{ payment.transaction_id }}</p>
+                            {% endif %}
+                            <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-sm btn-outline-primary">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="alert alert-info text-center py-5">
+                <h5><i class="bi bi-inbox"></i> No payments yet</h5>
+                <p>Your payments will appear here once you make a booking.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        {% include 'includes/footer.html' %}
+    </main>
+</div>
+{% endblock %}

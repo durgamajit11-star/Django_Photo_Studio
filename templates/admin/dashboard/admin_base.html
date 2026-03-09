@@ -16,27 +16,37 @@
             <i class="bi bi-shield-lock"></i> Admin Panel
         </div>
 
-      <div class="admin-header-content">
-    <div class="d-flex align-items-center">
-        <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-3">
-            <i class="bi bi-list"></i>
-        </button>
-        <div class="admin-logo">
-            <i class="bi bi-shield-lock-fill me-2"></i>
-            StudioSync Admin
+        <div class="admin-header-content">
+            <div class="d-flex align-items-center">
+
+                <nav class="header-nav">
+                    <span class="welcome-text">Welcome, <strong>{{ user.username }}</strong></span>
+                    <a href="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Logout
+                        </button>
+                    </a>
+
+                </nav>
+
+                <!-- <div class="admin-logo">
+                    <i class="bi bi-shield-lock-fill me-2"></i>
+                    StudioSync Admin
+                </div> -->
+            </div>
         </div>
-    </div>
-    </div>
 </header>
 
 <div class="admin-wrapper">
 
-     <!-- ===== SIDEBAR ===== -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="admin-sidebar" id="adminSidebar">
 
         <a href="#" onclick="toggleAdminSidebar()">
-            <i class="bi bi-list fs-4"></i>
-            <span>Menu</span>
+            <button id="sidebarToggle" class="btn btn-sm btn-outline-light me-3">
+                <i class="bi bi-list"></i>
+            </button>
         </a>
 
         <a href="{% url 'admin_dashboard' %}"

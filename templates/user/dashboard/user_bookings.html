@@ -15,16 +15,90 @@
     <!-- BOOKINGS CONTAINER -->
     <div class="bookings-container">
         
-        <!-- TABS -->
-        <div class="bookings-tabs">
-            <button class="tab-btn active" onclick="filterBookings('all')">All Bookings</button>
-            <button class="tab-btn" onclick="filterBookings('upcoming')">Upcoming</button>
-            <button class="tab-btn" onclick="filterBookings('completed')">Completed</button>
-            <button class="tab-btn" onclick="filterBookings('cancelled')">Cancelled</button>
+        {% if messages %}
+        <div class="alert alert-success alert-dismissible fade show">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+        {% endif %}
 
         <!-- BOOKINGS LIST -->
         <div class="bookings-list">
+            {% if bookings %}
+                {% for booking in bookings %}
+                <!-- BOOKING CARD -->
+                <div class="booking-card" data-status="{{ booking.status|lower }}">
+                    <div class="booking-header">
+                        <div class="booking-title">
+                            <h3>{{ booking.studio.studio_name }} - {{ booking.event_type }}</h3>
+                            <span class="badge badge-{{ booking.status|lower }}">{{ booking.status }}</span>
+                        </div>
+                        <div class="booking-price">${{ booking.amount }}</div>
+                    </div>
+
+                    <div class="booking-details">
+                        <div class="detail-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <div>
+                                <span class="label">Location</span>
+                                <p>{{ booking.location|default:booking.studio.location }}</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <i class="bi bi-calendar-event"></i>
+                            <div>
+                                <span class="label">Date & Time</span>
+                                <p>{{ booking.date|date:"M d, Y" }} {% if booking.time %}at {{ booking.time }}{% endif %}</p>
+                            </div>
+                        </div>
+
+                        {% if booking.duration_hours %}
+                        <div class="detail-item">
+                            <i class="bi bi-hourglass-split"></i>
+                            <div>
+                                <span class="label">Duration</span>
+                                <p>{{ booking.duration_hours }} hours</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="detail-item">
+                            <i class="bi bi-credit-card"></i>
+                            <div>
+                                <span class="label">Payment Status</span>
+                                <span class="badge {% if booking.payment_status == 'Paid' %}bg-success{% else %}bg-warning{% endif %}">{{ booking.payment_status }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-primary">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                        {% if booking.status == 'Pending' %}
+                        <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-danger" onclick="return confirm('Cancel this booking?')">
+                            Cancel Booking
+                        </a>
+                        {% endif %}
+                        {% if booking.payment_status == 'Unpaid' and booking.status != 'Cancelled' %}
+                        <a href="{% url 'payments:create_payment' booking.id %}" class="btn btn-success">
+                            <i class="bi bi-credit-card"></i> Pay Now
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="alert alert-info text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                <h5 class="mt-3">No bookings yet</h5>
+                <p>Start by browsing and booking studios!</p>
+                <a href="{% url 'studios:studio_list' %}" class="btn btn-primary mt-3">Browse Studios</a>
+            </div>
+            {% endif %}
             
             <!-- BOOKING CARD 1 -->
             <div class="booking-card" data-status="upcoming">

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book {{ studio.studio_name }} - StudioSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-form {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="studio-wrapper">
+    {% include 'includes/sidebar.html' %}
+
+    <main class="studio-main">
+        <div class="container">
+            <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-secondary mb-4">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <h1 class="h3 mb-4">Book {{ studio.studio_name }}</h1>
+                    
+                    <div class="booking-form">
+                        <form method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Event Type</label>
+                                <input type="text" name="event_type" class="form-control form-control-lg" 
+                                       placeholder="e.g., Wedding, Portrait Session, Product Photography" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Event Date</label>
+                                <input type="date" name="date" class="form-control form-control-lg" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Budget (Amount)</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" name="amount" class="form-control" 
+                                           placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle"></i> Create Booking
+                                </button>
+                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-secondary">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'includes/footer.html' %}
+    </main>
+</div>
+{% endblock %}

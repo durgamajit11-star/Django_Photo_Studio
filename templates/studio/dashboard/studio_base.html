@@ -64,6 +64,12 @@
             <i class="bi bi-star-half"></i>
             <span>Reviews</span>
         </a>
+        <!-- PROFILE -->
+        <a href="{% url 'user_profile' %}"
+            class="menu-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
+            <i class="bi bi-person-circle"></i>
+            <span>Profile Settings</span>
+        </a>
 
         <a href="{% url 'logout' %}">
             <i class="bi bi-box-arrow-right"></i>
@@ -81,7 +87,7 @@
         {% endblock %}
         <!-- Footer aligned with content -->
         {% include "includes/footer.html" %}
-        
+
     </main>
 
     <!-- Global Chatbot -->

@@ -1,3 +1,3 @@
 from django.contrib import admin
 
-# Register your models here.
+# Studio-related models are registered in the studios app admin

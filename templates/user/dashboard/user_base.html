@@ -24,7 +24,8 @@
     <!-- HEADER -->
     <header class="top-header glass">
         <div class="header-content">
-            <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleSidebar()" title="Toggle Menu">
+            <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleSidebar()"
+                title="Toggle Menu">
                 <i class="bi bi-list"></i>
             </button>
             <div class="logo">
@@ -35,99 +36,99 @@
                 <button class="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
                     <i class="bi bi-moon-stars"></i>
                 </button>
-                <a href="{% url 'logout' %}" >
-                     {% csrf_token %}
+                <a href="{% url 'logout' %}">
+                    {% csrf_token %}
                     <button type="submit" class="btn btn-danger btn-sm">
-            Logout
-        </button>
+                        Logout
+                    </button>
                 </a>
 
             </nav>
         </div>
     </header>
     <div class="dashboard-wrapper">
-       <!-- ================= USER SIDEBAR ================= -->
-<aside class="sidebar" id="sidebar">
+        <!-- ================= USER SIDEBAR ================= -->
+        <aside class="sidebar" id="sidebar">
 
-    <div class="sidebar-header">
-        <span class="sidebar-title">📸 StudioSync</span>
-        <button class="sidebar-close" onclick="toggleSidebar()" title="Close Sidebar">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
+            <div class="sidebar-header">
+                <span class="sidebar-title">📸 StudioSync</span>
+                <button class="sidebar-close" onclick="toggleSidebar()" title="Close Sidebar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
 
-    <nav class="sidebar-menu">
+            <nav class="sidebar-menu">
 
-        <!-- DASHBOARD -->
-        <a href="{% url 'user_dashboard' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
-            <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
-        </a>
+                <!-- DASHBOARD -->
+                <a href="{% url 'user_dashboard' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
 
-        <!-- AI RECOMMENDATIONS -->
-        <a href="{% url 'user_recommendations' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_recommendations' %}active{% endif %}">
-            <i class="bi bi-stars"></i>
-            <span>AI Recommendations</span>
-        </a>
+                <!-- AI RECOMMENDATIONS -->
+                <a href="{% url 'user_recommendations' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_recommendations' %}active{% endif %}">
+                    <i class="bi bi-stars"></i>
+                    <span>AI Recommendations</span>
+                </a>
 
-        <!-- EXPLORE STUDIOS -->
-        <a href="{% url 'explore_studios' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'explore_studios' %}active{% endif %}">
-            <i class="bi bi-images"></i>
-            <span>Explore Studios</span>
-        </a>
+                <!-- EXPLORE STUDIOS -->
+                <a href="{% url 'explore_studios' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'explore_studios' %}active{% endif %}">
+                    <i class="bi bi-images"></i>
+                    <span>Explore Studios</span>
+                </a>
 
-        <!-- BOOKINGS -->
-        <a href="{% url 'user_bookings' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_bookings' %}active{% endif %}">
-            <i class="bi bi-calendar-check"></i>
-            <span>My Bookings</span>
-        </a>
+                <!-- BOOKINGS -->
+                <a href="{% url 'user_bookings' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_bookings' %}active{% endif %}">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>My Bookings</span>
+                </a>
 
-        <!-- REVIEWS -->
-        <a href="{% url 'user_reviews' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_reviews' %}active{% endif %}">
-            <i class="bi bi-star"></i>
-            <span>Reviews</span>
-        </a>
+                <!-- REVIEWS -->
+                <a href="{% url 'user_reviews' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_reviews' %}active{% endif %}">
+                    <i class="bi bi-star"></i>
+                    <span>Reviews</span>
+                </a>
 
-        <!-- PAYMENTS -->
-        <a href="{% url 'user_payments' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_payments' %}active{% endif %}">
-            <i class="bi bi-credit-card"></i>
-            <span>Payments</span>
-        </a>
+                <!-- PAYMENTS -->
+                <a href="{% url 'user_payments' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_payments' %}active{% endif %}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Payments</span>
+                </a>
 
-        <!-- NOTIFICATIONS -->
-        <a href="{% url 'user_notifications' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_notifications' %}active{% endif %}">
-            <i class="bi bi-bell"></i>
-            <span>Notifications</span>
-        </a>
+                <!-- NOTIFICATIONS -->
+                <a href="{% url 'user_notifications' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_notifications' %}active{% endif %}">
+                    <i class="bi bi-bell"></i>
+                    <span>Notifications</span>
+                </a>
 
-        <div class="menu-divider"></div>
+                <div class="menu-divider"></div>
 
-        <!-- PROFILE -->
-        <a href="{% url 'user_profile' %}"
-           class="menu-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
-            <i class="bi bi-person-circle"></i>
-            <span>Profile Settings</span>
-        </a>
+                <!-- PROFILE -->
+                <a href="{% url 'user_profile' %}"
+                    class="menu-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Profile Settings</span>
+                </a>
 
-        <!-- LOGOUT -->
-       <li class="nav-item">
-    <form action="{% url 'logout' %}" method="POST" class="d-inline">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger btn-sm">
-            Logout
-        </button>
-    </form>
-</li>
+                <!-- LOGOUT -->
+                <li class="nav-item">
+                    <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Logout
+                        </button>
+                    </form>
+                </li>
 
-    </nav>
-</aside>
+            </nav>
+        </aside>
         <div class="content-wrapper" id="contentWrapper">
             <!-- MAIN CONTENT -->
             <main class="main-content">
