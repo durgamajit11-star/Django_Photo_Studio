@@ -19,14 +19,15 @@
 
     body {
         min-height: 100vh;
+        margin: 0;
         font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, var(--dark-bg), var(--dark-bg-2));
+        background-position: center;
+        background: linear-gradient(135deg, #020617, #0f172a);
+        overflow-x: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-light);
-        overflow-x: hidden;
-        position: relative;
+        color: #fff;
     }
 
     /* ================= FLOATING BLOBS ================= */
@@ -69,13 +70,13 @@
 
     .glass {
         background: var(--glass);
-        backdrop-filter: blur(30px);
+        backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(30px);
         border: 1px solid var(--border);
         border-radius: 24px;
         box-shadow:
             0 40px 80px rgba(0, 0, 0, 0.6),
-            inset 0 0 20px rgba(255, 255, 255, 0.05);
+            inset 0 0 20px rgba(6, 0, 0, 0.05);
         animation: fadeUp 0.8s ease;
     }
 
@@ -152,7 +153,7 @@
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.25);
-        color: white;
+        color: rgb(96, 94, 94);
         outline: none;
         transition: all 0.3s ease;
     }
@@ -196,6 +197,7 @@
         cursor: pointer;
         opacity: 0.7;
         transition: 0.2s;
+        color:rgb(90, 90, 246)
     }
 
     .toggle-password:hover {

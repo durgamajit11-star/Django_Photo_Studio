@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Explore Studios</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Segoe UI, sans-serif;
+            background: #020617;
+            color: white;
+        }
+
+        /* HEADER */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background: #020617;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .nav a {
+            margin-left: 25px;
+            text-decoration: none;
+            color: white;
+            font-size: 15px;
+        }
+
+        .nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* TITLE */
+
+        .page-title {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            color: #94a3b8;
+        }
+
+        .trending-section {
+            padding: 60px;
+        }
+
+        .trending-section h2 {
+            margin-bottom: 25px;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .studio-slider {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px;
+        }
+
+        .studio-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide-card {
+            min-width: 250px;
+            background: #0f172a;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+        }
+
+        .slide-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .slide-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .slide-card h4 {
+            margin: 10px;
+        }
+
+        .slide-card p {
+            margin: 0 10px 15px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 40%;
+            background: #38bdf8;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .slider-btn.left {
+            left: -20px;
+        }
+
+        .slider-btn.right {
+            right: -20px;
+        }
+
+        /* SEARCH */
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 30px;
+        }
+
+        .search-box input {
+            width: 400px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            outline: none;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            border: none;
+            background: #38bdf8;
+            color: white;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+        }
+
+        /* GRID */
+
+        .studio-container {
+            max-width: 1300px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        /* CARD */
+
+        .studio-card {
+            background: #0f172a;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .studio-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* IMAGE */
+
+        .studio-img {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .studio-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .studio-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* BODY */
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-body h3 {
+            margin: 0;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .location {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .rating {
+            color: #facc15;
+            margin: 6px 0;
+        }
+
+        .price {
+            color: #38bdf8;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            display: block;
+            text-align: center;
+            background: #38bdf8;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #0ea5e9;
+        }
+
+        /* FOOTER */
+        /* ===== Compact Premium Footer ===== */
+        footer {
+            background: #030712;
+            border-top: 1px solid rgba(0, 245, 255, 0.15);
+            padding: 40px 20px 20px;
+            /* reduced height */
+            font-size: 14px;
+            align-items:left;;
+            text-align: center;
+        }
+
+        /* Grid */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            /* reduced gap */
+        }
+
+        /* Headings */
+        .footer-grid h6 {
+            color: var(--neon);
+            font-size: 15px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        /* Links */
+        .footer-grid a {
+            display: block;
+            text-decoration: none;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            /* tighter spacing */
+            transition: 0.2s ease;
+            font-size: 13px;
+        }
+
+        .footer-grid a:hover {
+            color: var(--neon);
+            transform: translateX(3px);
+        }
+
+        /* Bottom copyright */
+        .footer-bottom {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <div class="header">
+        <div class="logo">StudioSync</div>
+
+        <div class="nav">
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="#">Studios</a>
+            <a href="{% url 'auth_page' %}">Login</a>
+            <a href="{% url 'auth_page' %}">Signup</a>
+        </div>
+    </div>
+
+    <!-- TITLE -->
+
+    <div class="page-title">
+        <h1>Explore Photography Studios</h1>
+        <p>Find the perfect studio for your photoshoot</p>
+    </div>
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+        <input type="text" placeholder="Search city or studio name...">
+        <button>Search</button>
+    </div>
+
+    <section class="trending-section">
+
+        <h2>🔥 Trending Studios</h2>
+
+        <div class="slider-wrapper">
+
+            <button class="slider-btn left" onclick="scrollSlider(-1)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="studio-slider" id="studioSlider">
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd">
+                    <h4>Dream Lens Studio</h4>
+                    <p>Nagpur • ₹2500</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7">
+                    <h4>Pixel Perfect</h4>
+                    <p>Mumbai • ₹3500</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32">
+                    <h4>Royal Capture</h4>
+                    <p>Pune • ₹3000</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+                    <h4>Golden Frame</h4>
+                    <p>Delhi • ₹2800</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e">
+                    <h4>Magic Moments</h4>
+                    <p>Bangalore • ₹3200</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0">
+                    <h4>Urban Shot</h4>
+                    <p>Hyderabad • ₹2600</p>
+                </div>
+
+                <div class="slide-card">
+                    <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4">
+                    <h4>Perfect Click</h4>
+                    <p>Chennai • ₹3000</p>
+                </div>
+
+            </div>
+
+            <button class="slider-btn right" onclick="scrollSlider(1)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- STUDIO GRID -->
+
+    <div class="studio-container">
+
+        <!-- 1 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd">
+            </div>
+            <div class="card-body">
+                <h3>Dream Lens Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Nagpur</div>
+                <div class="rating">★★★★★</div>
+                <div class="price">Starting ₹2500</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7">
+            </div>
+            <div class="card-body">
+                <h3>Pixel Perfect Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Mumbai</div>
+                <div class="rating">★★★★☆</div>
+                <div class="price">Starting ₹3500</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32">
+            </div>
+            <div class="card-body">
+                <h3>Royal Capture</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Pune</div>
+                <div class="rating">★★★★★</div>
+                <div class="price">Starting ₹3000</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+            </div>
+            <div class="card-body">
+                <h3>Golden Frame Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Delhi</div>
+                <div class="rating">★★★★☆</div>
+                <div class="price">Starting ₹2800</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e">
+            </div>
+            <div class="card-body">
+                <h3>Magic Moments</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Bangalore</div>
+                <div class="rating">★★★★★</div>
+                <div class="price">Starting ₹3200</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0">
+            </div>
+            <div class="card-body">
+                <h3>Urban Shot Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Hyderabad</div>
+                <div class="rating">★★★★☆</div>
+                <div class="price">Starting ₹2600</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4">
+            </div>
+            <div class="card-body">
+                <h3>Perfect Click Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Chennai</div>
+                <div class="rating">★★★★★</div>
+                <div class="price">Starting ₹3000</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42">
+            </div>
+            <div class="card-body">
+                <h3>Infinity Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Kolkata</div>
+                <div class="rating">★★★★☆</div>
+                <div class="price">Starting ₹2700</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07">
+            </div>
+            <div class="card-body">
+                <h3>Focus Point Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Jaipur</div>
+                <div class="rating">★★★★★</div>
+                <div class="price">Starting ₹2900</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="studio-card">
+            <div class="studio-img">
+                <img src="https://images.unsplash.com/photo-1487412912498-0447578fcca8">
+            </div>
+            <div class="card-body">
+                <h3>Light House Studio</h3>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Ahmedabad</div>
+                <div class="rating">★★★★☆</div>
+                <div class="price">Starting ₹3100</div>
+                <a href="#" class="btn">View Studio</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h6>Platform</h6>
+                    <a href="#">About</a>
+                    <a href="#how_ai_works">How It Works</a>
+                    <a href="#">Blog</a>
+                </div>
+
+                <div>
+                    <h6>Users</h6>
+                    <a href="#">Browse Studios</a>
+                    <a href="#">Sign Up</a>
+                    <a href="#">Login</a>
+                </div>
+                <div>
+                    <h6>Studios</h6>
+                    <a href="#">Register Studio</a>
+                    <a href="#">Pricing</a>
+                </div>
+                <div>
+                    <h6>Legal</h6>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Refund</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                © 2026 StudioSync AI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        function scrollSlider(direction) {
+
+            const slider = document.getElementById("studioSlider");
+
+            const card = slider.querySelector(".slide-card");
+
+            const scrollAmount = card.offsetWidth + 20;
+
+            slider.scrollBy({
+                left: direction * scrollAmount,
+                behavior: "smooth"
+            });
+
+        }
+
+    </script>
+    <script>
+        function scrollSlider(direction) {
+
+            const slider = document.getElementById("studioSlider");
+
+            slider.scrollBy({
+                left: direction * 300,
+                behavior: "smooth"
+            });
+
+        }
+    </script>
+</body>
+
+</html>

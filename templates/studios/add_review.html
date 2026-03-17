@@ -12,25 +12,30 @@
         border-radius: 15px;
         padding: 30px;
     }
+
     .rating-input {
         display: flex;
         gap: 10px;
         font-size: 2rem;
     }
+
     .rating-input input {
         display: none;
     }
+
     .rating-input label {
         cursor: pointer;
         transition: all 0.2s;
         opacity: 0.5;
     }
+
     .rating-input label:hover {
         opacity: 1;
         transform: scale(1.2);
     }
-    .rating-input input:checked ~ label,
-    .rating-input label:hover ~ label {
+
+    .rating-input input:checked~label,
+    .rating-input label:hover~label {
         opacity: 1;
     }
 </style>
@@ -50,24 +55,24 @@
                 <div class="col-md-8 mx-auto">
                     <h1 class="h3 mb-4">
                         {% if existing_review %}
-                            Update Your Review
+                        Update Your Review
                         {% else %}
-                            Write a Review
+                        Write a Review
                         {% endif %}
                     </h1>
-                    
+
                     <div class="review-form">
                         <h5 class="mb-3">{{ studio.studio_name }}</h5>
 
                         <form method="POST">
                             {% csrf_token %}
-                            
+
                             <div class="mb-4">
                                 <label class="form-label">Rating</label>
                                 <div class="rating-input">
                                     {% for i in "54321" %}
-                                    <input type="radio" name="rating" value="{{ i }}" id="rating{{ i }}"
-                                           {% if existing_review.rating == i %}checked{% endif %}>
+                                    <input type="radio" name="rating" value="{{ i }}" id="rating{{ i }}" {% if
+                                        existing_review.rating==i %}checked{% endif %}>
                                     <label for="rating{{ i }}">⭐</label>
                                     {% endfor %}
                                 </div>
@@ -75,14 +80,14 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Your Review</label>
-                                <textarea name="comment" class="form-control form-control-lg" rows="5" 
-                                          placeholder="Share your experience with this studio..."
-                                          required>{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
+                                <textarea name="comment" class="form-control form-control-lg" rows="5"
+                                    placeholder="Share your experience with this studio..."
+                                    required>{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
                             </div>
 
                             <div class="d-grid gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-check-circle"></i> 
+                                    <i class="bi bi-check-circle"></i>
                                     {% if existing_review %}Update Review{% else %}Post Review{% endif %}
                                 </button>
                                 <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-secondary">

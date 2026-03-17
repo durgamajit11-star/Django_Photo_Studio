@@ -1,0 +1,378 @@
+
+<head>
+    <meta charset="UTF-8">
+    <title>Studio Booking Payment</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ================= ROOT COLORS (MATCH YOUR PROJECT) ================= */
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #06b6d4;
+            --dark-bg: #020617;
+            --dark-bg-2: #0f172a;
+            --border: #334155;
+            --text: #ffffff;
+        }
+
+        /* ================= GLOBAL ================= */
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text);
+            font-family: Segoe UI;
+            padding: 40px;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .payment-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        /* ================= LEFT SUMMARY ================= */
+
+        .payment-summary {
+            width: 320px;
+            background: var(--dark-bg-2);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .summary-item {
+            margin-bottom: 20px;
+        }
+
+        .service {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .service input {
+            margin-right: 6px;
+        }
+
+        .total-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #020617;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .total-box h3 {
+            color: var(--secondary);
+        }
+
+        /* ================= RIGHT PAYMENT ================= */
+
+        .payment-form {
+            flex: 1;
+            background: var(--dark-bg-2);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        /* ================= PAYMENT METHOD ================= */
+
+        .method-box {
+            background: #020617;
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .method-box:hover {
+            border-color: var(--primary);
+        }
+
+        .qr-box {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ================= INPUTS ================= */
+
+        .form-control {
+            background: #020617;
+            border: 1px solid var(--border);
+            color: white;
+        }
+
+        .form-control:focus {
+            background: #020617;
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+
+        /* ================= SUMMARY BOX ================= */
+
+        .summary-box {
+            background: #020617;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .pay-btn {
+            background: var(--primary);
+            border: none;
+            padding: 12px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .pay-btn:hover {
+            background: #4f46e5;
+        }
+
+        /* ================= SUCCESS SCREEN ================= */
+
+        .success-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-card {
+            background: var(--dark-bg-2);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            animation: pop .4s ease;
+        }
+
+        .checkmark {
+            font-size: 60px;
+            color: #22c55e;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.5);
+                opacity: 0
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+    </style>
+
+</head>
+{% extends "user/dashboard/user_base.html" %}
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+
+    <div class="payment-container">
+
+        <!-- ================= LEFT SIDE SUMMARY ================= -->
+
+        <div class="payment-summary">
+
+            <h5>Payment Summary</h5>
+
+            <div class="summary-item">
+                <h6>Studio Slot</h6>
+                <p>Tue, 15 July 2026</p>
+                <p>10:00 AM - 12:00 PM</p>
+            </div>
+
+            <h6>Extra Services</h6>
+
+            <label class="service">
+                <input type="checkbox" class="service-check" data-price="500">
+                Extra Lighting (₹500)
+            </label>
+
+            <label class="service">
+                <input type="checkbox" class="service-check" data-price="1500">
+                Makeup Artist (₹1500)
+            </label>
+
+            <label class="service">
+                <input type="checkbox" class="service-check" data-price="2000">
+                Drone Camera (₹2000)
+            </label>
+
+            <label class="service">
+                <input type="checkbox" class="service-check" data-price="800">
+                Background Props (₹800)
+            </label>
+
+            <div class="summary-item mt-3">
+                <h6>Studio Location</h6>
+                <p>Nagpur Studio</p>
+            </div>
+
+            <div class="total-box">
+
+                <p>Total price</p>
+
+                <h3>₹<span id="finalTotal">3540</span></h3>
+
+                <small>Price includes GST</small>
+
+            </div>
+
+        </div>
+
+        <!-- ================= RIGHT SIDE PAYMENT ================= -->
+
+        <div class="payment-form">
+
+            <h5 class="mb-3">Payment Method</h5>
+
+            <div class="row mb-3">
+
+                <div class="col-6">
+                    <div class="method-box text-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/825/825454.png" width="50">
+                        <p>UPI</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= BOOKING SUMMARY ================= -->
+
+            <div class="summary-box">
+
+                <h6>Booking Summary</h6>
+
+                <div id="servicesList"></div>
+
+                <hr>
+
+                <p>Studio Slot: ₹<span id="slotPrice">3000</span></p>
+
+                <p>Subtotal: ₹<span id="subtotal">3000</span></p>
+
+                <p>GST (18%): ₹<span id="gst">540</span></p>
+
+                <h5>Total: ₹<span id="total">3540</span></h5>
+
+            </div>
+
+            <!-- ================= UPI PAYMENT ================= -->
+
+            <h6>UPI Payment</h6>
+
+            <div class="qr-box">
+
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=studio@upi"
+                    width="150">
+
+                <p class="mt-2">UPI ID: <b>studio@upi</b></p>
+
+            </div>
+
+            <input type="text" class="form-control mt-3" placeholder="Enter UPI Transaction ID">
+
+            <button class="pay-btn" onclick="showSuccess()">
+                Make Payment
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SUCCESS SCREEN ================= -->
+
+    <div id="successScreen" class="success-screen">
+
+        <div class="success-card">
+
+            <div class="checkmark">✓</div>
+
+            <h3>Payment Successful</h3>
+
+            <p>Your studio booking has been confirmed.</p>
+
+            <button class="btn btn-primary mt-3" onclick="location.reload()">Back to Home</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        /* ================= PRICE CALCULATION ================= */
+
+        const basePrice = 3000
+        const gstRate = 0.18
+
+        const services = document.querySelectorAll(".service-check")
+
+        services.forEach(service => {
+            service.addEventListener("change", calculateTotal)
+        })
+
+        function calculateTotal() {
+
+            let serviceTotal = 0
+            let servicesHTML = ""
+
+            services.forEach(service => {
+
+                if (service.checked) {
+
+                    let price = parseInt(service.dataset.price)
+
+                    serviceTotal += price
+
+                    servicesHTML += `<p>${service.parentElement.innerText}</p>`
+
+                }
+
+            })
+
+            document.getElementById("servicesList").innerHTML = servicesHTML
+
+            let subtotal = basePrice + serviceTotal
+
+            let gst = subtotal * gstRate
+
+            let total = subtotal + gst
+
+            document.getElementById("subtotal").innerText = subtotal.toFixed(0)
+
+            document.getElementById("gst").innerText = gst.toFixed(0)
+
+            document.getElementById("total").innerText = total.toFixed(0)
+
+            document.getElementById("finalTotal").innerText = total.toFixed(0)
+
+        }
+
+        /* ================= SUCCESS SCREEN ================= */
+
+        function showSuccess() {
+
+            document.getElementById("successScreen").style.display = "flex"
+
+        }
+
+    </script>
+
+{% endblock %}

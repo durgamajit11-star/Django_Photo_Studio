@@ -15,6 +15,17 @@ from studios.models import Studio, Portfolio, Review
 def landing_page(request):
     return render(request, "landing.html")
 
+
+def landing_explore_studio(request):
+    return render(request, "landing_explore_studio.html")
+
+
+def studio_payment(request):
+    return render(request, "user/dashboard/studio_payment.html")
+
+def studio_booking(request):
+    return render(request, "user/dashboard/studio_booking.html")
+
 @login_required
 @role_required(['USER'])
 def user_dashboard(request):

@@ -1,0 +1,325 @@
+{% extends "user/dashboard/user_base.html" %}
+{% load static %}
+
+{% block title %}Studio Booking{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ================= STEPPER ================= */
+.stepper{
+display:flex;
+justify-content:center;
+gap:30px;
+margin:40px 0 20px;
+}
+
+.step{
+padding:8px 18px;
+border-radius:20px;
+background:rgba(255,255,255,0.08);
+font-size:14px;
+}
+
+.step.active{
+background:#6366f1;
+}
+
+/* ================= CONTAINER ================= */
+
+.container{
+width:1100px;
+margin:20px auto;
+padding:40px;
+display:flex;
+gap:40px;
+border-radius:20px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+}
+
+/* LEFT FORM */
+
+.form-section{
+flex:2;
+}
+
+.section{
+display:none;
+}
+
+.section.active{
+display:block;
+}
+
+/* FORM */
+
+.form-group{
+margin-bottom:20px;
+display:flex;
+flex-direction:column;
+}
+
+label{
+margin-bottom:6px;
+font-size:14px;
+opacity:0.8;
+}
+
+input{
+padding:12px;
+border-radius:10px;
+border:none;
+background:rgba(255,255,255,0.08);
+color:#fff;
+}
+
+/* Slots */
+
+.slots{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+.slot{
+padding:8px 18px;
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.2);
+cursor:pointer;
+}
+
+.slot.available:hover{
+background:#6366f1;
+}
+
+.slot.booked{
+background:#7f1d1d;
+cursor:not-allowed;
+}
+
+.slot.selected{
+background:#06b6d4;
+}
+
+/* Buttons */
+
+.btn{
+padding:10px 22px;
+border:none;
+border-radius:25px;
+background:#6366f1;
+color:white;
+cursor:pointer;
+}
+
+.btn:hover{
+opacity:0.9;
+}
+
+/* SUMMARY */
+
+.summary{
+flex:1;
+padding:25px;
+border-radius:15px;
+background:rgba(255,255,255,0.05);
+}
+
+.summary-item{
+display:flex;
+justify-content:space-between;
+margin-bottom:8px;
+}
+
+.total{
+margin-top:15px;
+font-weight:600;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+.container{
+flex-direction:column;
+width:95%;
+}
+}
+
+</style>
+
+
+<!-- ================= STEPPER ================= -->
+
+<div class="stepper">
+<div class="step active">1. Booking Details</div>
+<div class="step">2. Confirmation</div>
+</div>
+
+
+<!-- ================= BOOKING CONTAINER ================= -->
+
+<div class="container">
+
+<!-- LEFT FORM -->
+
+<div class="form-section">
+
+<!-- STEP 1 -->
+
+<div class="section active" id="step1">
+
+<div class="form-group">
+<label>Select Date</label>
+<input type="date">
+</div>
+
+<label>Select Time Slot</label>
+
+<div class="slots">
+<div class="slot available">09:00 AM</div>
+<div class="slot available">12:00 PM</div>
+<div class="slot booked">03:00 PM</div>
+<div class="slot available">06:00 PM</div>
+</div>
+
+<div style="display:flex;justify-content:flex-end;">
+<button class="btn" onclick="nextStep()">Next</button>
+</div>
+
+</div>
+
+
+<!-- STEP 2 -->
+
+<div class="section" id="step2">
+
+<h3>Confirm Booking</h3>
+
+<p>Please review your booking before confirming.</p>
+
+<div style="display:flex;justify-content:space-between;margin-top:20px;">
+
+<button class="btn" onclick="prevStep()">Back</button>
+
+<a href="{% url 'studio_payment' %}" class="btn"  onclick="confirmBooking()" >Proceed to Payment</a>
+
+<button class="btn" onclick="cancelBooking()">Cancel</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+<h3>Booking Summary</h3>
+
+<div class="summary-item">
+<span>Base Package</span>
+<span>₹5000</span>
+</div>
+
+<div class="summary-item">
+<span>GST (18%)</span>
+<span>₹900</span>
+</div>
+
+<div class="summary-item total">
+<span>Total</span>
+<span>₹5900</span>
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* Step Control */
+
+let currentStep = 1;
+const totalSteps = 2;
+
+function showStep(step){
+
+document.querySelectorAll(".section").forEach(sec=>{
+sec.classList.remove("active");
+});
+
+document.querySelectorAll(".step").forEach(st=>{
+st.classList.remove("active");
+});
+
+document.getElementById("step"+step).classList.add("active");
+document.querySelectorAll(".step")[step-1].classList.add("active");
+
+}
+
+/* Next */
+
+function nextStep(){
+
+if(currentStep < totalSteps){
+
+currentStep++;
+showStep(currentStep);
+
+}
+
+}
+
+/* Back */
+
+function prevStep(){
+
+if(currentStep > 1){
+
+currentStep--;
+showStep(currentStep);
+
+}
+
+}
+
+/* Slot Selection */
+
+const slots=document.querySelectorAll(".slot.available");
+
+slots.forEach(slot=>{
+
+slot.addEventListener("click",()=>{
+
+slots.forEach(s=>s.classList.remove("selected"));
+
+slot.classList.add("selected");
+
+});
+
+});
+
+
+/* Confirm */
+
+function confirmBooking(){
+
+alert("Booking Confirmed Successfully 🎉");
+}
+
+/* Cancel */
+function cancelBooking(){
+if(confirm("Are you sure you want to cancel the booking?")){
+alert("Booking Cancelled");
+}
+}
+
+</script>
+
+{% endblock %}

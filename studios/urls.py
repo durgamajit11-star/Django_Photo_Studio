@@ -7,7 +7,7 @@ urlpatterns = [
     # ==================== PUBLIC STUDIO VIEWS ====================
     path('', views.studio_list, name='studio_list'),
     path('featured/', views.featured_studios, name='featured_studios'),
-    path('detail/<int:studio_id>/', views.studio_detail, name='studio_detail'),
+    path('studio/<int:studio_id>/', views.studio_detail, name='studio_detail'),
     path('portfolio/<int:studio_id>/', views.studio_portfolio, name='studio_portfolio'),
     path('reviews/<int:studio_id>/', views.studio_reviews, name='studio_reviews'),
     

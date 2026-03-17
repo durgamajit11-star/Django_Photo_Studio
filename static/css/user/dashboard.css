@@ -7,7 +7,9 @@
     --text-light: #ffffff;
     --glass: rgba(255, 255, 255, 0.12);
 }
-
+.p-color{
+    color: #06b6d4;
+}
 
 /* ===== GLOBAL ===== */
 * {
@@ -838,8 +840,8 @@ body::after {
     position: fixed;
     bottom: 100px;
     right: 30px;
-    width: 350px;
-    height: 500px;
+    width: 400px;
+    height: 450px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -880,7 +882,7 @@ body::after {
     background: rgba(255, 255, 255, 0.1);
     padding: 10px 15px;
     border-radius: 15px 15px 15px 5px;
-    max-width: 75%;
+    max-width: 65%;
 }
 
 .user-message {
@@ -888,7 +890,7 @@ body::after {
     background: linear-gradient(135deg, #4f46e5, #06b6d4);
     padding: 10px 15px;
     border-radius: 15px 15px 5px 15px;
-    max-width: 75%;
+    max-width: 65%;
 }
 
 .chat-input {
@@ -1979,6 +1981,9 @@ body::after {
 
 .btn-danger:hover {
     background: rgba(239, 68, 68, 0.3);
+}
+p{
+    color: #06b6d4;
 }
 
 /* MODAL */

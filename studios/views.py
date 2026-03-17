@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg, Q
 from django.core.paginator import Paginator
-from .models import Studio, Portfolio, Review
+from studios.models import Studio, Portfolio, Review
 from bookings.models import BookingRequest
 
 

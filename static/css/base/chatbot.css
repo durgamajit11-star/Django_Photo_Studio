@@ -40,8 +40,8 @@
     position: absolute;
     bottom: 80px;
     right: 0;
-    width: 360px;
-    height: 500px;
+    width: 480px;
+    height: 650px;
     background: rgba(15, 23, 42, 0.96);
     backdrop-filter: blur(18px);
     border-radius: 20px;

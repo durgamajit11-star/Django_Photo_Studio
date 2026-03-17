@@ -100,11 +100,19 @@
     .admin-main {
         padding: 100px 25px 25px 25px;
     }
+    .admin-wrapper {
+        transform: translateX(-100%);
+        width: 250px;
+    }
 }
 
 @media (max-width: 768px) {
 
     .admin-sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+    }
+    .admin-wrapper {
         transform: translateX(-100%);
         width: 250px;
     }

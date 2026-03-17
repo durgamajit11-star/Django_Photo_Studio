@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from dashboard.views import landing_page
+from dashboard.views import landing_page, landing_explore_studio
 
 urlpatterns = [
     path('', landing_page, name='landing'),   # 👈 ROOT URL
+    path('explore_studio', landing_explore_studio, name='landing_explore_studio'),   
+    
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('dashboard/', include('dashboard.urls')),
