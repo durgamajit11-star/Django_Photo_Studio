@@ -9,7 +9,7 @@ from datetime import datetime
 
 from accounts.models import CustomUser
 from studios.models import Studio, Portfolio, Review
-
+from django.db.models import Q 
 
 
 def landing_page(request):
@@ -67,8 +67,52 @@ def user_recommendations(request):
 @login_required
 @role_required(['USER'])
 def explore_studios(request):
-    featured_studios = Studio.objects.filter(is_featured=True)[:6]
-    context = {'featured_studios': featured_studios}
+    query = request.GET.get('q')
+    location = request.GET.get('location')
+    category = request.GET.get('category')
+    sort = request.GET.get('sort')
+
+    studios = Studio.objects.all()
+
+   # 🔍 SMART SEARCH (FIX)
+    if query:
+        studios = studios.filter(
+            Q(studio_name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(specializations__icontains=query)
+        )
+
+    # 📍 Location filter
+    if location:
+        studios = studios.filter(location__icontains=location)
+
+    # 🎯 Filter by category
+    if category:
+        studios = studios.filter(category__id=category)
+
+    # 🔥 Sorting options
+    if sort == 'rating':
+        studios = sorted(studios, key=lambda s: s.average_rating(), reverse=True)
+    elif sort == 'experience':
+        studios = studios.order_by('-experience_years')
+    elif sort == 'new':
+        studios = studios.order_by('-created_at')
+
+    # 🌟 Featured Studios
+    featured_studios = Studio.objects.filter(is_featured=True)
+
+    # 📂 Categories (for filter buttons)
+    from studios.models import Category
+    categories = Category.objects.all()
+
+    context = {
+        'studios': studios,
+        'featured_studios': featured_studios,
+        'categories': categories,
+        'selected_category': category,
+        'selected_sort': sort,
+    }
+
     return render(request, 'user/dashboard/explore_studios.html', context)
 
 
@@ -86,7 +130,8 @@ def user_reviews(request):
 def user_payments(request):
     from payments.models import Payment
     payments = Payment.objects.filter(user=request.user).order_by('-created_at')
-    context = {'payments': payments}
+    total_amount = sum(p.amount for p in payments if p.status == "Completed")
+    context = {'payments': payments, 'total_amount': total_amount }
     return render(request, 'user/dashboard/user_payments.html', context)
 
 
@@ -315,16 +360,38 @@ def admin_dashboard(request):
     return render(request, "admin/dashboard/admin_dashboard.html", context)
 
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 @login_required
 @role_required(['ADMIN'])
 def manage_users(request):
-    return render(request, "admin/dashboard/manage_users.html")
+    users = User.objects.filter(role='USER')   # ✅ only users
+    return render(request, "admin/dashboard/manage_users.html", {"users": users})
 
+
+from studios.models import Studio
 
 @login_required
 @role_required(['ADMIN'])
 def manage_studios(request):
-    return render(request, "admin/dashboard/manage_studios.html")
+    studios = Studio.objects.select_related('user')   # ✅ correct
+    return render(request, "admin/dashboard/manage_studios.html", {"studios": studios})
+
+
+def approve_studio(request, id):
+    studio = Studio.objects.get(id=id)
+    studio.is_active = True
+    studio.save()
+    return redirect('manage_studios')
+
+
+def reject_studio(request, id):
+    studio = Studio.objects.get(id=id)
+    studio.delete()
+    return redirect('manage_studios')
+
 
 
 @login_required

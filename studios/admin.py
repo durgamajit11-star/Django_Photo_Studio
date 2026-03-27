@@ -1,4 +1,5 @@
 from django.contrib import admin
+from requests import request
 from .models import Studio, Portfolio, Review
 
 
@@ -26,6 +27,9 @@ class StudioAdmin(admin.ModelAdmin):
         return obj.total_bookings()
     total_bookings.short_description = "Total Bookings"
 
+    def get_queryset(self, request):
+        return super().get_queryset(request)
+
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
@@ -49,3 +53,4 @@ class ReviewAdmin(admin.ModelAdmin):
         ('Review Information', {'fields': ('user', 'studio', 'rating', 'comment')}),
         ('Timestamps', {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)}),
     )
+

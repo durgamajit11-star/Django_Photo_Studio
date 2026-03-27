@@ -93,6 +93,7 @@ class UserUpdateForm(forms.ModelForm):
 from django.contrib.auth.forms import AuthenticationForm
 
 
+# ================= LOGIN FORM =================
 class StyledAuthenticationForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
@@ -100,12 +101,14 @@ class StyledAuthenticationForm(AuthenticationForm):
 
         self.fields['username'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': ' ',
-            'autocomplete': 'off'
+            'placeholder': ' ',   # 🔥 required for floating label
+            'required': True,
+            'autocomplete': 'username'
         })
 
         self.fields['password'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': ' ',
-            'autocomplete': 'off'
+            'placeholder': ' ',   # 🔥 required
+            'required': True,
+            'autocomplete': 'current-password'
         })

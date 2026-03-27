@@ -33,7 +33,7 @@
     <div class="col-md-3">
         <div class="stat-card">
             <h6>Total Revenue</h6>
-            <h3>${{ total_revenue }}</h3>
+            <h3>0.0{{ total_revenue }}</h3>
             <p class="text-primary small">Confirmed payments</p>
         </div>
     </div>
@@ -41,11 +41,32 @@
 
 <div class="card bg-dark text-light p-4 rounded-4">
     <h5 class="mb-3">Platform Overview</h5>
-    <p>
+    <p style="color: rgb(138, 138, 249);">
         The admin panel provides centralized control over users, studios,
         bookings, and payment analytics. Use the sidebar to manage
         platform operations efficiently.
     </p>
 </div>
+
+<!-- Chart.js -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="myChart" style="margin-top:30px;"></canvas>
+
+<script>
+const ctx = document.getElementById('myChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Users', 'Studios', 'Bookings'],
+        datasets: [{
+            label: 'Count',
+            data: [4, 2, 0],
+            borderWidth: 1
+        }]
+    }
+});
+</script> -->
 
 {% endblock %}

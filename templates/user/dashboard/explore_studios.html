@@ -5,71 +5,170 @@
 {% block content %}
 
 <div class="container-fluid">
+
+    <!-- Header -->
     <div class="row mb-4">
         <div class="col-md-12">
             <h3 class="fw-bold">🎥 Explore Studios</h3>
-            <p style="color: rgb(114, 136, 236);">Discover top-rated photography studios</p>
+            <p style="color: rgb(114, 136, 236);">
+                Discover top-rated photography studios
+            </p>
         </div>
     </div>
 
-    <!-- Featured Studios -->
+    <!-- 🔍 Search + Filters -->
+    <form method="GET" class="row g-2 mb-4">
+
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control"
+                   placeholder="Search studios..."
+                   value="{{ request.GET.q }}">
+        </div>
+
+        <div class="col-md-3">
+            <input type="text" name="location" class="form-control"
+                   placeholder="Location..."
+                   value="{{ request.GET.location }}">
+        </div>
+
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
+                <option value="">Sort By</option>
+                <option value="rating">Top Rated</option>
+                <option value="experience">Most Experienced</option>
+                <option value="new">Newest</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Apply
+            </button>
+        </div>
+
+    </form>
+
+    <!-- 🎯 Categories -->
+    <div class="mb-4">
+        <h5>Categories</h5>
+        {% for cat in categories %}
+        <a href="?category={{ cat.id }}"
+           class="btn btn-outline-info btn-sm m-1">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- 🌟 Featured Studios -->
+    <h4 class="fw-bold mb-3">🌟 Featured Studios</h4>
+
     <div class="row g-4">
         {% for studio in featured_studios %}
         <div class="col-md-4">
-            <div class="card bg-dark text-light border-0 shadow-sm overflow-hidden">
+
+            <div class="card bg-dark text-light border-0 shadow-sm">
+
                 {% if studio.profile_image %}
-                <img src="{{ studio.profile_image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <img src="{{ studio.profile_image.url }}"
+                     style="height:200px; object-fit:cover;">
                 {% else %}
-                <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" class="d-flex align-items-center justify-content-center">
-                    <i class="bi bi-camera-fill text-light" style="font-size: 3rem;"></i>
+                <div style="height:200px; background: linear-gradient(135deg,#667eea,#764ba2);"
+                     class="d-flex align-items-center justify-content-center">
+                    <i class="bi bi-camera-fill fs-1"></i>
                 </div>
                 {% endif %}
-                
+
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title mb-0">{{ studio.studio_name }}</h5>
+
+                    <div class="d-flex justify-content-between">
+                        <h5>{{ studio.studio_name }}</h5>
+
                         {% if studio.is_verified %}
-                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Verified</span>
+                        <span class="badge bg-success">✔ Verified</span>
                         {% endif %}
                     </div>
-                    
-                    <p class="text-muted small mb-2">
-                        <i class="bi bi-geo-alt"></i> {{ studio.city }}, {{ studio.state }}
+
+                    <p>
+                        📍 {{ studio.location }}
                     </p>
-                    
-                    <p class="small mb-2">
-                        <strong>Specialization:</strong><br>
-                        {% for spec in studio.specializations.all %}
-                        <span class="badge bg-secondary">{{ spec }}</span>
-                        {% endfor %}
+
+                    <p class="small">
+                        {{ studio.specializations }}
                     </p>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <div class="d-flex justify-content-between mb-2">
                         <span class="text-warning">
-                            <i class="bi bi-star-fill"></i> {{ studio.average_rating|default:"0" }}/5
+                            ⭐ {{ studio.average_rating|floatformat:1 }}
                         </span>
-                        <span class="text-muted small">{{ studio.experience_years }}+ years</span>
+                        <span class="small">
+                            {{ studio.experience_years }} yrs
+                        </span>
                     </div>
-                    
-                    <p class="small mb-3">
-                        <strong>Price Range:</strong> ${{ studio.price_min }} - ${{ studio.price_max }}
+
+                    <p class="small">
+                        💰 {{ studio.price_range }}
                     </p>
-                    
-                    <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-primary w-100">
-                        <i class="bi bi-eye"></i> View Studio
+
+                    <a href="{% url 'studios:studio_detail' studio.id %}"
+                       class="btn btn-primary w-100">
+                        View Studio
                     </a>
+
                 </div>
             </div>
+
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center py-5">
-                <i class="bi bi-camera" style="font-size: 2rem;"></i>
-                <p class="mt-3">No featured studios available yet. Check back soon!</p>
-            </div>
-        </div>
+        <p>No featured studios</p>
         {% endfor %}
     </div>
+
+    <!-- 🏢 All Studios -->
+    <hr class="my-5">
+
+    <h4 class="fw-bold mb-3">🏢 All Studios</h4>
+
+    <div class="row g-4">
+        {% for studio in studios %}
+        <div class="col-md-3">
+
+            <div class="card bg-dark text-light border-0 h-100">
+
+                {% if studio.profile_image %}
+                <img src="{{ studio.profile_image.url }}"
+                     style="height:180px; object-fit:cover;">
+                {% endif %}
+
+                <div class="card-body">
+
+                    <h6>{{ studio.studio_name }}</h6>
+
+                    <p class="small text-muted">
+                        📍 {{ studio.location }}
+                    </p>
+
+                    <p class="text-warning small">
+                        ⭐ {{ studio.average_rating|floatformat:1 }}
+                    </p>
+
+                    <p class="small">
+                        💰 {{ studio.price_range }}
+                    </p>
+
+                    <a href="{% url 'studios:studio_detail' studio.id %}"
+                       class="btn btn-outline-light btn-sm w-100">
+                        View
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <p class="text-center">No studios found</p>
+        {% endfor %}
+    </div>
+
 </div>
 
 {% endblock %}

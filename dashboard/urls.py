@@ -38,6 +38,13 @@ urlpatterns = [
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/users/', views.manage_users, name='manage_users'),
     path('admin/studios/', views.manage_studios, name='manage_studios'),
+
+     # Approve Studio
+    path('admin/studios/approve/<int:id>/', views.approve_studio, name='approve_studio'),
+
+    # Reject Studio
+    path('admin/studios/reject/<int:id>/', views.reject_studio, name='reject_studio'),
+
     path('admin/bookings/', views.admin_bookings, name='admin_bookings'),
     path('admin/payments/', views.admin_payments, name='admin_payments'),
 ]

@@ -1,292 +1,259 @@
-    :root {
-        --primary: #6366f1;
-        --secondary: #06b6d4;
-        --accent: #8b5cf6;
-        --dark-bg: #020617;
-        --dark-bg-2: #0f172a;
-        --glass: rgba(255, 255, 255, 0.08);
-        --border: rgba(255, 255, 255, 0.18);
-        --text-light: #ffffff;
+:root {
+    --primary: #6366f1;
+    --secondary: #06b6d4;
+    --accent: #8b5cf6;
+    --dark-bg: #020617;
+    --dark-card: rgba(15, 23, 42, 0.65);
+    --border: rgba(255, 255, 255, 0.15);
+}
+
+/* ================= GLOBAL ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+
+    /* 🔥 Premium gradient background */
+    background: radial-gradient(circle at top left, #1e293b, #020617 60%);
+}
+
+/* ================= FLOATING LIGHT EFFECT ================= */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    animation: float 10s infinite alternate ease-in-out;
+}
+
+body::before {
+    background: rgba(99, 102, 241, 0.4);
+    top: -100px;
+    left: -100px;
+}
+
+body::after {
+    background: rgba(6, 182, 212, 0.4);
+    bottom: -100px;
+    right: -100px;
+}
+
+@keyframes float {
+    to {
+        transform: translateY(40px);
     }
+}
 
-    /* ================= GLOBAL ================= */
+/* ================= GLASS CARD ================= */
+.glass {
+    background: var(--dark-card);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    animation: fadeUp 0.7s ease;
+}
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+.form-container {
+    max-width: 720px;
+    width: 100%;
+    padding: 45px;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
     }
-
-    body {
-        min-height: 100vh;
-        margin: 0;
-        font-family: 'Segoe UI', sans-serif;
-        background-position: center;
-        background: linear-gradient(135deg, #020617, #0f172a);
-        overflow-x: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-    }
-
-    /* ================= FLOATING BLOBS ================= */
-
-    body::before,
-    body::after {
-        content: "";
-        position: fixed;
-        width: 500px;
-        height: 500px;
-        border-radius: 50%;
-        filter: blur(120px);
-        z-index: -1;
-        animation: float 18s infinite alternate ease-in-out;
-    }
-
-    body::before {
-        background: rgba(99, 102, 241, 0.5);
-        top: -150px;
-        left: -150px;
-    }
-
-    body::after {
-        background: rgba(6, 182, 212, 0.5);
-        bottom: -150px;
-        right: -150px;
-    }
-
-    @keyframes float {
-        from {
-            transform: translateY(0px);
-        }
-
-        to {
-            transform: translateY(40px);
-        }
-    }
-
-    /* ================= GLASS CONTAINER ================= */
-
-    .glass {
-        background: var(--glass);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(30px);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        box-shadow:
-            0 40px 80px rgba(0, 0, 0, 0.6),
-            inset 0 0 20px rgba(6, 0, 0, 0.05);
-        animation: fadeUp 0.8s ease;
-    }
-
-    .form-container {
-        max-width: 720px;
-        width: 100%;
-        padding: 50px;
-    }
-
-    /* ================= ANIMATION ================= */
-
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* ================= TITLE ================= */
-
-    .form-container h2 {
-        font-weight: 700;
-        font-size: 28px;
-        letter-spacing: 1px;
-    }
-
-    /* ================= ROLE BUTTONS ================= */
-
-    .role-selection {
-        display: flex;
-        justify-content: center;
-        gap: 14px;
-        margin: 30px 0;
-        flex-wrap: wrap;
-    }
-
-    .role-btn {
-        padding: 10px 24px;
-        border-radius: 50px;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        transition: all 0.3s ease;
-        font-size: 14px;
-        cursor: pointer;
-    }
-
-    .role-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-2px);
-    }
-
-    .role-btn.active {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border: none;
-        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.6);
-    }
-
-    /* ================= MODERN LOGIN INPUT ================= */
-
-    .input-group-modern {
-        position: relative;
-        margin-bottom: 28px;
-    }
-
-    .input-group-modern input {
-        width: 100%;
-        padding: 16px 16px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: rgb(96, 94, 94);
-        outline: none;
-        transition: all 0.3s ease;
-    }
-
-    .input-group-modern input:focus {
-        border-color: var(--secondary);
-        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.35);
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .input-group-modern label {
-        position: absolute;
-        top: 50%;
-        left: 16px;
-        transform: translateY(-50%);
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.6);
-        pointer-events: none;
-        transition: all 0.3s ease;
-    }
-
-    /* Floating effect */
-    .input-group-modern input:focus+label,
-    .input-group-modern input:not(:placeholder-shown)+label {
-        top: -8px;
-        left: 12px;
-        font-size: 11px;
-        background: rgba(2, 6, 23, 0.9);
-        padding: 0 6px;
-        border-radius: 6px;
-        color: var(--secondary);
-    }
-
-    /* ================= PASSWORD TOGGLE ================= */
-
-    .toggle-password {
-        position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        opacity: 0.7;
-        transition: 0.2s;
-        color:rgb(90, 90, 246)
-    }
-
-    .toggle-password:hover {
+    to {
         opacity: 1;
+        transform: translateY(0);
     }
+}
 
-    /* ================= NORMAL FORM FIELDS ================= */
+/* ================= TITLE ================= */
+.form-container h2 {
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #fff, #9ca3af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-    .form-control,
-    textarea {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: white !important;
-        border-radius: 14px;
-        padding: 12px 16px;
-        transition: all 0.3s ease;
+/* ================= ROLE BUTTONS ================= */
+.role-selection {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 28px 0;
+    flex-wrap: wrap;
+}
+
+.role-btn {
+    padding: 10px 22px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: #cbd5f5;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.role-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.05);
+}
+
+.role-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(99,102,241,0.6);
+}
+
+/* ================= INPUT FIELDS ================= */
+.input-group-modern {
+    position: relative;
+    margin-bottom: 26px;
+}
+
+.input-group-modern input {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    transition: 0.3s;
+}
+
+.input-group-modern input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(6,182,212,0.3);
+    background: rgba(255,255,255,0.08);
+}
+
+/* Floating label */
+.input-group-modern label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 14px;
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.input-group-modern input:focus + label,
+.input-group-modern input:not(:focus):valid + label {
+    top: -8px;
+    font-size: 11px;
+    background: #020617;
+    padding: 0 6px;
+    border-radius: 6px;
+    color: var(--secondary);
+}
+
+/* ================= PASSWORD ICON ================= */
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+}
+
+/* ================= FORM CONTROLS ================= */
+.form-control, textarea {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: white !important;
+    border-radius: 12px;
+}
+
+.form-control:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(6,182,212,0.3);
+}
+
+/* ================= BUTTON ================= */
+.btn-submit {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+/* Shine effect */
+.btn-submit::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+    top: 0;
+    left: -100%;
+    transition: 0.6s;
+}
+
+.btn-submit:hover::after {
+    left: 100%;
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px);
+}
+
+/* ================= ALERTS ================= */
+.alert {
+    border-radius: 12px;
+}
+
+.alert-success {
+    background: rgba(34,197,94,0.15);
+    color: #86efac;
+}
+
+.alert-danger {
+    background: rgba(239,68,68,0.15);
+    color: #fca5a5;
+}
+
+/* ================= LINKS ================= */
+a {
+    color: var(--secondary);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 30px 20px;
     }
-
-    .form-control:focus,
-    textarea:focus {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--secondary);
-        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.35);
-    }
-
-    /* ================= FILE INPUT ================= */
-
-    input[type="file"] {
-        border: 1px dashed rgba(255, 255, 255, 0.4);
-        padding: 10px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    /* ================= BUTTON ================= */
-
-    .btn-submit {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border: none;
-        padding: 14px;
-        font-weight: 600;
-        border-radius: 16px;
-        transition: all 0.3s ease;
-        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5);
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 45px rgba(6, 182, 212, 0.6);
-    }
-
-    /* ================= ALERTS ================= */
-
-    .alert {
-        border-radius: 14px;
-        font-size: 14px;
-    }
-
-    .alert-success {
-        background: rgba(34, 197, 94, 0.15);
-        color: #86efac;
-    }
-
-    .alert-danger {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fca5a5;
-    }
-
-    /* ================= LINKS ================= */
-
-    a {
-        color: var(--secondary);
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    /* ================= RESPONSIVE ================= */
-
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 35px 25px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .form-container {
-            padding: 25px 20px;
-        }
-    }
+}

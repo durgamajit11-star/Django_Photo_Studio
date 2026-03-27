@@ -1,71 +1,257 @@
-{% extends  "user/dashboard/user_base.html"  %}
+{% extends "user/dashboard/user_base.html" %}
 
 {% block title %}AI Recommendations | StudioSync{% endblock %}
 
 {% block content %}
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h3 class="fw-bold">✨ Recommended for You</h3>
-            <p style="color: rgb(114, 136, 236);">Studios picked based on your preferences and activity</p>
-        </div>
+<style>
+
+/* ===== PAGE HEADER ===== */
+.page-header h3 {
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.page-header p {
+    color: #94a3b8;
+}
+
+/* ===== CARD ===== */
+.rec-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.35s ease;
+}
+
+.rec-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+
+/* Gradient Border Glow */
+.rec-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    -webkit-mask: 
+        linear-gradient(#000 0 0) content-box, 
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+}
+
+/* IMAGE */
+.rec-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+/* FALLBACK */
+.rec-fallback {
+    height: 200px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* FAVORITE ICON */
+.fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.fav-btn:hover {
+    background: #ef4444;
+}
+
+/* TITLE */
+.rec-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* META */
+.rec-meta {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* MATCH BADGE */
+.match-badge {
+    font-size: 12px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* AI MATCH BAR */
+.match-bar {
+    height: 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.match-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #06b6d4);
+}
+
+/* BUTTON */
+.rec-btn {
+    border-radius: 50px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    border: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.rec-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.6);
+}
+
+/* EMPTY STATE */
+.empty-box {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .rec-title {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .rec-img,
+    .rec-fallback {
+        height: 160px;
+    }
+
+    .page-header h3 {
+        font-size: 20px;
+    }
+}
+
+</style>
+
+<div class="container-fluid px-3 px-md-4">
+
+    <!-- HEADER -->
+    <div class="page-header mb-4">
+        <h3>✨ AI Recommended Studios</h3>
+        <p>Smart suggestions powered by your activity & preferences</p>
     </div>
 
     {% if recommendations %}
     <div class="row g-4">
+
         {% for rec in recommendations %}
-        <div class="col-md-4">
-            <div class="card bg-dark text-light border-0 shadow-sm overflow-hidden">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+
+            <div class="rec-card">
+
+                <!-- ❤️ Favorite -->
+                <div class="fav-btn">
+                    <i class="bi bi-heart text-white"></i>
+                </div>
+
                 {% if rec.studio.profile_image %}
-                <img src="{{ rec.studio.profile_image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <img src="{{ rec.studio.profile_image.url }}" class="rec-img">
                 {% else %}
-                <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" class="d-flex align-items-center justify-content-center">
-                    <i class="bi bi-camera-fill text-light" style="font-size: 3rem;"></i>
+                <div class="rec-fallback">
+                    <i class="bi bi-camera-fill text-white fs-1"></i>
                 </div>
                 {% endif %}
-                
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title">{{ rec.studio.studio_name }}</h5>
-                        <span class="badge bg-warning">{{ rec.score|floatformat:0 }}% Match</span>
+
+                <div class="p-3">
+
+                    <!-- TITLE -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <div class="rec-title">{{ rec.studio.studio_name }}</div>
+                        <span class="match-badge">{{ rec.score|floatformat:0 }}%</span>
                     </div>
-                    
-                    <p class="small text-muted mb-2">
-                        <i class="bi bi-geo-alt"></i> {{ rec.studio.city }}, {{ rec.studio.state }}
-                    </p>
-                    
-                    <p class="small mb-2">
-                        <strong>Why recommended:</strong><br>
+
+                    <!-- MATCH BAR -->
+                    <div class="match-bar">
+                        <div class="match-bar-fill" style="width: {{ rec.score }}%;"></div>
+                    </div>
+
+                    <!-- LOCATION -->
+                    <div class="rec-meta mb-2">
+                        <i class="bi bi-geo-alt"></i>
+                        {{ rec.studio.city }}, {{ rec.studio.state }}
+                    </div>
+
+                    <!-- REASON -->
+                    <div class="small text-light mb-2" style="opacity:0.85;">
                         {{ rec.reason }}
-                    </p>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-warning">
-                            <i class="bi bi-star-fill"></i> {{ rec.studio.average_rating|default:"0" }}/5
-                        </span>
-                        <span class="text-muted small">{{ rec.studio.experience_years }}+ years</span>
                     </div>
-                    
-                    <p class="small mb-3">
-                        <strong>Price Range:</strong> ${{ rec.studio.price_min }} - ${{ rec.studio.price_max }}
-                    </p>
-                    
-                    <a href="{% url 'studios:studio_detail' rec.studio.id %}" class="btn btn-primary w-100">
-                        <i class="bi bi-eye"></i> View Studio
+
+                    <!-- RATING + EXPERIENCE -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-warning">⭐ {{ rec.studio.average_rating|default:"0" }}/5</span>
+                        <span class="rec-meta">{{ rec.studio.experience_years }}+ yrs</span>
+                    </div>
+
+                    <!-- PRICE -->
+                    <div class="rec-meta mb-3">
+                        💰 ${{ rec.studio.price_min }} - ${{ rec.studio.price_max }}
+                    </div>
+
+                    <!-- BUTTON -->
+                    <a href="{% url 'studios:studio_detail' rec.studio.id %}"
+                       class="btn rec-btn w-100 text-white">
+                        View Studio →
                     </a>
+
                 </div>
             </div>
+
         </div>
         {% endfor %}
+
     </div>
+
     {% else %}
-    <div class="alert alert-info text-center py-5">
-        <i class="bi bi-stars" style="font-size: 2rem;"></i>
-        <p class="mt-3">No recommendations yet. Browse some studios to get AI-powered recommendations!</p>
-        <a href="{% url 'explore_studios' %}" class="btn btn-primary mt-2">Browse Studios</a>
+
+    <div class="empty-box">
+        <i class="bi bi-stars text-info fs-1"></i>
+        <p class="mt-3 text-light">
+            No recommendations yet.<br>
+            Explore studios to unlock AI suggestions 🚀
+        </p>
+        <a href="{% url 'explore_studios' %}" class="btn rec-btn text-white mt-2">
+            Browse Studios
+        </a>
     </div>
+
     {% endif %}
+
 </div>
 
 {% endblock %}

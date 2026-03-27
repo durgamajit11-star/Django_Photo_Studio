@@ -4,46 +4,185 @@
 
 {% block content %}
 
-<div class="main-content">
-    <!-- PAGE HEADER -->
-    <section class="page-header">
-        <div class="header-content">
-            <h1>💳 Payments</h1>
-            <p style="color: rgb(242, 242, 243);">View your payment history and status</p>
-        </div>
-    </section>
+<style>
+/* 🔥 Premium Styles */
 
-    <!-- PAYMENTS CONTAINER -->
-    <div class="payments-container">
-        {% if payments %}
-            {% for payment in payments %}
+.payments-container {
+    padding: 20px;
+}
+
+/* Stats Cards */
+.stats-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.payment-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.payment-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #00f5c4;
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+/* Status Colors */
+.badge-success { background: #22c55e; }
+.badge-warning { background: #f59e0b; }
+.badge-danger { background: #ef4444; }
+
+/* Divider */
+.divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 10px 0;
+}
+
+</style>
+
+<div class="container-fluid payments-container">
+
+    <!-- 🔥 HEADER -->
+    <div class="mb-4">
+        <h2 class="fw-bold">💳 Payments Dashboard</h2>
+        <p>Track your transactions and payment history</p>
+    </div>
+
+    <!-- 📊 STATS -->
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="stats-card text-center">
+                <h5>Total Payments</h5>
+                <h3>{{ payments|length }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stats-card text-center">
+                <h5>Completed</h5>
+                <h3>
+                    {{ payments|dictsort:"status"|length }}
+                </h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stats-card text-center">
+                <h5>Total Amount</h5>
+                <h3>₹ {{ total_amount|default:"0" }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 💳 PAYMENTS LIST -->
+    <div class="row g-4">
+        {% for payment in payments %}
+        <div class="col-md-4">
+
             <div class="payment-card">
+
                 <div class="payment-header">
                     <div>
-                        <h4>Payment #{{ payment.id }}</h4>
-                        <p class="text-muted">{{ payment.created_at|date:"M d, Y" }}</p>
+                        <h6>Payment #{{ payment.id }}</h6>
+                        <small class="text-muted">
+                            {{ payment.created_at|date:"M d, Y" }}
+                        </small>
                     </div>
-                    <span class="badge {% if payment.status == 'Completed' %}bg-success{% elif payment.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
+
+                    <span class="badge 
+                        {% if payment.status == 'Completed' %}badge-success
+                        {% elif payment.status == 'Pending' %}badge-warning
+                        {% else %}badge-danger{% endif %}">
                         {{ payment.status }}
                     </span>
                 </div>
+
+                <div class="divider"></div>
+
                 <div class="payment-details">
-                    <p><strong>Amount:</strong> ${{ payment.amount }}</p>
-                    <p><strong>Method:</strong> {{ payment.get_payment_method_display }}</p>
+
+                    <p class="payment-amount">
+                        ₹ {{ payment.amount }}
+                    </p>
+
+                    <p>
+                        <strong>Method:</strong> 
+                        {{ payment.get_payment_method_display }}
+                    </p>
+
                     {% if payment.transaction_id %}
-                    <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+                    <p style="font-size: 0.85rem;">
+                        <strong>Txn ID:</strong> {{ payment.transaction_id }}
+                    </p>
                     {% endif %}
+
                 </div>
-                <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-sm btn-primary">View Details</a>
+
+                <a href="{% url 'payments:payment_detail' payment.id %}"
+                   class="btn btn-outline-light btn-sm w-100 mt-2">
+                    View Details →
+                </a>
+
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="alert alert-info text-center py-5">
-            <h5><i class="bi bi-inbox"></i> No payments yet</h5>
-            <p>Your payment history will appear here.</p>
+
         </div>
-        {% endif %}
+        {% empty %}
+
+        <!-- EMPTY STATE -->
+        <div class="col-12 text-center mt-5">
+            <div class="p-5 rounded" style="background: rgba(255,255,255,0.05);">
+                <i class="bi bi-wallet2" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">No Payments Yet</h5>
+                <p class="text-muted">Your transactions will appear here</p>
+            </div>
+        </div>
+
+        {% endfor %}
     </div>
+
 </div>
+
+<!-- ✨ Optional JS Animation -->
+<script>
+document.querySelectorAll('.payment-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        card.style.transform = "translateY(-8px) scale(1.02)";
+    });
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = "translateY(0)";
+    });
+});
+</script>
 
 {% endblock %}

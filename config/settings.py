@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'chatbot',
     'recommendations',
     'dashboard',
+    'notifications',
     'api',
 ]
 

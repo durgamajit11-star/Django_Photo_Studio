@@ -1,62 +1,39 @@
 /* ===============================
    StudioSync Admin Panel JS
    =============================== */
-
 document.addEventListener("DOMContentLoaded", function () {
-
-    /* ===============================
-       Sidebar Collapse / Expand
-    =============================== */
 
     const sidebar = document.querySelector(".admin-sidebar");
     const wrapper = document.querySelector(".admin-wrapper");
     const toggleBtn = document.querySelector("#sidebarToggle");
+    const mobileToggle = document.querySelector("#mobileSidebarToggle");
 
-    // Load saved sidebar state
+    // Sidebar collapse
     if (localStorage.getItem("adminSidebar") === "collapsed") {
         sidebar.classList.add("collapsed");
         wrapper.classList.add("collapsed");
     }
 
-    // Toggle sidebar
     if (toggleBtn) {
         toggleBtn.addEventListener("click", function () {
             sidebar.classList.toggle("collapsed");
             wrapper.classList.toggle("collapsed");
 
-            // Save state
-            if (sidebar.classList.contains("collapsed")) {
-                localStorage.setItem("adminSidebar", "collapsed");
-            } else {
-                localStorage.setItem("adminSidebar", "expanded");
-            }
+            localStorage.setItem(
+                "adminSidebar",
+                sidebar.classList.contains("collapsed") ? "collapsed" : "expanded"
+            );
         });
     }
 
-    /* ===============================
-       Auto Highlight Active Link
-    =============================== */
-
-    const currentUrl = window.location.href;
-    const sidebarLinks = document.querySelectorAll(".admin-sidebar a");
-
-    sidebarLinks.forEach(link => {
-        if (link.href === currentUrl) {
-            link.classList.add("active");
-        }
-    });
-
-    /* ===============================
-       Mobile Sidebar Toggle
-    =============================== */
-
-    const mobileToggle = document.querySelector("#mobileSidebarToggle");
-
+    // Mobile toggle
     if (mobileToggle) {
         mobileToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("mobile-show");
+            sidebar.classList.toggle("show"); // ✅ fixed
         });
     }
+
+});
 
     /* ===============================
        Revenue Chart Initialization
@@ -135,5 +112,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-});
 

@@ -3,6 +3,13 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Studio(models.Model):
     """Model to store studio information and link it to the user"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='studio')
@@ -11,6 +18,10 @@ class Studio(models.Model):
     description = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to="studio_profiles/", blank=True, null=True)
     
+    # Categorization
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+
+
     # Advanced Features
     is_featured = models.BooleanField(default=False, help_text="Display on homepage")
     is_verified = models.BooleanField(default=False, help_text="Studio has been verified")
@@ -107,3 +118,5 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.studio.studio_name} ({self.rating}/5)"
+    
+
