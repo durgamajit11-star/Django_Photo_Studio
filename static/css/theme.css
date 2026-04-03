@@ -1,0 +1,450 @@
+:root {
+    --theme-bg: #0f172a;
+    --theme-surface: #111c32;
+    --theme-surface-2: #1e293b;
+    --theme-text: #e2e8f0;
+    --theme-muted: #94a3b8;
+    --theme-border: rgba(148, 163, 184, 0.2);
+    --theme-primary: #22c1b4;
+}
+
+html[data-theme='light'] {
+    --theme-bg: #f6f8fb;
+    --theme-surface: #ffffff;
+    --theme-surface-2: #eef3fa;
+    --theme-text: #172235;
+    --theme-muted: #60728b;
+    --theme-border: rgba(23, 34, 53, 0.13);
+    --theme-primary: #0f9d8f;
+}
+
+html[data-theme='dark'] {
+    --theme-bg: #0f172a;
+    --theme-surface: #111c32;
+    --theme-surface-2: #1e293b;
+    --theme-text: #e2e8f0;
+    --theme-muted: #94a3b8;
+    --theme-border: rgba(148, 163, 184, 0.2);
+    --theme-primary: #22c1b4;
+}
+
+body {
+    background: var(--theme-bg);
+    color: var(--theme-text);
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, label, small, li, td, th, .form-label {
+    color: inherit;
+}
+
+.text-muted {
+    color: var(--theme-muted) !important;
+}
+
+.card,
+.admin-panel,
+.stat-card,
+.glass-card,
+.modal-content,
+.table,
+.form-control,
+.form-select,
+.input-group-text,
+.dropdown-menu {
+    color: var(--theme-text);
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+    background-color: var(--theme-surface);
+    border-color: var(--theme-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem rgba(15, 157, 143, 0.2);
+}
+
+.badge {
+    color: #ffffff;
+}
+
+html[data-theme='light'] .badge.bg-warning,
+html[data-theme='light'] .badge.text-bg-warning,
+html[data-theme='light'] .badge.bg-light,
+html[data-theme='light'] .badge.text-bg-light {
+    color: #172235 !important;
+}
+
+html[data-theme='dark'] .table-hover tbody tr:hover {
+    background: rgba(34, 193, 180, 0.12) !important;
+}
+
+html[data-theme='light'] .table-hover tbody tr:hover {
+    background: rgba(15, 157, 143, 0.08) !important;
+}
+
+.theme-toggle-btn {
+    border: 1px solid var(--theme-border);
+    background: var(--theme-surface);
+    color: var(--theme-text);
+    border-radius: 10px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+}
+
+.theme-floating-toggle {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2000;
+}
+
+.top-header .theme-toggle-btn,
+.studio-header .theme-toggle-btn,
+.admin-header .theme-toggle-btn {
+    position: static;
+}
+
+.top-header ~ .theme-floating-toggle,
+.studio-header ~ .theme-floating-toggle,
+.admin-header ~ .theme-floating-toggle {
+    display: none;
+}
+
+html[data-theme='light'] .top-header,
+html[data-theme='light'] .sidebar,
+html[data-theme='light'] .studio-header,
+html[data-theme='light'] .studio-sidebar,
+html[data-theme='light'] .admin-header,
+html[data-theme='light'] .admin-sidebar {
+    background: #ffffff !important;
+    color: #172235 !important;
+    border-color: rgba(23, 34, 53, 0.12) !important;
+}
+
+html[data-theme='light'] .menu-item,
+html[data-theme='light'] .studio-sidebar a,
+html[data-theme='light'] .admin-sidebar a,
+html[data-theme='light'] .welcome-text,
+html[data-theme='light'] .logo,
+html[data-theme='light'] .studio-logo,
+html[data-theme='light'] .admin-logo,
+html[data-theme='light'] .footer,
+html[data-theme='light'] .footer * {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .footer {
+    background: linear-gradient(135deg, #eef3fa, #dfe8f5) !important;
+}
+
+html[data-theme='dark'] .admin-main,
+html[data-theme='dark'] .studio-main,
+html[data-theme='dark'] .main-content {
+    color: var(--theme-text);
+}
+
+/* ===== MAIN CONTENT PAGE COVERAGE ===== */
+html[data-theme='light'] .main-content,
+html[data-theme='light'] .content-wrapper,
+html[data-theme='light'] .dashboard-wrapper,
+html[data-theme='light'] .bookings-container,
+html[data-theme='light'] .profile-container,
+html[data-theme='light'] .container,
+html[data-theme='light'] section {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .page-header {
+    background: linear-gradient(135deg, #0f9d8f, #22b7a8) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme='light'] .booking-card,
+html[data-theme='light'] .profile-card,
+html[data-theme='light'] .setting-item,
+html[data-theme='light'] .preference-item,
+html[data-theme='light'] .danger-zone,
+html[data-theme='light'] .stat-card,
+html[data-theme='light'] .glass,
+html[data-theme='light'] .ai-step,
+html[data-theme='light'] .studio-card,
+html[data-theme='light'] .mockup,
+html[data-theme='light'] .hero-box,
+html[data-theme='light'] .empty-state,
+html[data-theme='light'] .booking-form,
+html[data-theme='light'] .dashboard-card {
+    background: #ffffff !important;
+    color: #172235 !important;
+    border-color: rgba(21, 34, 56, 0.14) !important;
+}
+
+html[data-theme='light'] .booking-card h3,
+html[data-theme='light'] .booking-card p,
+html[data-theme='light'] .profile-card h3,
+html[data-theme='light'] .profile-card p,
+html[data-theme='light'] .setting-info h4,
+html[data-theme='light'] .setting-info p,
+html[data-theme='light'] .preference-info label,
+html[data-theme='light'] .preference-info p,
+html[data-theme='light'] .display-field .label,
+html[data-theme='light'] .display-field p,
+html[data-theme='light'] .detail-item .label,
+html[data-theme='light'] .detail-item p,
+html[data-theme='light'] .action-title,
+html[data-theme='light'] .action-desc,
+html[data-theme='light'] .notification-title,
+html[data-theme='light'] .notification-time,
+html[data-theme='light'] .hero-title,
+html[data-theme='light'] .hero-subtitle,
+html[data-theme='light'] .glass h1,
+html[data-theme='light'] .glass h2,
+html[data-theme='light'] .glass p,
+html[data-theme='light'] .studio-card h3,
+html[data-theme='light'] .studio-card p {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .form-input,
+html[data-theme='light'] .input-group-modern input,
+html[data-theme='light'] textarea.form-control,
+html[data-theme='light'] .search-input,
+html[data-theme='light'] .search-select,
+html[data-theme='light'] .file-input-label {
+    background: #ffffff !important;
+    color: #172235 !important;
+    border-color: rgba(21, 34, 56, 0.18) !important;
+}
+
+html[data-theme='light'] .input-group-modern label,
+html[data-theme='light'] .form-group label,
+html[data-theme='light'] .tab-btn,
+html[data-theme='light'] .btn-action,
+html[data-theme='light'] .mobile-sidebar-toggle,
+html[data-theme='light'] .sidebar-close {
+    color: #2a3f5f !important;
+}
+
+html[data-theme='light'] .btn-outline-secondary {
+    color: #2a3f5f !important;
+    border-color: rgba(21, 34, 56, 0.24) !important;
+}
+
+html[data-theme='light'] header,
+html[data-theme='light'] .top-header {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-bottom-color: rgba(21, 34, 56, 0.14) !important;
+}
+
+html[data-theme='light'] .announcement {
+    color: #ffffff !important;
+}
+
+html[data-theme='light'] .footer {
+    background: linear-gradient(135deg, #eef3fa, #dfe8f5) !important;
+    border-top-color: rgba(21, 34, 56, 0.12) !important;
+}
+
+html[data-theme='light'] .footer-bottom {
+    border-top-color: rgba(21, 34, 56, 0.12) !important;
+}
+
+html[data-theme='dark'] .booking-card,
+html[data-theme='dark'] .profile-card,
+html[data-theme='dark'] .setting-item,
+html[data-theme='dark'] .preference-item,
+html[data-theme='dark'] .booking-form,
+html[data-theme='dark'] .dashboard-card,
+html[data-theme='dark'] .glass,
+html[data-theme='dark'] .ai-step,
+html[data-theme='dark'] .studio-card,
+html[data-theme='dark'] .mockup,
+html[data-theme='dark'] .hero-box,
+html[data-theme='dark'] .empty-state {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='dark'] .input-group-modern input,
+html[data-theme='dark'] .form-input,
+html[data-theme='dark'] .search-input,
+html[data-theme='dark'] .search-select,
+html[data-theme='dark'] textarea.form-control {
+    color: #e2e8f0 !important;
+}
+
+/* Bootstrap utility class compatibility */
+html[data-theme='light'] .bg-dark,
+html[data-theme='light'] .card.bg-dark,
+html[data-theme='light'] .table-dark,
+html[data-theme='light'] .modal-content.bg-dark {
+    background-color: #ffffff !important;
+    border-color: rgba(21, 34, 56, 0.14) !important;
+}
+
+html[data-theme='light'] .text-light,
+html[data-theme='light'] .card.text-light,
+html[data-theme='light'] .table-dark,
+html[data-theme='light'] .table-dark th,
+html[data-theme='light'] .table-dark td,
+html[data-theme='light'] .bg-dark * {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .btn-outline-light {
+    color: #172235 !important;
+    border-color: rgba(21, 34, 56, 0.3) !important;
+}
+
+html[data-theme='light'] .btn-outline-light:hover {
+    background: rgba(15, 157, 143, 0.12) !important;
+    border-color: #0f9d8f !important;
+    color: #0f9d8f !important;
+}
+
+html[data-theme='dark'] .bg-dark,
+html[data-theme='dark'] .card.bg-dark,
+html[data-theme='dark'] .table-dark {
+    background-color: #101b30 !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+/* ===== STRICT MODE BACKGROUND + TEXT RULES ===== */
+html[data-theme='dark'] body {
+    background: #0b1324 !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='light'] body {
+    background: #f4f7fb !important;
+    color: #172235 !important;
+}
+
+html[data-theme='dark'] .main-content,
+html[data-theme='dark'] .content-wrapper,
+html[data-theme='dark'] .dashboard-wrapper,
+html[data-theme='dark'] .studio-main,
+html[data-theme='dark'] .admin-main,
+html[data-theme='dark'] .container,
+html[data-theme='dark'] section {
+    background-color: transparent;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='light'] .main-content,
+html[data-theme='light'] .content-wrapper,
+html[data-theme='light'] .dashboard-wrapper,
+html[data-theme='light'] .studio-main,
+html[data-theme='light'] .admin-main,
+html[data-theme='light'] .container,
+html[data-theme='light'] section {
+    color: #172235 !important;
+}
+
+/* User templates: protect text visibility in both modes */
+html[data-theme='dark'] .booking-title h3,
+html[data-theme='dark'] .detail-item p,
+html[data-theme='dark'] .detail-item .label,
+html[data-theme='dark'] .setting-info h4,
+html[data-theme='dark'] .setting-info p,
+html[data-theme='dark'] .preference-info label,
+html[data-theme='dark'] .preference-info p,
+html[data-theme='dark'] .display-field .label,
+html[data-theme='dark'] .display-field p,
+html[data-theme='dark'] .profile-card h3,
+html[data-theme='dark'] .profile-card p,
+html[data-theme='dark'] .section-title,
+html[data-theme='dark'] .section-subtitle,
+html[data-theme='dark'] .studio-info h6,
+html[data-theme='dark'] .studio-info .location,
+html[data-theme='dark'] .step-card h5,
+html[data-theme='dark'] .step-card p,
+html[data-theme='dark'] .stat-label,
+html[data-theme='dark'] .empty-state h3,
+html[data-theme='dark'] .empty-state p {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='light'] .booking-title h3,
+html[data-theme='light'] .detail-item p,
+html[data-theme='light'] .detail-item .label,
+html[data-theme='light'] .setting-info h4,
+html[data-theme='light'] .setting-info p,
+html[data-theme='light'] .preference-info label,
+html[data-theme='light'] .preference-info p,
+html[data-theme='light'] .display-field .label,
+html[data-theme='light'] .display-field p,
+html[data-theme='light'] .profile-card h3,
+html[data-theme='light'] .profile-card p,
+html[data-theme='light'] .section-title,
+html[data-theme='light'] .section-subtitle,
+html[data-theme='light'] .studio-info h6,
+html[data-theme='light'] .studio-info .location,
+html[data-theme='light'] .step-card h5,
+html[data-theme='light'] .step-card p,
+html[data-theme='light'] .stat-label,
+html[data-theme='light'] .empty-state h3,
+html[data-theme='light'] .empty-state p {
+    color: #172235 !important;
+}
+
+/* Landing/Auth readability with hardcoded original dark styles */
+html[data-theme='light'] .announcement,
+html[data-theme='light'] .offer,
+html[data-theme='light'] .btn-neon,
+html[data-theme='light'] .badge-ai {
+    color: #ffffff !important;
+}
+
+html[data-theme='light'] .glass,
+html[data-theme='light'] .form-container,
+html[data-theme='light'] .role-btn,
+html[data-theme='light'] .step-card,
+html[data-theme='light'] .stat-card,
+html[data-theme='light'] .studio-card,
+html[data-theme='light'] .pricing-card,
+html[data-theme='light'] .ai-step,
+html[data-theme='light'] .mockup,
+html[data-theme='light'] .hero-box {
+    background: #ffffff !important;
+    border-color: rgba(21, 34, 56, 0.16) !important;
+}
+
+html[data-theme='light'] .input-group-modern input:focus + label,
+html[data-theme='light'] .input-group-modern input:not(:focus):valid + label {
+    background: #ffffff !important;
+    color: #0f9d8f !important;
+}
+
+html[data-theme='dark'] .input-group-modern input:focus + label,
+html[data-theme='dark'] .input-group-modern input:not(:focus):valid + label {
+    background: #0b1324 !important;
+    color: #22c1b4 !important;
+}
+
+/* Link/button text visibility */
+html[data-theme='light'] a,
+html[data-theme='light'] .btn,
+html[data-theme='light'] button,
+html[data-theme='light'] .nav-link {
+    color: inherit;
+}
+
+html[data-theme='dark'] a,
+html[data-theme='dark'] .btn,
+html[data-theme='dark'] button,
+html[data-theme='dark'] .nav-link {
+    color: inherit;
+}

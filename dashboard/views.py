@@ -4,12 +4,16 @@ from accounts.decorators import role_required
 from accounts.forms import UserUpdateForm
 from django.contrib import messages
 from django.db.models import Avg, Sum
-from django.db.models.functions import TruncMonth
-from datetime import datetime
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.sessions.models import Session
+from django.contrib.auth import logout
+from django.utils import timezone
+import json
 
-from accounts.models import CustomUser
 from studios.models import Studio, Portfolio, Review
 from django.db.models import Q 
+from .models import StudioPreference
 
 
 def landing_page(request):
@@ -252,7 +256,7 @@ def studio_earnings(request):
     total_bookings = bookings.count()
     completed_bookings = bookings.filter(status="Completed").count()
     pending_amount = bookings.filter(payment_status="Pending").aggregate(Sum('amount'))['amount__sum'] or 0
-    recent_payments = Payment.objects.filter(booking_request__studio=studio).order_by('-created_at')[:10]
+    recent_payments = Payment.objects.filter(booking__studio=studio).order_by('-created_at')[:10]
 
     return render(request, 'studio/dashboard/studio_earnings.html', {
         'total_earnings': total_earnings,
@@ -283,6 +287,85 @@ def studio_reviews(request):
         'total_reviews': reviews.count()
     })
 
+
+@login_required
+@role_required(['STUDIO'])
+def studio_profile(request):
+    studio = Studio.objects.filter(user=request.user).first()
+    
+    if not studio:
+        messages.error(request, 'Studio profile not found')
+        return redirect('studio_dashboard')
+
+    preferences, _ = StudioPreference.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('studio_profile')
+    else:
+        form = UserUpdateForm(instance=request.user)
+
+    return render(request, 'studio/dashboard/studio_profile.html', {
+        'studio': studio,
+        'form': form,
+        'user': request.user,
+        'preferences': preferences,
+    })
+
+
+@login_required
+@role_required(['STUDIO'])
+@require_POST
+def save_studio_preferences(request):
+    preferences, _ = StudioPreference.objects.get_or_create(user=request.user)
+
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'success': False, 'message': 'Invalid JSON payload.'}, status=400)
+
+    preferences.email_notifications = bool(payload.get('email_notifications', preferences.email_notifications))
+    preferences.sms_alerts = bool(payload.get('sms_alerts', preferences.sms_alerts))
+    preferences.portfolio_visibility = bool(payload.get('portfolio_visibility', preferences.portfolio_visibility))
+    preferences.marketing_emails = bool(payload.get('marketing_emails', preferences.marketing_emails))
+    preferences.two_factor_enabled = bool(payload.get('two_factor_enabled', preferences.two_factor_enabled))
+    preferences.device_login_alerts = bool(payload.get('device_login_alerts', preferences.device_login_alerts))
+    preferences.save()
+
+    return JsonResponse({'success': True, 'message': 'Preferences saved successfully.'})
+
+
+@login_required
+@role_required(['STUDIO'])
+@require_POST
+def logout_all_devices(request):
+    current_session_key = request.session.session_key
+    sessions = Session.objects.filter(expire_date__gte=timezone.now())
+
+    removed_sessions = 0
+    for session in sessions:
+        data = session.get_decoded()
+        if str(data.get('_auth_user_id')) == str(request.user.id) and session.session_key != current_session_key:
+            session.delete()
+            removed_sessions += 1
+
+    return JsonResponse({
+        'success': True,
+        'message': f'Logged out from {removed_sessions} other device(s).'
+    })
+
+
+@login_required
+@role_required(['STUDIO'])
+@require_POST
+def delete_studio_account(request):
+    user = request.user
+    logout(request)
+    user.delete()
+    return JsonResponse({'success': True, 'redirect_url': '/'})
 
 
 @login_required
@@ -335,105 +418,3 @@ def cancel_booking(request, booking_id):
     messages.success(request, 'Booking cancelled!')
 
     return redirect('studio_bookings')
-
-@login_required
-@role_required(['ADMIN'])
-def admin_dashboard(request):
-
-    total_users = CustomUser.objects.count()
-    total_studios = Studio.objects.count()
-    
-    from bookings.models import BookingRequest
-    total_bookings = BookingRequest.objects.count()
-
-    total_revenue = BookingRequest.objects.filter(
-        status="Confirmed"
-    ).aggregate(Sum('amount'))['amount__sum'] or 0
-
-    context = {
-        'total_users': total_users,
-        'total_studios': total_studios,
-        'total_bookings': total_bookings,
-        'total_revenue': total_revenue,
-    }
-
-    return render(request, "admin/dashboard/admin_dashboard.html", context)
-
-
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-@login_required
-@role_required(['ADMIN'])
-def manage_users(request):
-    users = User.objects.filter(role='USER')   # ✅ only users
-    return render(request, "admin/dashboard/manage_users.html", {"users": users})
-
-
-from studios.models import Studio
-
-@login_required
-@role_required(['ADMIN'])
-def manage_studios(request):
-    studios = Studio.objects.select_related('user')   # ✅ correct
-    return render(request, "admin/dashboard/manage_studios.html", {"studios": studios})
-
-
-def approve_studio(request, id):
-    studio = Studio.objects.get(id=id)
-    studio.is_active = True
-    studio.save()
-    return redirect('manage_studios')
-
-
-def reject_studio(request, id):
-    studio = Studio.objects.get(id=id)
-    studio.delete()
-    return redirect('manage_studios')
-
-
-
-@login_required
-@role_required(['ADMIN'])
-def admin_bookings(request):
-    from bookings.models import BookingRequest
-    
-    bookings = BookingRequest.objects.select_related('user', 'studio').all()
-
-    confirmed_count = bookings.filter(status="Confirmed").count()
-    pending_count = bookings.filter(status="Pending").count()
-    cancelled_count = bookings.filter(status="Cancelled").count()
-
-    # ===== Monthly Revenue Data =====
-    monthly_revenue = (
-        BookingRequest.objects
-        .filter(status="Confirmed")
-        .annotate(month=TruncMonth("created_at"))
-        .values("month")
-        .annotate(total=Sum("amount"))
-        .order_by("month")
-    )
-
-    labels = []
-    revenue_data = []
-
-    for item in monthly_revenue:
-        labels.append(item["month"].strftime("%b %Y"))
-        revenue_data.append(float(item["total"]))
-
-    context = {
-        'bookings': bookings,
-        'confirmed_count': confirmed_count,
-        'pending_count': pending_count,
-        'cancelled_count': cancelled_count,
-        'revenue_labels': labels,
-        'revenue_data': revenue_data,
-    }
-
-    return render(request, "admin/dashboard/admin_bookings.html", context)
-
-@login_required
-@role_required(['ADMIN'])
-def admin_payments(request):
-    return render(request, "admin/dashboard/admin_payments.html")

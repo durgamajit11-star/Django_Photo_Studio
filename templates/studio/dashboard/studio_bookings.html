@@ -1,88 +1,149 @@
 {% extends "studio/dashboard/studio_base.html" %}
-{% block title %}Bookings{% endblock %}
+{% load static %}
+
+{% block title %}Bookings Management{% endblock %}
 
 {% block studio_content %}
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h3 class="fw-bold">📅 Studio Bookings</h3>
-            <p style="color: rgb(114, 136, 236);">Manage booking requests from clients</p>
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold mb-2">📅 Bookings Management</h1>
+            <p class="text-muted">Manage booking requests and organize your schedule</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <i class="bi bi-funnel"></i> Filters
+            </button>
         </div>
     </div>
+</div>
 
-    {% if messages %}
-    <div class="alert alert-success alert-dismissible fade show">
-        {% for message in messages %}
-            {{ message }}
-        {% endfor %}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
+{% if messages %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+        <i class="bi bi-check-circle"></i> {{ message }}
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
 
-    <!-- STATS -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3">
-                <div class="text-muted small">Pending</div>
-                <h3 class="text-warning">{{ pending }}</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3">
-                <div class="text-muted small">Confirmed</div>
-                <h3 class="text-success">{{ confirmed }}</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-dark border-0 shadow-sm p-3">
-                <div class="text-muted small">Total</div>
-                <h3 class="text-primary">{{ bookings|length }}</h3>
+<!-- ================= STATS CARDS ================= -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon"><i class="bi bi-hourglass-top"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Pending</span>
+                <h3 class="stat-value">{{ pending }}</h3>
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Confirmed</span>
+                <h3 class="stat-value">{{ confirmed }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon"><i class="bi bi-calendar-range"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Total</span>
+                <h3 class="stat-value">{{ bookings|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon"><i class="bi bi-exclamation-circle"></i></div>
+            <div class="stat-content">
+                <span class="stat-label">Urgent</span>
+                <h3 class="stat-value">2</h3>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- BOOKINGS TABLE -->
-    <div class="card bg-dark border-0 shadow-sm p-4">
+<!-- ================= BOOKINGS TABLE ================= -->
+<div class="dashboard-card">
+    <div class="card-header">
+        <h5 class="mb-0">All Bookings</h5>
+        <div class="search-box">
+            <input type="text" class="form-control form-control-sm" placeholder="Search by client name..." id="searchInput">
+        </div>
+    </div>
+    <div class="card-body">
         {% if bookings %}
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle bookings-table">
                 <thead>
                     <tr>
-                        <th>Client</th>
+                        <th>Client Name</th>
+                        <th>Service</th>
                         <th>Event Type</th>
-                        <th>Date</th>
+                        <th>Booking Date</th>
+                        <th>Event Date</th>
+                        <th>Time Slot</th>
                         <th>Amount</th>
                         <th>Status</th>
                         <th>Payment</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr>
+                    <tr class="booking-row" data-booking-id="{{ booking.id }}">
                         <td>
-                            <strong>{{ booking.user.get_full_name|default:booking.user.username }}</strong>
+                            <div class="client-info">
+                                <strong>{{ booking.user.get_full_name|default:booking.user.username }}</strong>
+                                <small class="d-block text-muted">{{ booking.user.email }}</small>
+                            </div>
                         </td>
-                        <td>{{ booking.event_type }}</td>
-                        <td>{{ booking.date|date:"M d, Y" }}</td>
-                        <td>${{ booking.amount }}</td>
                         <td>
-                            <span class="badge {% if booking.status == 'Confirmed' %}bg-success{% elif booking.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                            <span class="badge bg-info-subtle text-dark">{{ booking.service.service_name|default:'General Session' }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark">{{ booking.event_type }}</span>
+                        </td>
+                        <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                        <td>{{ booking.date|date:"M d, Y" }}</td>
+                        <td>{{ booking.time_slot|default:'-' }}</td>
+                        <td class="fw-bold">${{ booking.total_price|default:booking.amount }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'Confirmed' %}bg-success{% elif booking.status == 'Pending' %}bg-warning{% elif booking.status == 'Completed' %}bg-info{% else %}bg-danger{% endif %}">
                                 {{ booking.status }}
                             </span>
                         </td>
                         <td>
-                            <span class="badge {% if booking.payment_status == 'Paid' %}bg-info{% else %}bg-secondary{% endif %}">
+                            <span class="badge {% if booking.payment_status == 'Paid' %}bg-success{% else %}bg-secondary{% endif %}">
                                 {{ booking.payment_status }}
                             </span>
                         </td>
                         <td>
-                            <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
-                            {% if booking.status == 'Pending' %}
-                            <a href="{% url 'bookings:approve_booking' booking.id %}" class="btn btn-sm btn-success">Approve</a>
-                            <a href="{% url 'bookings:reject_booking' booking.id %}" class="btn btn-sm btn-danger">Reject</a>
-                            {% endif %}
+                            <div class="action-buttons">
+                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bookingDetail{{ booking.id }}">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                {% if booking.status == 'Pending' %}
+                                <form method="POST" action="{% url 'approve_booking' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approve this booking?')">
+                                        <i class="bi bi-check"></i> Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{% url 'cancel_booking' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this booking?')">
+                                        <i class="bi bi-x"></i> Reject
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -90,12 +151,72 @@
             </table>
         </div>
         {% else %}
-        <div class="alert alert-info text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-            <p class="mt-3">No bookings yet. Clients will see your studio and make bookings soon!</p>
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #6366f1;"></i>
+            <h5 class="mt-3">No bookings yet</h5>
+            <p class="text-muted">Clients will see your studio and make bookings. Be patient!</p>
         </div>
         {% endif %}
     </div>
 </div>
+
+<!-- ================= BOOKING DETAIL MODALS ================= -->
+{% for booking in bookings %}
+<div class="modal fade" id="bookingDetail{{ booking.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Client Name:</strong> {{ booking.user.get_full_name|default:booking.user.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Phone:</strong> {{ booking.user.phone|default:"Not provided" }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Service:</strong> {{ booking.service.service_name|default:'General Session' }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Event Type:</strong> {{ booking.event_type }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Event Date:</strong> {{ booking.booking_date|default:booking.date|date:"M d, Y" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Time Slot:</strong> {{ booking.time_slot|default:'Not specified' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Amount:</strong> ${{ booking.total_price|default:booking.amount }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Status:</strong> <span class="badge bg-warning">{{ booking.status }}</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <strong>Notes:</strong>
+                    <p class="text-muted">{{ booking.notes|default:"No additional notes" }}</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if booking.status == 'Pending' %}
+                <form method="POST" action="{% url 'approve_booking' booking.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}

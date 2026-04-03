@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/studio/studio.css' %}">
+<link rel="stylesheet" href="{% static 'css/studio/studio_dashboard_enhanced.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
@@ -20,6 +21,11 @@
 
         <div class="studio-header-right">
             <span>Welcome, <strong>{{ user.username }}</strong></span>
+
+            <button type="button" class="theme-toggle-btn" data-theme-toggle>
+                <i class="bi bi-sun-fill" data-theme-icon></i>
+                <span data-theme-text>Light Mode</span>
+            </button>
 
             <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light ms-3">
                 <i class="bi bi-box-arrow-right"></i> Logout
@@ -65,8 +71,8 @@
             <span>Reviews</span>
         </a>
         <!-- PROFILE -->
-        <a href="{% url 'user_profile' %}"
-            class="menu-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
+        <a href="{% url 'studio_profile' %}"
+            class="menu-item {% if request.resolver_match.url_name == 'studio_profile' %}active{% endif %}">
             <i class="bi bi-person-circle"></i>
             <span>Profile Settings</span>
         </a>

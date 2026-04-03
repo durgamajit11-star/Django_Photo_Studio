@@ -3,6 +3,12 @@
 {% block page_title %}Bookings Management{% endblock %}
 {% block page_description %}Monitor and manage all platform bookings{% endblock %}
 
+{% block page_actions %}
+<a href="{% url 'admin_payments' %}" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-wallet2 me-1"></i>Open Payments
+</a>
+{% endblock %}
+
 {% block admin_content %}
 
 <!-- ================= SUMMARY CARDS ================= -->
@@ -43,45 +49,57 @@
 </div>
 
 <!-- ================= SEARCH & FILTER ================= -->
-<div class="card bg-dark text-light p-4 rounded-4 mb-4">
+<div class="admin-panel p-3 mb-4">
     <form method="GET" class="row g-3">
 
         <div class="col-md-4">
-            <input type="text" name="search" class="form-control"
-                   placeholder="Search by user or studio...">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Search by user, studio, event...">
         </div>
 
         <div class="col-md-3">
             <select name="status" class="form-select">
                 <option value="">All Status</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Pending">Pending</option>
-                <option value="Cancelled">Cancelled</option>
+                <option value="Confirmed" {% if status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="Pending" {% if status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Cancelled" {% if status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
             </select>
         </div>
 
         <div class="col-md-3">
-            <input type="date" name="date" class="form-control">
+            <input type="date" name="date" value="{{ selected_date }}" class="form-control">
         </div>
 
         <div class="col-md-2 d-grid">
-            <button class="btn btn-primary">Filter</button>
+            <button class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filter</button>
         </div>
 
     </form>
 </div>
 
+<div class="admin-panel p-4 mb-4">
+    <h6 class="fw-semibold mb-3">Monthly Revenue Trend</h6>
+    <div class="chart-shell">
+        <canvas id="revenueChart"></canvas>
+    </div>
+    {{ revenue_labels|json_script:"revenue-labels" }}
+    {{ revenue_data|json_script:"revenue-data" }}
+</div>
+
 <!-- ================= BOOKINGS TABLE ================= -->
-<div class="card bg-dark text-light p-4 rounded-4">
+<div class="admin-panel p-0 overflow-hidden">
     <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle">
+        <table class="table table-hover align-middle">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>User</th>
                     <th>Studio</th>
+                    <th>Service</th>
                     <th>Event Type</th>
                     <th>Booking Date</th>
+                    <th>Time Slot</th>
                     <th>Status</th>
                     <th>Payment</th>
                     <th>Amount</th>
@@ -95,8 +113,10 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
                     <td>{{ booking.studio.studio_name }}</td>
+                    <td>{{ booking.service.service_name|default:'General Session' }}</td>
                     <td>{{ booking.event_type }}</td>
-                    <td>{{ booking.date|date:"M d, Y" }}</td>
+                    <td>{{ booking.booking_date|default:booking.date|date:"M d, Y" }}</td>
+                    <td>{{ booking.time_slot|default:'-' }}</td>
 
                     <td>
                         {% if booking.status == "Confirmed" %}
@@ -116,18 +136,25 @@
                         {% endif %}
                     </td>
 
-                    <td>${{ booking.amount }}</td>
+                    <td>${{ booking.total_price|default:booking.amount }}</td>
                     <td>{{ booking.created_at|date:"M d, Y" }}</td>
 
                     <td>
-                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-info">View</a>
-                        <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Client: {{ booking.user.username }} | Studio: {{ booking.studio.studio_name }}">
+                            View
+                        </button>
+                        {% if booking.status == 'Pending' %}
+                        <form method="POST" action="{% url 'admin_cancel_booking' booking.id %}" class="d-inline" onsubmit="return confirm('Cancel this booking?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                        </form>
+                        {% endif %}
                     </td>
                 </tr>
 
                 {% empty %}
                 <tr>
-                    <td colspan="10" class="text-center py-4">
+                    <td colspan="12" class="text-center py-5 text-muted">
                         No bookings available
                     </td>
                 </tr>

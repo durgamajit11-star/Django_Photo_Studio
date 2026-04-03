@@ -61,24 +61,10 @@ function logout() {
 
 // ===== THEME TOGGLE =====
 function toggleTheme() {
-    const body = document.body;
-    body.classList.toggle("light-mode");
-
-    // Save theme in localStorage
-    if (body.classList.contains("light-mode")) {
-        localStorage.setItem("theme", "light");
-    } else {
-        localStorage.setItem("theme", "dark");
+    if (window.StudioSyncTheme && typeof window.StudioSyncTheme.toggleTheme === 'function') {
+        window.StudioSyncTheme.toggleTheme();
     }
 }
-
-// Load saved theme on page load
-document.addEventListener("DOMContentLoaded", function () {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
-        document.body.classList.add("light-mode");
-    }
-});
 
 
 // ===== FILTER FUNCTION =====

@@ -35,7 +35,7 @@
                             <h3>{{ booking.studio.studio_name }} - {{ booking.event_type }}</h3>
                             <span class="badge badge-{{ booking.status|lower }}">{{ booking.status }}</span>
                         </div>
-                        <div class="booking-price">${{ booking.amount }}</div>
+                        <div class="booking-price">${{ booking.total_price|default:booking.amount }}</div>
                     </div>
 
                     <div class="booking-details">
@@ -51,9 +51,19 @@
                             <i class="bi bi-calendar-event"></i>
                             <div>
                                 <span class="label">Date & Time</span>
-                                <p>{{ booking.date|date:"M d, Y" }} {% if booking.time %}at {{ booking.time }}{% endif %}</p>
+                                <p>{{ booking.booking_date|default:booking.date|date:"M d, Y" }} {% if booking.time_slot %}- {{ booking.time_slot }}{% elif booking.time %}at {{ booking.time }}{% endif %}</p>
                             </div>
                         </div>
+
+                        {% if booking.service %}
+                        <div class="detail-item">
+                            <i class="bi bi-camera2"></i>
+                            <div>
+                                <span class="label">Service</span>
+                                <p>{{ booking.service.service_name }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
 
                         {% if booking.duration_hours %}
                         <div class="detail-item">

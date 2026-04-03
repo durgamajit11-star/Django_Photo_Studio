@@ -17,6 +17,8 @@ class Studio(models.Model):
     location = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to="studio_profiles/", blank=True, null=True)
+    price_per_hour = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     
     # Categorization
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
@@ -93,6 +95,36 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.studio.studio_name} - Portfolio"
+
+
+class StudioImage(models.Model):
+    """Dedicated studio image table for gallery/image URLs"""
+    studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name='studio_images')
+    image = models.ImageField(upload_to="studio_images/", blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return f"Image for {self.studio.studio_name}"
+
+
+class Service(models.Model):
+    """Services offered by studios (Wedding shoot, Event, etc.)"""
+    studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name='services')
+    service_name = models.CharField(max_length=120)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['studio', 'service_name']
+        unique_together = ['studio', 'service_name']
+
+    def __str__(self):
+        return f"{self.studio.studio_name} - {self.service_name}"
 
 
 

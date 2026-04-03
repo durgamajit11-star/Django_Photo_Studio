@@ -28,6 +28,7 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    payment_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -39,6 +40,13 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for Booking #{self.booking.id} - {self.amount}"
+
+    def save(self, *args, **kwargs):
+        if self.status and self.payment_status != self.status:
+            self.payment_status = self.status
+        elif self.payment_status and self.status != self.payment_status:
+            self.status = self.payment_status
+        super().save(*args, **kwargs)
 
 
 class PaymentRefund(models.Model):

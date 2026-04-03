@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg, Q
 from django.core.paginator import Paginator
-from studios.models import Studio, Portfolio, Review
+from studios.models import Studio, Portfolio, Review, Service
 from bookings.models import BookingRequest
 
 
@@ -148,21 +148,38 @@ def book_studio(request, studio_id):
     studio = get_object_or_404(Studio, id=studio_id)
     
     if request.method == 'POST':
+        service_id = request.POST.get('service_id')
         event_type = request.POST.get('event_type')
         date = request.POST.get('date')
+        time_slot = request.POST.get('time_slot')
         amount = request.POST.get('amount')
         
-        if not all([event_type, date, amount]):
-            messages.error(request, 'All fields are required')
+        if not all([event_type, date]):
+            messages.error(request, 'Event type and date are required')
             return redirect('studio_detail', studio_id=studio_id)
         
         try:
+            service = None
+            if service_id:
+                service = Service.objects.filter(id=service_id, studio=studio).first()
+
+            total_price = amount
+            if service and service.price is not None:
+                total_price = service.price
+
+            if not total_price:
+                total_price = studio.price_per_hour or 0
+
             booking = BookingRequest.objects.create(
                 studio=studio,
                 user=request.user,
+                service=service,
                 event_type=event_type,
                 date=date,
-                amount=amount
+                booking_date=date,
+                time_slot=time_slot,
+                amount=total_price,
+                total_price=total_price
             )
             messages.success(request, 'Booking created successfully!')
             return redirect('user_bookings')
@@ -170,7 +187,10 @@ def book_studio(request, studio_id):
             messages.error(request, f'Error creating booking: {str(e)}')
             return redirect('studio_detail', studio_id=studio_id)
     
-    context = {'studio': studio}
+    context = {
+        'studio': studio,
+        'services': Service.objects.filter(studio=studio).order_by('service_name')
+    }
     return render(request, 'studios/book_studio.html', context)
 
 

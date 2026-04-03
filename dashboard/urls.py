@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -34,17 +34,12 @@ urlpatterns = [
     # ================= REVIEWS =================
     path('studio/reviews/', views.studio_reviews, name='studio_reviews'),
 
-    # ADMIN
-    path('admin/', views.admin_dashboard, name='admin_dashboard'),
-    path('admin/users/', views.manage_users, name='manage_users'),
-    path('admin/studios/', views.manage_studios, name='manage_studios'),
+    # ================= PROFILE =================
+    path('studio/profile/', views.studio_profile, name='studio_profile'),
+    path('studio/profile/preferences/', views.save_studio_preferences, name='save_studio_preferences'),
+    path('studio/profile/logout-all/', views.logout_all_devices, name='logout_all_devices'),
+    path('studio/profile/delete-account/', views.delete_studio_account, name='delete_studio_account'),
 
-     # Approve Studio
-    path('admin/studios/approve/<int:id>/', views.approve_studio, name='approve_studio'),
-
-    # Reject Studio
-    path('admin/studios/reject/<int:id>/', views.reject_studio, name='reject_studio'),
-
-    path('admin/bookings/', views.admin_bookings, name='admin_bookings'),
-    path('admin/payments/', views.admin_payments, name='admin_payments'),
+    # ADMIN APP ROUTES
+    path('admin/', include('adminpanel.urls')),
 ]

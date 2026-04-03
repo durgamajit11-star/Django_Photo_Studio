@@ -1,6 +1,6 @@
 from django.contrib import admin
 from requests import request
-from .models import Studio, Portfolio, Review
+from .models import Studio, Portfolio, Review, Service, StudioImage
 
 
 @admin.register(Studio)
@@ -53,4 +53,18 @@ class ReviewAdmin(admin.ModelAdmin):
         ('Review Information', {'fields': ('user', 'studio', 'rating', 'comment')}),
         ('Timestamps', {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)}),
     )
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('service_name', 'studio', 'price', 'created_at')
+    list_filter = ('created_at', 'studio')
+    search_fields = ('service_name', 'studio__studio_name')
+
+
+@admin.register(StudioImage)
+class StudioImageAdmin(admin.ModelAdmin):
+    list_display = ('studio', 'image_url', 'uploaded_at')
+    list_filter = ('uploaded_at', 'studio')
+    search_fields = ('studio__studio_name', 'image_url')
 

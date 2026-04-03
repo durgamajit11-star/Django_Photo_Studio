@@ -420,6 +420,57 @@ body::after {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* ================= THEME CONTRAST ================= */
+html[data-theme='light'] body::after {
+    background: radial-gradient(circle, rgba(15, 157, 143, 0.18), transparent 70%);
+}
+
+html[data-theme='light'] .top-header,
+html[data-theme='light'] .sidebar,
+html[data-theme='light'] .glass {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-color: rgba(21, 34, 56, 0.15) !important;
+}
+
+html[data-theme='light'] .logo,
+html[data-theme='light'] .welcome-text,
+html[data-theme='light'] .sidebar-title,
+html[data-theme='light'] .menu-item,
+html[data-theme='light'] .main-content,
+html[data-theme='light'] .footer,
+html[data-theme='light'] .footer p,
+html[data-theme='light'] .footer a,
+html[data-theme='light'] .footer h5 {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .menu-item:hover {
+    background: rgba(15, 157, 143, 0.12);
+}
+
+html[data-theme='light'] .menu-item.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0f9d8f, #26b6ab);
+}
+
+html[data-theme='light'] .hero {
+    background:
+        linear-gradient(rgba(247, 251, 255, 0.72), rgba(232, 241, 249, 0.85)),
+        url('/static/images/image.png'),
+        linear-gradient(135deg, #d4f2f0 0%, #e9efff 100%);
+}
+
+html[data-theme='light'] .hero-title,
+html[data-theme='light'] .hero-subtitle {
+    color: #172235;
+}
+
+html[data-theme='dark'] .top-header,
+html[data-theme='dark'] .sidebar,
+html[data-theme='dark'] .glass {
+    background: rgba(2, 6, 23, 0.9) !important;
+}
+
 @keyframes fadeUp {
     from {
         opacity: 0;

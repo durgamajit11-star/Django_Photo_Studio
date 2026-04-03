@@ -76,7 +76,9 @@ body {
     background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(20px);
     border-right: 1px solid var(--studio-border);
-    
+    transition: width 0.3s ease;
+    overflow: hidden;
+    z-index: 999;
 }
 
 .studio-sidebar.collapsed {
@@ -133,19 +135,20 @@ body {
 
 .studio-wrapper {
     display: flex;
-    .studio-wrapper {
     margin-top: 70px;
-}
+    width: 100%;
 }
 
 .studio-main {
+    flex: 1;
     margin-left: 250px;   /* sidebar width */
     padding: 40px;
-    padding-top: 110px;   /* header (70px) + spacing */
-    min-height: 100vh;
+    padding-top: 70px;   /* header (70px) */
+    min-height: calc(100vh - 70px);
     background: #020617;
     color: #ffffff;
     transition: margin-left 0.3s ease;
+    overflow-x: hidden;
 }
 
 /* Footer always bottom */
@@ -258,4 +261,59 @@ body {
     .studio-main {
         padding: 90px 15px 15px 15px;
     }
+}
+
+/* ================= THEME CONTRAST ================= */
+html[data-theme='light'] .studio-header,
+html[data-theme='light'] .studio-sidebar {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-color: rgba(21, 34, 56, 0.14) !important;
+}
+
+html[data-theme='light'] .studio-logo,
+html[data-theme='light'] .studio-header-right,
+html[data-theme='light'] .studio-sidebar a,
+html[data-theme='light'] .studio-main,
+html[data-theme='light'] .studio-main h1,
+html[data-theme='light'] .studio-main h2,
+html[data-theme='light'] .studio-main h3,
+html[data-theme='light'] .studio-main p,
+html[data-theme='light'] .studio-main label,
+html[data-theme='light'] .studio-main span,
+html[data-theme='light'] .studio-main td,
+html[data-theme='light'] .studio-main th {
+    color: #172235 !important;
+}
+
+html[data-theme='light'] .studio-main {
+    background: #f6f8fb !important;
+}
+
+html[data-theme='light'] .studio-sidebar a:hover {
+    background: rgba(15, 157, 143, 0.1);
+}
+
+html[data-theme='light'] .studio-sidebar a.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0f9d8f, #22b7a8);
+    border-left-color: #0f9d8f;
+}
+
+html[data-theme='light'] .glass-card,
+html[data-theme='light'] .table-dark {
+    background: #ffffff !important;
+    color: #172235 !important;
+    border-color: rgba(21, 34, 56, 0.12);
+}
+
+html[data-theme='light'] .table-dark thead {
+    background: #edf2f9 !important;
+}
+
+html[data-theme='light'] .table-dark tbody tr:hover {
+    background: rgba(15, 157, 143, 0.09) !important;
+}
+
+html[data-theme='dark'] .studio-main {
+    color: #e2e8f0;
 }

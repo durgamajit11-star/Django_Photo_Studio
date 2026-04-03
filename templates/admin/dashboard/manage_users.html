@@ -1,47 +1,94 @@
 {% extends "admin/dashboard/admin_base.html" %}
+{% block page_title %}User Governance{% endblock %}
+{% block page_description %}Review, filter, and moderate platform users with clear status controls.{% endblock %}
+
+{% block page_actions %}
+<span class="metric-tag">Total: {{ total_users }}</span>
+{% endblock %}
 
 {% block admin_content %}
 
-<h2 class="fw-bold mb-4">👥 Manage Users</h2>
-<p>Total Users: {{ users|length }}</p>
-<div class="card bg-dark text-light p-4 rounded-4">
-    <table class="table table-dark table-hover align-middle">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role }}</td>
-                <td>
-                    {% if user.is_active %}
-                        <span class="badge bg-success">Active</span>
-                    {% else %}
-                        <span class="badge bg-danger">Blocked</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="#" class="btn btn-sm btn-warning">Block</a>
-                    <a href="#" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No users found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% if messages %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {% for message in messages %}{{ message }}{% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<div class="admin-panel p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label small text-muted">Search</label>
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Username, email, phone">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                <option value="blocked" {% if status == 'blocked' %}selected{% endif %}>Blocked</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Apply Filters</button>
+        </div>
+    </form>
+</div>
+
+<div class="admin-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Contact</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>#{{ user.id }}</td>
+                    <td>
+                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+                        <div class="small text-muted">@{{ user.username }}</div>
+                    </td>
+                    <td>
+                        <div>{{ user.email|default:'-' }}</div>
+                        <div class="small text-muted">{{ user.phone|default:'No phone' }}</div>
+                    </td>
+                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="badge text-bg-success">Active</span>
+                        {% else %}
+                        <span class="badge text-bg-danger">Blocked</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <form method="POST" action="{% url 'toggle_user_status' user.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                {% if user.is_active %}Block{% else %}Unblock{% endif %}
+                            </button>
+                        </form>
+                        <form method="POST" action="{% url 'delete_user' user.id %}" class="d-inline" onsubmit="return confirm('Delete this user permanently?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">No users found for current filters.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

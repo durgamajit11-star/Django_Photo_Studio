@@ -4,13 +4,13 @@ from .models import ChatMessage, ChatSession, ChatbotFAQ
 
 @admin.register(ChatMessage)
 class ChatMessageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'created_at')
-    list_filter = ('created_at', 'user')
-    search_fields = ('user__username', 'user_message', 'bot_response')
-    readonly_fields = ('created_at',)
+    list_display = ('user', 'is_user', 'timestamp')
+    list_filter = ('timestamp', 'user', 'is_user')
+    search_fields = ('user__username', 'message', 'response', 'user_message', 'bot_response')
+    readonly_fields = ('timestamp', 'created_at')
     fieldsets = (
-        ('Chat', {'fields': ('user', 'user_message', 'bot_response')}),
-        ('Timestamp', {'fields': ('created_at',), 'classes': ('collapse',)}),
+        ('Chat', {'fields': ('user', 'is_user', 'message', 'response', 'user_message', 'bot_response')}),
+        ('Timestamp', {'fields': ('timestamp', 'created_at'), 'classes': ('collapse',)}),
     )
 
 

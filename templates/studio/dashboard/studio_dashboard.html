@@ -1,179 +1,293 @@
 {% extends "studio/dashboard/studio_base.html" %}
+{% load static %}
 
 {% block title %}Studio Dashboard{% endblock %}
 
 {% block studio_content %}
 
-<h3 class="mb-4 fw-bold">📊 Studio Dashboard</h3>
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header mb-3">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="h4 fw-bold mb-1">📊 Studio Dashboard</h1>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <small class="text-muted" style="font-size: 0.8rem;">Last updated: <span id="lastUpdate">Just now</span></small>
+        </div>
+    </div>
+</div>
 
 <!-- ================= STATS CARDS ================= -->
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-5">
 
-    <div class="col-md-3 col-sm-6">
-        <div class="glass-card text-center">
-            <h6>Total Bookings</h6>
-            <h2 class="stat-number" data-target="{{ total_bookings }}">
-    {{ total_bookings }}
-</h2>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Total Bookings</span>
+                <h2 class="stat-value">{{ total_bookings }}</h2>
+                <small class="stat-trend">📈 +12% this month</small>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-3 col-sm-6">
-        <div class="glass-card text-center">
-            <h6>Upcoming Shoots</h6>
-            <h2 class="stat-number" data-target="{{ confirmed_bookings }}">
-    {{ confirmed_bookings }}
-</h2>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Upcoming Shoots</span>
+                <h2 class="stat-value">{{ confirmed_bookings }}</h2>
+                <small class="stat-trend">💪 Keep it up!</small>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-3 col-sm-6">
-        <div class="glass-card text-center">
-            <h6>Total Revenue</h6>
-            <h2 class="stat-number" data-target="{{ total_earnings }}">
-     {{ total_earnings }}
-</h2>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">
+                <i class="bi bi-cash-coin"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Total Revenue</span>
+                <h2 class="stat-value">${{ total_earnings }}</h2>
+                <small class="stat-trend">💰 Earnings tracked</small>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-3 col-sm-6">
-        <div class="glass-card text-center">
-            <h6>Average Rating</h6>
-            <h2>{{ average_rating }} ⭐</h2>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Average Rating</span>
+                <h2 class="stat-value">{{ average_rating|floatformat:1 }}/5</h2>
+                <small class="stat-trend">⭐ Excellent!</small>
+            </div>
         </div>
     </div>
 
 </div>
-
 
 <!-- ================= CHARTS SECTION ================= -->
-<div class="row g-4 mb-4 align-items-stretch">
+<div class="row g-4 mb-5">
 
     <!-- Revenue Chart -->
-    <div class="col-lg-8 d-flex">
-        <div class="glass-card p-4 w-100">
-            <h5 class="mb-3">📈 Monthly Revenue</h5>
-            <canvas id="revenueChart"></canvas>
+    <div class="col-lg-8">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">📈 Monthly Revenue Trend</h5>
+                <div class="chart-controls">
+                    <button class="btn btn-sm btn-outline-secondary active">Month</button>
+                    <button class="btn btn-sm btn-outline-secondary">Quarter</button>
+                    <button class="btn btn-sm btn-outline-secondary">Year</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="160"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Booking Status -->
-    <div class="col-lg-4 d-flex">
-        <div class="glass-card p-4 w-100">
-            <h5 class="mb-3">📊 Booking Status</h5>
-            <canvas id="bookingStatusChart"></canvas>
+    <!-- Booking Status Chart -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">📊 Booking Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="bookingStatusChart" height="120"></canvas>
+            </div>
         </div>
     </div>
 
 </div>
 
-<!-- ================= SCHEDULE + NOTIFICATIONS ================= -->
-<div class="row g-4 mb-4">
+<!-- ================= QUICK ACTIONS ================= -->
+<div class="row g-4 mb-5">
+
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">🚀 Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="action-list">
+                    <a href="{% url 'studio_portfolio' %}" class="action-item">
+                        <i class="bi bi-camera"></i>
+                        <div>
+                            <span class="action-title">Add Photos</span>
+                            <small class="action-desc">Update your portfolio</small>
+                        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'studio_bookings' %}" class="action-item">
+                        <i class="bi bi-calendar-event"></i>
+                        <div>
+                            <span class="action-title">View Bookings</span>
+                            <small class="action-desc">Manage your schedule</small>
+                        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'user_profile' %}" class="action-item">
+                        <i class="bi bi-person-circle"></i>
+                        <div>
+                            <span class="action-title">Profile Settings</span>
+                            <small class="action-desc">Update studio details</small>
+                        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Today Schedule -->
-    <div class="col-lg-6">
-        <div class="glass-card p-4">
-            <h5 class="mb-3">📅 Today’s Schedule</h5>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-transparent text-light">
-                    10:00 AM – Wedding Shoot
-                </li>
-                <li class="list-group-item bg-transparent text-light">
-                    03:00 PM – Product Shoot
-                </li>
-            </ul>
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">📅 Today's Schedule</h5>
+                <span class="badge bg-primary">Live</span>
+            </div>
+            <div class="card-body">
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <div class="schedule-time">10:00 AM</div>
+                        <div class="schedule-details">
+                            <span class="schedule-event">Wedding Shoot</span>
+                            <small class="schedule-client">Client: John Doe</small>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-time">03:00 PM</div>
+                        <div class="schedule-details">
+                            <span class="schedule-event">Product Shoot</span>
+                            <small class="schedule-client">Client: ABC Company</small>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'studio_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Notifications -->
-    <div class="col-lg-6">
-        <div class="glass-card p-4">
-            <h5 class="mb-3">🔔 Notifications</h5>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-transparent text-light">
-                    New booking request received.
-                </li>
-                <li class="list-group-item bg-transparent text-light">
-                    Payment pending from Rahul Sharma.
-                </li>
-                <li class="list-group-item bg-transparent text-light">
-                    New 5⭐ review added.
-                </li>
-            </ul>
+    <!-- Recent Notifications -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">🔔 Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="notification-list">
+                    <div class="notification-item notification-new">
+                        <i class="bi bi-calendar-plus"></i>
+                        <div class="notification-content">
+                            <span class="notification-title">New booking request</span>
+                            <small class="notification-time">2 minutes ago</small>
+                        </div>
+                    </div>
+                    <div class="notification-item notification-warning">
+                        <i class="bi bi-credit-card"></i>
+                        <div class="notification-content">
+                            <span class="notification-title">Payment received</span>
+                            <small class="notification-time">1 hour ago</small>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <i class="bi bi-star"></i>
+                        <div class="notification-content">
+                            <span class="notification-title">New 5-star review</span>
+                            <small class="notification-time">3 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 </div>
 
+<!-- ================= PERFORMANCE METRICS ================= -->
+<div class="row g-4">
 
-<!-- ================= AI INSIGHTS + REVIEWS ================= -->
-<div class="row g-4 mb-4">
-
-    <!-- AI Insights -->
     <div class="col-lg-6">
-        <div class="glass-card p-4">
-            <h5 class="mb-3">🤖 AI Insights</h5>
-            <ul>
-                <li>Most booked service: Wedding Premium Package</li>
-                <li>Peak booking month: December</li>
-                <li>High demand from Mumbai region</li>
-                <li>Customer satisfaction rate: 92%</li>
-            </ul>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">📊 Performance Metrics</h5>
+            </div>
+            <div class="card-body">
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <label>Booking Rate</label>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                        <span class="metric-value">75%</span>
+                    </div>
+                    <div class="metric-item">
+                        <label>Client Satisfaction</label>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 92%"></div>
+                        </div>
+                        <span class="metric-value">92%</span>
+                    </div>
+                    <div class="metric-item">
+                        <label>Portfolio Completion</label>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                        <span class="metric-value">60%</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Reviews -->
     <div class="col-lg-6">
-        <div class="glass-card p-4">
-            <h5 class="mb-3">⭐ Recent Reviews</h5>
-            <p>“Amazing photography quality!” – 5⭐</p>
-            <p>“Very professional team.” – 4⭐</p>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="mb-0">🎯 Studio Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="studio-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Studio Name</span>
+                        <span class="info-value">{{ studio.studio_name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location</span>
+                        <span class="info-value">{{ studio.location }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Experience</span>
+                        <span class="info-value">{{ studio.experience_years }} years</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Verified</span>
+                        <span class="info-value">
+                            {% if studio.is_verified %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Yes</span>
+                            {% else %}
+                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 </div>
 
-
-<!-- ================= RECENT BOOKINGS ================= -->
-<div class="glass-card p-4">
-    <h5 class="mb-3">🗓 Recent Bookings</h5>
-
-    <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Client</th>
-                    <th>Event Type</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Rahul Sharma</td>
-                    <td>Wedding</td>
-                    <td>25 July 2026</td>
-                    <td><span class="badge bg-success">Confirmed</span></td>
-                    <td>₹ 45,000</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Anjali Verma</td>
-                    <td>Pre-Wedding</td>
-                    <td>02 Aug 2026</td>
-                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                    <td>₹ 18,000</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 
 {% endblock %}
-
 
 {% block extra_js %}
 {{ block.super }}
@@ -181,53 +295,72 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
-    // ================= COUNTER ANIMATION =================
-    document.querySelectorAll('.stat-number').forEach(counter => {
-        const target = +counter.getAttribute('data-target');
-        let count = 0;
-        const increment = target / 100;
-
-        const updateCounter = () => {
-            if (count < target) {
-                count += increment;
-                counter.innerText = Math.ceil(count);
-                setTimeout(updateCounter, 20);
-            } else {
-                counter.innerText = target.toLocaleString();
-            }
-        };
-        updateCounter();
-    });
-
-    // ================= REVENUE CHART =================
-    new Chart(document.getElementById('revenueChart'), {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
         type: 'line',
         data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             datasets: [{
-                label: 'Revenue',
-                data: [40000, 55000, 60000, 70000, 85000, 95000],
-                borderColor: '#06b6d4',
-                backgroundColor: 'rgba(6,182,212,0.2)',
+                label: 'Revenue ($)',
+                data: [1000, 1500, 2000, 1800, 2500, 3000],
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderWidth: 3,
+                fill: true,
                 tension: 0.4,
-                fill: true
+                pointBackgroundColor: '#6366f1',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
         }
     });
 
-    // ================= BOOKING STATUS CHART =================
-    new Chart(document.getElementById('bookingStatusChart'), {
+    // Booking Status Chart
+    const statusCtx = document.getElementById('bookingStatusChart').getContext('2d');
+    new Chart(statusCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Confirmed', 'Pending', 'Cancelled'],
+            labels: ['Confirmed', 'Pending', 'Completed'],
             datasets: [{
-                data: [80, 30, 18],
-                backgroundColor: ['#10b981', '#facc15', '#ef4444']
+                data: [{{ confirmed_bookings }}, 5, 12],
+                backgroundColor: ['#10b981', '#f59e0b', '#6366f1'],
+                borderColor: '#0f172a',
+                borderWidth: 2
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { 
+                    position: 'bottom',
+                    labels: { color: '#e2e8f0' }
+                }
+            }
         }
     });
 
+    // Update last updated time
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
 </script>
 
 {% endblock %}

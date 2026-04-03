@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'chatbot',
     'recommendations',
     'dashboard',
+    'adminpanel',
     'notifications',
     'api',
 ]
@@ -85,7 +86,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
-LOGIN_URL = 'login'
+LOGIN_URL = 'auth_page'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

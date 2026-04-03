@@ -1,40 +1,103 @@
 {% extends "admin/dashboard/admin_base.html" %}
+{% block page_title %}Payments Control Center{% endblock %}
+{% block page_description %}Audit transaction flow, monitor failures, and track settlement performance.{% endblock %}
 
 {% block admin_content %}
 
-<h2 class="fw-bold mb-4">💳 Payments</h2>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h6 class="text-muted mb-1">Completed Payments</h6>
+            <h3 class="fw-bold">{{ stats.completed_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h6 class="text-muted mb-1">Pending Payments</h6>
+            <h3 class="fw-bold">{{ stats.pending_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h6 class="text-muted mb-1">Collected Revenue</h6>
+            <h3 class="fw-bold">${{ stats.total_amount }}</h3>
+        </div>
+    </div>
+</div>
 
-<div class="card bg-dark text-light p-4 rounded-4">
-    <table class="table table-dark table-hover">
-        <thead>
-            <tr>
-                <th>Transaction ID</th>
-                <th>User</th>
-                <th>Studio</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in payments %}
-            <tr>
-                <td>{{ payment.transaction_id }}</td>
-                <td>{{ payment.user.username }}</td>
-                <td>{{ payment.studio.name }}</td>
-                <td>₹ {{ payment.amount }}</td>
-                <td>
-                    <span class="badge bg-success">{{ payment.status }}</span>
-                </td>
-                <td>{{ payment.created_at }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No payments found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="admin-panel p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label small text-muted">Search</label>
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Transaction, user, studio">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Pending" {% if status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Processing" {% if status == 'Processing' %}selected{% endif %}>Processing</option>
+                <option value="Failed" {% if status == 'Failed' %}selected{% endif %}>Failed</option>
+                <option value="Refunded" {% if status == 'Refunded' %}selected{% endif %}>Refunded</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small text-muted">Method</label>
+            <select name="method" class="form-select">
+                <option value="">All</option>
+                <option value="Card" {% if method == 'Card' %}selected{% endif %}>Card</option>
+                <option value="Bank" {% if method == 'Bank' %}selected{% endif %}>Bank</option>
+                <option value="Wallet" {% if method == 'Wallet' %}selected{% endif %}>Wallet</option>
+                <option value="UPI" {% if method == 'UPI' %}selected{% endif %}>UPI</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="admin-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>User</th>
+                    <th>Studio</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.transaction_id|default:'Pending ID' }}</td>
+                    <td>
+                        <strong>{{ payment.user.username }}</strong>
+                        <div class="small text-muted">{{ payment.user.email }}</div>
+                    </td>
+                    <td>{{ payment.booking.studio.studio_name|default:'-' }}</td>
+                    <td>{{ payment.payment_method }}</td>
+                    <td>${{ payment.amount }}</td>
+                    <td>
+                        <span class="badge {% if payment.status == 'Completed' %}text-bg-success{% elif payment.status == 'Pending' or payment.status == 'Processing' %}text-bg-warning{% elif payment.status == 'Failed' %}text-bg-danger{% else %}text-bg-secondary{% endif %}">
+                            {{ payment.status }}
+                        </span>
+                    </td>
+                    <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">No payments found for selected filters.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

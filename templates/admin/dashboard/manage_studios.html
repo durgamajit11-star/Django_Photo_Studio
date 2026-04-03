@@ -1,66 +1,93 @@
 {% extends "admin/dashboard/admin_base.html" %}
+{% block page_title %}Studio Moderation{% endblock %}
+{% block page_description %}Approve quality studios, reject invalid listings, and monitor supply quality.{% endblock %}
+
+{% block page_actions %}
+<span class="metric-tag">Total: {{ total_studios }}</span>
+{% endblock %}
 
 {% block admin_content %}
 
-<h2 class="fw-bold mb-4">🏢 Manage Studios</h2>
+{% if messages %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {% for message in messages %}{{ message }}{% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
 
-<p>Total Studios: {{ studios|length }}</p>
+<div class="admin-panel p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label small text-muted">Search</label>
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Studio, location, owner">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="verified" {% if status == 'verified' %}selected{% endif %}>Verified</option>
+                <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Apply Filters</button>
+        </div>
+    </form>
+</div>
 
-<div class="card bg-dark text-light p-4 rounded-4">
-    <table class="table table-dark table-hover align-middle">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Studio Name</th>
-                <th>Owner</th>
-                <th>Email</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for studio in studios %}
-            <tr>
-                <td>{{ studio.id }}</td>
-                <td>{{ studio.studio_name }}</td>
-                <td>{{ studio.user.username }}</td>
-                <td>{{ studio.user.email }}</td>
-                <td>{{ studio.location }}</td>
-
-                <!-- Status -->
-                <td>
-                    {% if studio.is_active %}
-                        <span class="badge bg-success">Approved</span>
-                    {% else %}
-                        <span class="badge bg-warning text-dark">Pending</span>
-                    {% endif %}
-                </td>
-
-                <!-- Actions -->
-                <td>
-                    {% if not studio.is_active %}
-                        <a href="{% url 'approve_studio' studio.id %}" 
-                           class="btn btn-sm btn-success">
-                           Approve
-                        </a>
-                    {% endif %}
-
-                    <a href="{% url 'reject_studio' studio.id %}" 
-                       class="btn btn-sm btn-danger"
-                       onclick="return confirm('Are you sure to reject/delete this studio?');">
-                       Reject
-                    </a>
-                </td>
-            </tr>
-
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center">No studios found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="admin-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Studio</th>
+                    <th>Owner</th>
+                    <th>Contact</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for studio in studios %}
+                <tr>
+                    <td>#{{ studio.id }}</td>
+                    <td>
+                        <strong>{{ studio.studio_name }}</strong>
+                        <div class="small text-muted">Created {{ studio.created_at|date:"M d, Y" }}</div>
+                    </td>
+                    <td>{{ studio.user.username }}</td>
+                    <td>{{ studio.user.email|default:'-' }}</td>
+                    <td>{{ studio.location|default:'-' }}</td>
+                    <td>
+                        {% if studio.is_verified %}
+                        <span class="badge text-bg-success">Verified</span>
+                        {% else %}
+                        <span class="badge text-bg-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if not studio.is_verified %}
+                        <form method="POST" action="{% url 'approve_studio' studio.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success">Approve</button>
+                        </form>
+                        {% endif %}
+                        <form method="POST" action="{% url 'reject_studio' studio.id %}" class="d-inline" onsubmit="return confirm('Reject and remove this studio?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">No studios found for current filters.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

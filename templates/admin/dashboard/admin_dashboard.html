@@ -1,72 +1,89 @@
 {% extends 'admin/dashboard/admin_base.html' %}
 {% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Executive Overview{% endblock %}
+{% block page_description %}Track growth, quality, and operational health from one command center.{% endblock %}
 
 {% block admin_content %}
-
-<h2 class="fw-bold mb-4">📊 Admin Dashboard</h2>
 
 <div class="row g-4 mb-4">
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Total Users</h6>
-            <h3>{{ total_users }}</h3>
-            <p class="text-success small">+12% this month</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="text-muted mb-0">Total Users</h6>
+                <span class="metric-tag">Growth</span>
+            </div>
+            <h3 class="fw-bold mb-1">{{ total_users }}</h3>
+            <p class="small text-success mb-0">Strong customer acquisition trend</p>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Total Studios</h6>
-            <h3>{{ total_studios }}</h3>
-            <p class="text-info small">Active listings</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="text-muted mb-0">Total Studios</h6>
+                <span class="metric-tag">Supply</span>
+            </div>
+            <h3 class="fw-bold mb-1">{{ total_studios }}</h3>
+            <p class="small text-info mb-0">Verified and listed studios</p>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Total Bookings</h6>
-            <h3>{{ total_bookings }}</h3>
-            <p class="text-warning small">Pending approvals</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="text-muted mb-0">Total Bookings</h6>
+                <span class="metric-tag">Demand</span>
+            </div>
+            <h3 class="fw-bold mb-1">{{ total_bookings }}</h3>
+            <p class="small text-warning mb-0">Track pending and completed flow</p>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Total Revenue</h6>
-            <h3>0.0{{ total_revenue }}</h3>
-            <p class="text-primary small">Confirmed payments</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="text-muted mb-0">Total Revenue</h6>
+                <span class="metric-tag">Finance</span>
+            </div>
+            <h3 class="fw-bold mb-1">${{ total_revenue }}</h3>
+            <p class="small text-primary mb-0">Revenue from confirmed bookings</p>
         </div>
     </div>
 </div>
 
-<div class="card bg-dark text-light p-4 rounded-4">
-    <h5 class="mb-3">Platform Overview</h5>
-    <p style="color: rgb(138, 138, 249);">
-        The admin panel provides centralized control over users, studios,
-        bookings, and payment analytics. Use the sidebar to manage
-        platform operations efficiently.
-    </p>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-panel p-4 h-100">
+            <h5 class="fw-bold mb-2">Platform Health</h5>
+            <p class="text-muted mb-4">Keep conversion quality high by monitoring supply-demand ratio and booking health weekly.</p>
+            <div class="chart-shell">
+                <canvas id="revenueChart"></canvas>
+            </div>
+            {{ revenue_labels|json_script:"revenue-labels" }}
+            {{ revenue_data|json_script:"revenue-data" }}
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-panel p-4 h-100 d-flex flex-column">
+            <h5 class="fw-bold mb-3">Quick Actions</h5>
+            <a href="{% url 'manage_users' %}" class="btn btn-outline-primary mb-2 text-start">
+                <i class="bi bi-people me-2"></i>Review Users
+            </a>
+            <a href="{% url 'manage_studios' %}" class="btn btn-outline-primary mb-2 text-start">
+                <i class="bi bi-building me-2"></i>Verify Studios
+            </a>
+            <a href="{% url 'admin_bookings' %}" class="btn btn-outline-primary mb-2 text-start">
+                <i class="bi bi-calendar-event me-2"></i>Open Booking Queue
+            </a>
+            <a href="{% url 'admin_payments' %}" class="btn btn-outline-primary text-start">
+                <i class="bi bi-wallet2 me-2"></i>Audit Payments
+            </a>
+            <hr>
+            <div class="small text-muted mt-auto">
+                Tip: Prioritize pending bookings and unverified studios to improve booking success rates.
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- Chart.js -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<canvas id="myChart" style="margin-top:30px;"></canvas>
-
-<script>
-const ctx = document.getElementById('myChart');
-
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Users', 'Studios', 'Bookings'],
-        datasets: [{
-            label: 'Count',
-            data: [4, 2, 0],
-            borderWidth: 1
-        }]
-    }
-});
-</script> -->
 
 {% endblock %}
