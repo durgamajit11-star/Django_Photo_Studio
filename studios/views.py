@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg, Q
 from django.core.paginator import Paginator
-from studios.models import Studio, Portfolio, Review, Service
+from studios.models import Studio, Portfolio, Review, Service, StudioImage
 from bookings.models import BookingRequest
 
 
@@ -80,16 +80,39 @@ def studio_list(request):
 def studio_detail(request, studio_id):
     """Display detailed information about a specific studio"""
     studio = get_object_or_404(Studio, id=studio_id)
-    portfolios = studio.portfolios.all()
-    reviews = studio.reviews.all()
+    portfolios = studio.portfolios.all()[:12]
+    studio_images = studio.studio_images.all()[:12]
+    services = studio.services.all().order_by('price', 'service_name')
+    reviews = studio.reviews.select_related('user').all()
+
+    related_studios = Studio.objects.filter(
+        Q(category=studio.category) | Q(location__icontains=studio.location),
+    ).exclude(id=studio.id).order_by('-is_featured', '-created_at').distinct()[:4]
+
+    recent_reviews = reviews[:6]
+    specialization_tags = [item.strip() for item in (studio.specializations or '').split(',') if item.strip()]
+
+    min_service_price = services.order_by('price').values_list('price', flat=True).first()
+    max_service_price = services.order_by('-price').values_list('price', flat=True).first()
     
     context = {
         'studio': studio,
         'portfolios': portfolios,
-        'reviews': reviews,
+        'studio_images': studio_images,
+        'services': services,
+        'reviews': recent_reviews,
+        'related_studios': related_studios,
+        'specialization_tags': specialization_tags,
         'avg_rating': studio.average_rating(),
         'total_reviews': reviews.count(),
         'total_bookings': studio.total_bookings(),
+        'confirmed_bookings': studio.confirmed_bookings(),
+        'avg_booking_value': studio.average_booking_value(),
+        'portfolio_count': portfolios.count(),
+        'gallery_count': studio_images.count(),
+        'service_count': services.count(),
+        'min_service_price': min_service_price,
+        'max_service_price': max_service_price,
     }
     
     return render(request, 'studios/studio_detail.html', context)

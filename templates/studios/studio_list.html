@@ -110,7 +110,7 @@
                                         View Details
                                     </a>
                                     {% if user.is_authenticated %}
-                                    <a href="{% url 'studios:book_studio' studio.id %}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-calendar-check"></i> Book
                                     </a>
                                     {% else %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Details | StudioSync{% endblock %}
+
+{% block extra_css %}
+<style>
+.booking-detail-shell {
+    max-width: 1000px;
+    margin: 2rem auto;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 22px;
+    padding: 1.4rem;
+}
+
+.detail-card {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+}
+
+.info-line:last-child {
+    border-bottom: none;
+}
+
+.note-item {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+    background: rgba(30, 41, 59, 0.45);
+}
+
+.status-badge {
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.st-pending { background: rgba(245, 158, 11, 0.2); color: #facc15; }
+.st-confirmed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.st-completed { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+.st-cancelled { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="booking-detail-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="mb-1">Booking #{{ booking.id }}</h3>
+            <p class="text-secondary mb-0">{{ booking.studio.studio_name }} - {{ booking.event_type }}</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="status-badge st-{{ booking.status|lower }}">{{ booking.status }}</span>
+            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-light btn-sm">All Bookings</a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="detail-card h-100">
+                <h5 class="mb-3">Booking Information</h5>
+                <div class="info-line"><span>Date</span><strong>{{ booking.date|date:"d M Y" }}</strong></div>
+                <div class="info-line"><span>Time</span><strong>{{ booking.time_slot|default:booking.time|default:"Not specified" }}</strong></div>
+                <div class="info-line"><span>Location</span><strong>{{ booking.location|default:booking.studio.location }}</strong></div>
+                <div class="info-line"><span>Service</span><strong>{{ booking.service.service_name|default:"General Session" }}</strong></div>
+                <div class="info-line"><span>Amount</span><strong>Rs. {{ booking.amount }}</strong></div>
+                <div class="info-line"><span>Payment Status</span><strong>{{ booking.payment_status }}</strong></div>
+                <div class="info-line"><span>Created</span><strong>{{ booking.created_at|date:"d M Y, h:i A" }}</strong></div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="detail-card mb-3">
+                <h6 class="mb-2">Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    {% if booking.payment_status == 'Unpaid' and booking.status != 'Cancelled' %}
+                    <a href="{% url 'payments:create_payment' booking.id %}" class="btn btn-success btn-sm">Pay Now</a>
+                    {% endif %}
+                    {% if booking.status == 'Pending' and booking.user == request.user %}
+                    <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Cancel this booking?');">Cancel Booking</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h6 class="mb-2">Add Note</h6>
+                <form method="post" action="{% url 'bookings:add_note' booking.id %}">
+                    {% csrf_token %}
+                    <textarea name="message" class="form-control mb-2" rows="3" placeholder="Add booking notes" required></textarea>
+                    <button type="submit" class="btn btn-info btn-sm w-100">Post Note</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-card mt-3">
+        <h5 class="mb-3">Booking Notes</h5>
+        {% for note in notes %}
+        <div class="note-item">
+            <div class="d-flex justify-content-between">
+                <strong>{{ note.user.username }}</strong>
+                <small class="text-secondary">{{ note.created_at|date:"d M Y, h:i A" }}</small>
+            </div>
+            <div class="mt-1">{{ note.message }}</div>
+        </div>
+        {% empty %}
+        <p class="text-secondary mb-0">No notes added yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

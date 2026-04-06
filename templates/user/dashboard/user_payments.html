@@ -1,188 +1,196 @@
-{% extends  "user/dashboard/user_base.html"  %}
+{% extends "user/dashboard/user_base.html" %}
 
 {% block title %}Payments | StudioSync{% endblock %}
 
 {% block content %}
-
 <style>
-/* 🔥 Premium Styles */
-
-.payments-container {
-    padding: 20px;
+:root {
+    --pay-bg: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.88));
+    --pay-border: rgba(148, 163, 184, 0.25);
+    --pay-card: rgba(2, 6, 23, 0.74);
+    --pay-accent: #38bdf8;
 }
 
-/* Stats Cards */
-.stats-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 20px;
-    backdrop-filter: blur(10px);
-    transition: 0.3s;
+.pay-shell {
+    background: radial-gradient(circle at 95% 0%, rgba(56, 189, 248, 0.2), transparent 40%), var(--pay-bg);
+    border: 1px solid var(--pay-border);
+    border-radius: 22px;
+    padding: 1.4rem;
 }
 
-.stats-card:hover {
-    transform: translateY(-5px);
+.pay-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.2rem;
 }
 
-.payment-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 20px;
-    backdrop-filter: blur(12px);
-    transition: 0.3s;
-    border: 1px solid rgba(255,255,255,0.08);
+.stat-card {
+    background: rgba(15, 23, 42, 0.68);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 0.9rem;
 }
 
-.payment-card:hover {
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+.stat-card .value {
+    font-size: 1.35rem;
+    font-weight: 700;
 }
 
-.payment-header {
+.pay-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 180px 170px auto;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.pay-card {
+    background: var(--pay-card);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.pay-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    gap: 1rem;
 }
 
-.payment-amount {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #00f5c4;
+.pill {
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
 
-.badge {
-    padding: 8px 12px;
-    border-radius: 20px;
+.pill-completed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.pill-processing { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+.pill-pending { background: rgba(245, 158, 11, 0.2); color: #facc15; }
+.pill-failed { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.pill-refunded { background: rgba(99, 102, 241, 0.2); color: #c4b5fd; }
+
+.pay-grid {
+    margin-top: 0.8rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.55rem;
 }
 
-/* Status Colors */
-.badge-success { background: #22c55e; }
-.badge-warning { background: #f59e0b; }
-.badge-danger { background: #ef4444; }
-
-/* Divider */
-.divider {
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 10px 0;
+.meta {
+    background: rgba(30, 41, 59, 0.54);
+    border-radius: 12px;
+    padding: 0.6rem;
+    font-size: 0.9rem;
 }
 
+.meta small {
+    display: block;
+    color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+    .pay-toolbar {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
-<div class="container-fluid payments-container">
-
-    <!-- 🔥 HEADER -->
-    <div class="mb-4">
-        <h2 class="fw-bold">💳 Payments Dashboard</h2>
-        <p>Track your transactions and payment history</p>
+<section class="pay-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="fw-bold mb-1">Payments Hub</h2>
+            <p class="text-secondary mb-0">Track all transactions with method and status insights.</p>
+        </div>
     </div>
 
-    <!-- 📊 STATS -->
-    <div class="row mb-4">
-
-        <div class="col-md-4">
-            <div class="stats-card text-center">
-                <h5>Total Payments</h5>
-                <h3>{{ payments|length }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="stats-card text-center">
-                <h5>Completed</h5>
-                <h3>
-                    {{ payments|dictsort:"status"|length }}
-                </h3>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="stats-card text-center">
-                <h5>Total Amount</h5>
-                <h3>₹ {{ total_amount|default:"0" }}</h3>
-            </div>
-        </div>
-
+    <div class="pay-stats">
+        <div class="stat-card"><small class="text-secondary">Total Transactions</small><div class="value">{{ total_payments }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Completed</small><div class="value text-success">{{ completed_count }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Processing</small><div class="value text-info">{{ processing_count }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Pending</small><div class="value text-warning">{{ pending_count }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Failed</small><div class="value text-danger">{{ failed_count }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Total Paid</small><div class="value">Rs. {{ total_amount }}</div></div>
     </div>
 
-    <!-- 💳 PAYMENTS LIST -->
-    <div class="row g-4">
-        {% for payment in payments %}
-        <div class="col-md-4">
+    <form class="pay-toolbar" method="get">
+        <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by studio or transaction ID">
+        <select name="status" class="form-select">
+            <option value="">All statuses</option>
+            <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Processing" {% if status == 'Processing' %}selected{% endif %}>Processing</option>
+            <option value="Pending" {% if status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Failed" {% if status == 'Failed' %}selected{% endif %}>Failed</option>
+            <option value="Refunded" {% if status == 'Refunded' %}selected{% endif %}>Refunded</option>
+        </select>
+        <select name="method" class="form-select">
+            <option value="">All methods</option>
+            <option value="Card" {% if method == 'Card' %}selected{% endif %}>Card</option>
+            <option value="Bank" {% if method == 'Bank' %}selected{% endif %}>Bank</option>
+            <option value="Wallet" {% if method == 'Wallet' %}selected{% endif %}>Wallet</option>
+            <option value="UPI" {% if method == 'UPI' %}selected{% endif %}>UPI</option>
+        </select>
+        <button class="btn btn-info" type="submit"><i class="bi bi-search"></i> Filter</button>
+    </form>
 
-            <div class="payment-card">
-
-                <div class="payment-header">
-                    <div>
-                        <h6>Payment #{{ payment.id }}</h6>
-                        <small class="text-muted">
-                            {{ payment.created_at|date:"M d, Y" }}
-                        </small>
-                    </div>
-
-                    <span class="badge 
-                        {% if payment.status == 'Completed' %}badge-success
-                        {% elif payment.status == 'Pending' %}badge-warning
-                        {% else %}badge-danger{% endif %}">
-                        {{ payment.status }}
-                    </span>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="payment-details">
-
-                    <p class="payment-amount">
-                        ₹ {{ payment.amount }}
-                    </p>
-
-                    <p>
-                        <strong>Method:</strong> 
-                        {{ payment.get_payment_method_display }}
-                    </p>
-
-                    {% if payment.transaction_id %}
-                    <p style="font-size: 0.85rem;">
-                        <strong>Txn ID:</strong> {{ payment.transaction_id }}
-                    </p>
-                    {% endif %}
-
-                </div>
-
-                <a href="{% url 'payments:payment_detail' payment.id %}"
-                   class="btn btn-outline-light btn-sm w-100 mt-2">
-                    View Details →
-                </a>
-
-            </div>
-
-        </div>
-        {% empty %}
-
-        <!-- EMPTY STATE -->
-        <div class="col-12 text-center mt-5">
-            <div class="p-5 rounded" style="background: rgba(255,255,255,0.05);">
-                <i class="bi bi-wallet2" style="font-size: 3rem;"></i>
-                <h5 class="mt-3">No Payments Yet</h5>
-                <p class="text-muted">Your transactions will appear here</p>
-            </div>
-        </div>
-
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+        <div>{{ message }}</div>
         {% endfor %}
     </div>
+    {% endif %}
 
-</div>
+    {% for payment in payments %}
+    <article class="pay-card">
+        <div class="pay-head">
+            <div>
+                <h5 class="mb-1">Booking #{{ payment.booking.id }} - {{ payment.booking.studio.studio_name }}</h5>
+                <small class="text-secondary">{{ payment.created_at|date:"d M Y, h:i A" }}</small>
+            </div>
+            <div class="text-end">
+                <h5 class="mb-1">Rs. {{ payment.amount }}</h5>
+                <span class="pill pill-{{ payment.status|lower }}">{{ payment.status }}</span>
+            </div>
+        </div>
 
-<!-- ✨ Optional JS Animation -->
-<script>
-document.querySelectorAll('.payment-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        card.style.transform = "translateY(-8px) scale(1.02)";
-    });
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = "translateY(0)";
-    });
-});
-</script>
+        <div class="pay-grid">
+            <div class="meta">
+                <small>Method</small>
+                {{ payment.get_payment_method_display }}
+            </div>
+            <div class="meta">
+                <small>Transaction ID</small>
+                {{ payment.transaction_id|default:"Not generated" }}
+            </div>
+            <div class="meta">
+                <small>Event</small>
+                {{ payment.booking.event_type }}
+            </div>
+            <div class="meta">
+                <small>Booking Date</small>
+                {{ payment.booking.date|date:"d M Y" }}
+            </div>
+        </div>
 
+        <div class="mt-3 d-flex flex-wrap gap-2">
+            <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-receipt"></i> View Receipt
+            </a>
+            {% if payment.status == 'Completed' %}
+            <a href="{% url 'payments:request_refund' payment.id %}" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i> Request Refund
+            </a>
+            {% endif %}
+        </div>
+    </article>
+    {% empty %}
+    <div class="alert alert-secondary text-center py-5">
+        <i class="bi bi-wallet2" style="font-size: 2rem;"></i>
+        <h5 class="mt-3">No payments found</h5>
+        <p class="text-secondary">Try another filter or complete a booking payment first.</p>
+    </div>
+    {% endfor %}
+</section>
 {% endblock %}

@@ -78,13 +78,69 @@
     </form>
 </div>
 
-<div class="admin-panel p-4 mb-4">
-    <h6 class="fw-semibold mb-3">Monthly Revenue Trend</h6>
-    <div class="chart-shell">
-        <canvas id="revenueChart"></canvas>
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="admin-panel p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="fw-semibold mb-1">Priority Booking Queue</h6>
+                    <p class="text-muted mb-0">High-value or older pending requests that need admin attention first.</p>
+                </div>
+                <span class="metric-tag">Action Required</span>
+            </div>
+            {% for item in priority_bookings %}
+            <div class="d-flex justify-content-between align-items-start border-bottom border-secondary-subtle py-3">
+                <div>
+                    <div class="fw-semibold">{{ item.booking.user.get_full_name|default:item.booking.user.username }} - {{ item.booking.studio.studio_name }}</div>
+                    <div class="small text-muted">{{ item.booking.event_type }} | {{ item.booking.booking_date|default:item.booking.date|date:"M d, Y" }}</div>
+                    <div class="small text-muted">Age: {{ item.age_days }} day{{ item.age_days|pluralize }} | Amount: ${{ item.booking.amount }}</div>
+                </div>
+                <div class="text-end">
+                    {% if item.is_urgent %}
+                    <span class="badge bg-danger mb-1">Urgent</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark mb-1">Review</span>
+                    {% endif %}
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Prioritize this booking in approval workflow">Inspect</button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-muted">No priority bookings at the moment.</div>
+            {% endfor %}
+        </div>
     </div>
-    {{ revenue_labels|json_script:"revenue-labels" }}
-    {{ revenue_data|json_script:"revenue-data" }}
+    <div class="col-lg-5">
+        <div class="admin-panel p-4 h-100">
+            <h6 class="fw-semibold mb-3">Pending Booking Aging</h6>
+            <div class="d-flex flex-column gap-3">
+                {% for row in aging_rows %}
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ row.label }}</span>
+                        <strong>{{ row.count }}</strong>
+                    </div>
+                    <div class="progress" style="height: 10px; background: rgba(255,255,255,0.06);">
+                        <div class="progress-bar bg-info" data-width="{{ row.percent }}" style="width: 0;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <hr>
+
+            <h6 class="fw-semibold mb-2">Stale Pending Requests</h6>
+            {% for item in stale_pending %}
+            <div class="small border-bottom border-secondary-subtle py-2">
+                <strong>{{ item.booking.studio.studio_name }}</strong><br>
+                {{ item.booking.user.username }} | {{ item.age_days }} day{{ item.age_days|pluralize }} pending
+            </div>
+            {% empty %}
+            <div class="text-muted small">No stale bookings found.</div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 <!-- ================= BOOKINGS TABLE ================= -->
@@ -164,4 +220,16 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.progress-bar[data-width]').forEach(function (bar) {
+        const width = bar.getAttribute('data-width') || '0';
+        bar.style.width = width + '%';
+    });
+});
+</script>
 {% endblock %}

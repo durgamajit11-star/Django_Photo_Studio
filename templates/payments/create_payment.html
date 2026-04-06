@@ -1,0 +1,171 @@
+{% extends "user/dashboard/user_base.html" %}
+
+{% block title %}Complete Payment | StudioSync{% endblock %}
+
+{% block content %}
+<style>
+.checkout-shell {
+    background: radial-gradient(circle at 10% -20%, rgba(56, 189, 248, 0.22), transparent 40%), linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 24px;
+    padding: 1.4rem;
+}
+
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1rem;
+}
+
+.panel {
+    background: rgba(2, 6, 23, 0.7);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1rem;
+}
+
+.method-option {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 12px;
+    padding: 0.65rem;
+    cursor: pointer;
+}
+
+.method-option.active {
+    border-color: rgba(56, 189, 248, 0.85);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.qr-box {
+    text-align: center;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 0.9rem;
+}
+
+.qr-box img {
+    width: 220px;
+    max-width: 100%;
+}
+
+.meta-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.92rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+}
+
+.meta-line:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 900px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<section class="checkout-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="fw-bold mb-1">Secure Checkout</h2>
+            <p class="text-secondary mb-0">Choose your payment mode and complete this booking instantly.</p>
+        </div>
+        <a href="{% url 'user_bookings' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Bookings
+        </a>
+    </div>
+
+    <div class="checkout-grid">
+        <div class="panel">
+            <h5 class="mb-3">Booking Summary</h5>
+            <div class="meta-line"><span>Studio</span><strong>{{ booking.studio.studio_name }}</strong></div>
+            <div class="meta-line"><span>Event</span><strong>{{ booking.event_type }}</strong></div>
+            <div class="meta-line"><span>Date</span><strong>{{ booking.date|date:"d M Y" }}</strong></div>
+            <div class="meta-line"><span>Time Slot</span><strong>{{ booking.time_slot|default:"Not selected" }}</strong></div>
+            <div class="meta-line"><span>Booking Status</span><strong>{{ booking.status }}</strong></div>
+            <div class="meta-line"><span>Amount</span><strong>Rs. {{ booking.amount }}</strong></div>
+
+            <hr class="border-secondary">
+
+            <form method="post" id="paymentForm">
+                {% csrf_token %}
+
+                <h6 class="mb-2">Choose Method</h6>
+                <div class="d-grid gap-2 mb-3" id="methodsWrap">
+                    {% for method_code, method_label in payment_methods %}
+                    <label class="method-option" data-method="{{ method_code }}">
+                        <input type="radio" class="form-check-input me-2" name="payment_method" value="{{ method_code }}" {% if method_code == 'UPI' %}checked{% endif %}>
+                        <span class="fw-semibold">{{ method_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div id="upiPanel" class="panel mb-3" style="background: rgba(17, 24, 39, 0.45);">
+                    <h6 class="mb-2">UPI Payment (Recommended)</h6>
+                    <p class="small text-secondary mb-2">Scan QR with any UPI app and submit UTR/reference to verify payment.</p>
+                    <div class="mb-2">
+                        <label class="form-label small">Your UPI ID (optional)</label>
+                        <input type="text" name="payer_upi_id" class="form-control" placeholder="example@oksbi">
+                    </div>
+                    <div>
+                        <label class="form-label small">UPI UTR / Reference Number <span class="text-warning">*</span></label>
+                        <input type="text" name="upi_reference" class="form-control" placeholder="Enter minimum 8 characters">
+                    </div>
+                </div>
+
+                <button class="btn btn-info w-100" type="submit">
+                    <i class="bi bi-shield-check"></i> Pay Rs. {{ booking.amount }}
+                </button>
+            </form>
+        </div>
+
+        <aside class="panel">
+            <h5 class="mb-3">UPI QR</h5>
+            <div class="qr-box mb-2">
+                <img src="{{ upi_payload.upi_qr_url }}" alt="UPI QR Code">
+            </div>
+            <div class="small text-secondary mb-1">Payee</div>
+            <div class="fw-semibold">{{ upi_payload.upi_name }} ({{ upi_payload.upi_id }})</div>
+            <div class="small text-secondary mt-3 mb-1">UPI Intent Link</div>
+            <a href="{{ upi_payload.upi_intent }}" class="btn btn-outline-success btn-sm w-100 mb-2">Open UPI App</a>
+            <a href="{{ upi_payload.upi_qr_url }}" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm w-100">Download QR</a>
+            <p class="small text-secondary mt-3 mb-0">For demo environments, payment confirmation is recorded after UTR submission.</p>
+        </aside>
+    </div>
+</section>
+
+<script>
+(function () {
+    const methodOptions = document.querySelectorAll('.method-option');
+    const upiPanel = document.getElementById('upiPanel');
+
+    function render() {
+        let selected = 'UPI';
+        methodOptions.forEach((card) => {
+            const input = card.querySelector('input[type="radio"]');
+            if (input.checked) {
+                selected = input.value;
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        upiPanel.style.display = selected === 'UPI' ? 'block' : 'none';
+    }
+
+    methodOptions.forEach((card) => {
+        card.addEventListener('click', () => {
+            const input = card.querySelector('input[type="radio"]');
+            input.checked = true;
+            render();
+        });
+    });
+
+    render();
+})();
+</script>
+{% endblock %}

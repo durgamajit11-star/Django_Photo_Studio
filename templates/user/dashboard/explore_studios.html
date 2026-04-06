@@ -109,10 +109,16 @@
                         💰 {{ studio.price_range }}
                     </p>
 
-                    <a href="{% url 'studios:studio_detail' studio.id %}"
-                       class="btn btn-primary w-100">
-                        View Studio
-                    </a>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'studios:studio_detail' studio.id %}"
+                           class="btn btn-primary w-100">
+                            View Studio
+                        </a>
+                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}"
+                           class="btn btn-outline-warning w-100">
+                            <i class="bi bi-calendar-check"></i> Book Studio
+                        </a>
+                    </div>
 
                 </div>
             </div>
@@ -155,10 +161,16 @@
                         💰 {{ studio.price_range }}
                     </p>
 
-                          <a href="{% url 'studios:studio_detail' studio.id %}"
-                              class="btn btn-outline-secondary btn-sm w-100">
-                        View
-                    </a>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'studios:studio_detail' studio.id %}"
+                           class="btn btn-outline-secondary btn-sm w-100">
+                            View
+                        </a>
+                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}"
+                           class="btn btn-warning btn-sm w-100">
+                            <i class="bi bi-calendar-check"></i> Book Studio
+                        </a>
+                    </div>
 
                 </div>
             </div>

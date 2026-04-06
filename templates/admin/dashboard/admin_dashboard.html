@@ -54,33 +54,112 @@
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="admin-panel p-4 h-100">
-            <h5 class="fw-bold mb-2">Platform Health</h5>
-            <p class="text-muted mb-4">Keep conversion quality high by monitoring supply-demand ratio and booking health weekly.</p>
-            <div class="chart-shell">
-                <canvas id="revenueChart"></canvas>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Operational Spotlight</h5>
+                    <p class="text-muted mb-0">A screenshot-ready control view with approval flow, booking activity, and revenue quality indicators.</p>
+                </div>
+                <span class="metric-tag">Live</span>
             </div>
-            {{ revenue_labels|json_script:"revenue-labels" }}
-            {{ revenue_data|json_script:"revenue-data" }}
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Verified Studios</h6>
+                        <h3 class="mb-1">{{ verified_studios }}</h3>
+                        <p class="small text-success mb-0">Trusted supply base</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Pending Approvals</h6>
+                        <h3 class="mb-1">{{ pending_studios }}</h3>
+                        <p class="small text-warning mb-0">Studios awaiting verification</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Avg Booking Value</h6>
+                        <h3 class="mb-1">Rs. {{ avg_booking_value|floatformat:0 }}</h3>
+                        <p class="small text-info mb-0">Higher value bookings increase platform growth</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="admin-panel p-3 h-100">
+                        <h6 class="fw-bold mb-3">Recent Bookings</h6>
+                        {% for booking in recent_bookings %}
+                        <div class="d-flex justify-content-between align-items-start border-bottom border-secondary-subtle py-2">
+                            <div>
+                                <div class="fw-semibold">{{ booking.studio.studio_name }}</div>
+                                <div class="small text-muted">{{ booking.user.username }} | {{ booking.event_type }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small">{{ booking.status }}</div>
+                                <div class="small text-muted">Rs. {{ booking.amount }}</div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-muted">No recent bookings.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="admin-panel p-3 h-100">
+                        <h6 class="fw-bold mb-3">Top Studios</h6>
+                        {% for studio in top_studios %}
+                        <div class="d-flex justify-content-between align-items-start border-bottom border-secondary-subtle py-2">
+                            <div>
+                                <div class="fw-semibold">{{ studio.studio_name }}</div>
+                                <div class="small text-muted">{{ studio.location }}{% if studio.is_verified %} • Verified{% endif %}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small">{{ studio.booking_count }} bookings</div>
+                                <div class="small text-muted">⭐ {{ studio.average_rating|floatformat:1 }}</div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-muted">No studios available.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="admin-panel p-4 h-100 d-flex flex-column">
-            <h5 class="fw-bold mb-3">Quick Actions</h5>
-            <a href="{% url 'manage_users' %}" class="btn btn-outline-primary mb-2 text-start">
-                <i class="bi bi-people me-2"></i>Review Users
-            </a>
-            <a href="{% url 'manage_studios' %}" class="btn btn-outline-primary mb-2 text-start">
-                <i class="bi bi-building me-2"></i>Verify Studios
-            </a>
-            <a href="{% url 'admin_bookings' %}" class="btn btn-outline-primary mb-2 text-start">
-                <i class="bi bi-calendar-event me-2"></i>Open Booking Queue
-            </a>
-            <a href="{% url 'admin_payments' %}" class="btn btn-outline-primary text-start">
-                <i class="bi bi-wallet2 me-2"></i>Audit Payments
-            </a>
-            <hr>
+        <div class="admin-panel p-4 h-100 d-flex flex-column gap-3">
+            <div>
+                <h5 class="fw-bold mb-3">Quick Actions</h5>
+                <a href="{% url 'manage_users' %}" class="btn btn-outline-primary mb-2 text-start w-100">
+                    <i class="bi bi-people me-2"></i>Review Users
+                </a>
+                <a href="{% url 'manage_studios' %}" class="btn btn-outline-primary mb-2 text-start w-100">
+                    <i class="bi bi-building me-2"></i>Verify Studios
+                </a>
+                <a href="{% url 'admin_bookings' %}" class="btn btn-outline-primary mb-2 text-start w-100">
+                    <i class="bi bi-calendar-event me-2"></i>Open Booking Queue
+                </a>
+                <a href="{% url 'admin_payments' %}" class="btn btn-outline-primary text-start w-100">
+                    <i class="bi bi-wallet2 me-2"></i>Audit Payments
+                </a>
+            </div>
+
+            <div>
+                <h6 class="fw-bold mb-2">Payment Snapshot</h6>
+                <div class="d-flex justify-content-between small py-1 border-bottom border-secondary-subtle"><span>Completed</span><strong>{{ payment_snapshot.completed }}</strong></div>
+                <div class="d-flex justify-content-between small py-1 border-bottom border-secondary-subtle"><span>Processing</span><strong>{{ payment_snapshot.processing }}</strong></div>
+                <div class="d-flex justify-content-between small py-1"><span>Failed</span><strong>{{ payment_snapshot.failed }}</strong></div>
+            </div>
+
+            <div>
+                <h6 class="fw-bold mb-2">Studio Growth Notes</h6>
+                <div class="small text-muted">Use this dashboard to verify studios, monitor demand, and improve booking quality.</div>
+            </div>
+
             <div class="small text-muted mt-auto">
-                Tip: Prioritize pending bookings and unverified studios to improve booking success rates.
+                Tip: Prioritize pending studios and high-value bookings to improve marketplace conversion.
             </div>
         </div>
     </div>

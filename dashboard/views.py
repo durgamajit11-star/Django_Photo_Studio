@@ -1,15 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from accounts.decorators import role_required
 from accounts.forms import UserUpdateForm
 from django.contrib import messages
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, Count, Min, Max
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.sessions.models import Session
 from django.contrib.auth import logout
 from django.utils import timezone
+from decimal import Decimal, InvalidOperation
+from urllib.parse import quote
 import json
+import re
 
 from studios.models import Studio, Portfolio, Review
 from django.db.models import Q 
@@ -24,16 +28,300 @@ def landing_explore_studio(request):
     return render(request, "landing_explore_studio.html")
 
 
+@login_required
+@role_required(['USER'])
 def studio_payment(request):
-    return render(request, "user/dashboard/studio_payment.html")
+    from bookings.models import BookingRequest
+    from payments.models import Payment
 
+    upi_id_pattern = re.compile(r'^[a-zA-Z0-9._-]{2,}@[a-zA-Z]{2,}$')
+    payee_upi_id = 'studiosync@upi'
+    payee_name = 'StudioSync'
+
+    unpaid_bookings = BookingRequest.objects.filter(
+        user=request.user,
+        payment_status='Unpaid'
+    ).exclude(status='Cancelled').select_related('studio').order_by('date', 'time')
+
+    selected_booking_id = request.POST.get('booking_id') or request.GET.get('booking_id')
+    selected_booking = None
+    if selected_booking_id:
+        selected_booking = unpaid_bookings.filter(id=selected_booking_id).first()
+    if not selected_booking:
+        selected_booking = unpaid_bookings.first()
+
+    if request.method == 'POST':
+        if not selected_booking:
+            messages.error(request, 'Please select a valid unpaid booking first')
+            return redirect('studio_payment')
+
+        payment_method = request.POST.get('payment_method', '').strip()
+        payer_upi_id = request.POST.get('payer_upi_id', '').strip().lower()
+        upi_reference = request.POST.get('upi_reference', '').strip().upper()
+        valid_methods = {code for code, _ in Payment.PAYMENT_METHOD_CHOICES}
+
+        if payment_method not in valid_methods:
+            messages.error(request, 'Please select a valid payment method')
+            return redirect(f"{request.path}?booking_id={selected_booking.id}")
+
+        existing_payment = getattr(selected_booking, 'payment', None)
+        if existing_payment:
+            messages.warning(request, 'Payment already exists for this booking')
+            return redirect('payments:payment_detail', payment_id=existing_payment.id)
+
+        if payment_method == 'UPI':
+            if payer_upi_id and not upi_id_pattern.match(payer_upi_id):
+                messages.error(request, 'Please enter a valid UPI ID (example: name@bank)')
+                return redirect(f"{request.path}?booking_id={selected_booking.id}")
+            if not upi_reference or len(upi_reference) < 8:
+                messages.error(request, 'Please enter a valid UPI reference/UTR (minimum 8 characters)')
+                return redirect(f"{request.path}?booking_id={selected_booking.id}")
+
+        try:
+            payment = Payment.objects.create(
+                booking=selected_booking,
+                user=request.user,
+                amount=selected_booking.amount,
+                payment_method=payment_method,
+                status='Processing'
+            )
+
+            if payment_method == 'UPI':
+                payment.transaction_id = f"UPI-{upi_reference}-{payment.id:04d}"
+            else:
+                payment.transaction_id = f"TXN{payment.id:06d}"
+
+            payment.status = 'Completed'
+            payment.completed_at = timezone.now()
+            payment.save()
+
+            selected_booking.payment_status = 'Paid'
+            selected_booking.save(update_fields=['payment_status', 'updated_at'])
+
+            messages.success(request, 'Payment successful. Booking is now confirmed for payment.')
+            return redirect('payments:payment_detail', payment_id=payment.id)
+        except Exception as exc:
+            messages.error(request, f'Unable to process payment: {exc}')
+            return redirect(f"{request.path}?booking_id={selected_booking.id}")
+
+    upi_payload = None
+    if selected_booking:
+        amount_str = f"{Decimal(selected_booking.amount):.2f}"
+        note = f"Studio booking #{selected_booking.id}"
+        upi_intent = (
+            f"upi://pay?pa={quote(payee_upi_id)}"
+            f"&pn={quote(payee_name)}"
+            f"&am={amount_str}"
+            f"&cu=INR"
+            f"&tn={quote(note)}"
+        )
+        upi_payload = {
+            'upi_id': payee_upi_id,
+            'upi_name': payee_name,
+            'upi_intent': upi_intent,
+            'upi_qr_url': f"https://chart.googleapis.com/chart?cht=qr&chs=340x340&chl={quote(upi_intent, safe='')}",
+        }
+
+    context = {
+        'unpaid_bookings': unpaid_bookings[:12],
+        'selected_booking': selected_booking,
+        'upi_payload': upi_payload,
+        'payment_methods': Payment.PAYMENT_METHOD_CHOICES,
+    }
+    return render(request, "user/dashboard/studio_payment.html", context)
+
+@login_required
+@role_required(['USER'])
 def studio_booking(request):
-    return render(request, "user/dashboard/studio_booking.html")
+    from bookings.models import BookingRequest
+    from studios.models import Service
+
+    camera_options = [
+        {'code': 'none', 'label': 'Use Studio Default Camera Setup', 'price': Decimal('0')},
+        {'code': 'dslr_basic', 'label': 'DSLR Basic Kit', 'price': Decimal('1200')},
+        {'code': 'mirrorless_pro', 'label': 'Mirrorless Pro Kit', 'price': Decimal('2500')},
+        {'code': 'cinema_4k', 'label': 'Cinema 4K Camera Kit', 'price': Decimal('4200')},
+    ]
+    camera_price_map = {opt['code']: opt['price'] for opt in camera_options}
+    camera_label_map = {opt['code']: opt['label'] for opt in camera_options}
+    gst_rate = Decimal('0.18')
+
+    selected_studio_id = request.POST.get('studio_id') or request.GET.get('studio_id')
+    if not str(selected_studio_id or '').isdigit():
+        messages.info(request, 'Please select a studio from Explore or Studio Detail to start booking.')
+        return redirect('explore_studios')
+
+    selected_studio = Studio.objects.filter(id=selected_studio_id).first()
+    if not selected_studio:
+        messages.error(request, 'Selected studio was not found.')
+        return redirect('explore_studios')
+
+    services_queryset = Service.objects.filter(studio=selected_studio).order_by('service_name')
+
+    if request.method == 'POST':
+        event_type = request.POST.get('event_type', '').strip()
+        booking_date = request.POST.get('date')
+        time_slot = request.POST.get('time_slot', '').strip()
+        location = request.POST.get('location', '').strip()
+        special_requirements = request.POST.get('special_requirements', '').strip()
+        service_id = request.POST.get('service_id')
+        camera_option = request.POST.get('camera_option', 'none').strip()
+        duration_raw = request.POST.get('duration_hours', '').strip()
+
+        if not event_type or not booking_date:
+            messages.error(request, 'Event type and booking date are required')
+            return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        service = None
+        if service_id:
+            service = Service.objects.filter(id=service_id, studio=selected_studio).first()
+
+        try:
+            duration_hours = int(duration_raw or 2)
+            if duration_hours <= 0 or duration_hours > 24:
+                raise ValueError
+        except ValueError:
+            messages.error(request, 'Duration must be between 1 and 24 hours')
+            return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        if camera_option not in camera_price_map:
+            camera_option = 'none'
+
+        base_rate = selected_studio.price_per_hour or Decimal('0')
+        base_price = (base_rate * Decimal(duration_hours)).quantize(Decimal('0.01'))
+        service_price = (service.price if service and service.price is not None else Decimal('0')).quantize(Decimal('0.01'))
+        camera_price = camera_price_map[camera_option].quantize(Decimal('0.01'))
+
+        subtotal = (base_price + service_price + camera_price).quantize(Decimal('0.01'))
+        gst_amount = (subtotal * gst_rate).quantize(Decimal('0.01'))
+        total_amount = (subtotal + gst_amount).quantize(Decimal('0.01'))
+
+        if total_amount <= 0:
+            messages.error(request, 'Unable to compute total bill. Please contact studio or choose another package.')
+            return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        notes_lines = []
+        if special_requirements:
+            notes_lines.append(f"User Notes: {special_requirements}")
+        if service:
+            notes_lines.append(f"Service: {service.service_name} (Rs. {service_price})")
+        if camera_option != 'none':
+            notes_lines.append(f"Camera: {camera_label_map[camera_option]} (Rs. {camera_price})")
+        notes_lines.append(f"Base Price: Rs. {base_price}")
+        notes_lines.append(f"GST (18%): Rs. {gst_amount}")
+
+        final_notes = "\n".join(notes_lines)
+
+        booking = BookingRequest.objects.create(
+            studio=selected_studio,
+            user=request.user,
+            service=service,
+            event_type=event_type,
+            date=booking_date,
+            booking_date=booking_date,
+            time_slot=time_slot,
+            duration_hours=duration_hours,
+            location=location or selected_studio.location,
+            special_requirements=final_notes,
+            amount=total_amount,
+            total_price=total_amount,
+        )
+
+        messages.success(request, 'Booking created successfully. Complete payment to confirm.')
+        return redirect(f"{reverse('studio_payment')}?booking_id={booking.id}")
+
+    context = {
+        'selected_studio': selected_studio,
+        'services': services_queryset,
+        'camera_options': camera_options,
+        'gst_percent': int(gst_rate * 100),
+        'recent_bookings': BookingRequest.objects.filter(user=request.user).select_related('studio').order_by('-created_at')[:6],
+    }
+    return render(request, "user/dashboard/studio_booking.html", context)
 
 @login_required
 @role_required(['USER'])
 def user_dashboard(request):
-    return render(request, 'user/dashboard/user_dashboard.html')
+    from bookings.models import BookingRequest
+    from payments.models import Payment
+    from recommendations.models import StudioRecommendation
+    from studios.models import Review
+
+    featured_studios = Studio.objects.order_by('-is_featured', '-is_verified', '-created_at')[:4]
+    user_bookings = BookingRequest.objects.filter(user=request.user)
+    recent_bookings = user_bookings.select_related('studio').order_by('-created_at')[:4]
+    upcoming_booking = user_bookings.exclude(status='Cancelled').order_by('date', 'time').first()
+
+    recent_payments = Payment.objects.filter(user=request.user).select_related('booking', 'booking__studio').order_by('-created_at')[:4]
+    recent_reviews = Review.objects.filter(user=request.user).select_related('studio').order_by('-created_at')[:3]
+    recommendations = StudioRecommendation.objects.filter(user=request.user).select_related('studio').order_by('-score')[:4]
+
+    price_insights = Studio.objects.aggregate(
+        min_price=Min('price_per_hour'),
+        max_price=Max('price_per_hour'),
+        avg_price=Avg('price_per_hour'),
+    )
+
+    trending_categories = (
+        Studio.objects
+        .exclude(category__isnull=True)
+        .values('category__name')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:5]
+    )
+
+    active_booking = user_bookings.exclude(status='Cancelled').order_by('-updated_at').first()
+    booking_timeline = []
+    if active_booking:
+        booking_timeline = [
+            {'label': 'Request Submitted', 'done': True},
+            {'label': 'Studio Confirmed', 'done': active_booking.status in ['Confirmed', 'Completed']},
+            {'label': 'Payment Completed', 'done': active_booking.payment_status == 'Paid'},
+            {'label': 'Shoot Completed', 'done': active_booking.status == 'Completed'},
+        ]
+
+    recommendation_reasons = [
+        {
+            'studio': rec.studio,
+            'score': rec.score,
+            'reason': rec.reason or 'Matched based on your recent activity and preferences.',
+        }
+        for rec in recommendations
+    ]
+
+    trust_metrics = {
+        'verified_studios': Studio.objects.filter(is_verified=True).count(),
+        'secure_payments': 'UPI/Card/Wallet protected checkout',
+        'support': '24x7 assistance via dashboard and chatbot',
+        'refund_policy': 'Refund requests available from payment history',
+    }
+
+    spotlight_offers = [
+        {'title': 'First Booking Offer', 'desc': 'Get priority support on your first confirmed booking.'},
+        {'title': 'Bundle Value Pack', 'desc': 'Combine shoot + editing for better package value.'},
+        {'title': 'Prime Time Slots', 'desc': 'Book early for weekend slots at top-rated studios.'},
+    ]
+
+    context = {
+        'featured_studios': featured_studios,
+        'total_bookings': user_bookings.count(),
+        'pending_bookings': user_bookings.filter(status='Pending').count(),
+        'confirmed_bookings': user_bookings.filter(status='Confirmed').count(),
+        'completed_bookings': user_bookings.filter(status='Completed').count(),
+        'upcoming_booking': upcoming_booking,
+        'recent_bookings': recent_bookings,
+        'recent_payments': recent_payments,
+        'recent_reviews': recent_reviews,
+        'recommendations': recommendations,
+        'recommendation_reasons': recommendation_reasons,
+        'price_insights': price_insights,
+        'trending_categories': trending_categories,
+        'active_booking': active_booking,
+        'booking_timeline': booking_timeline,
+        'trust_metrics': trust_metrics,
+        'spotlight_offers': spotlight_offers,
+    }
+    return render(request, 'user/dashboard/user_dashboard.html', context)
 
 @login_required
 @role_required(['USER'])
@@ -54,8 +342,32 @@ def user_profile(request):
 @role_required(['USER'])
 def user_bookings(request):
     from bookings.models import BookingRequest
-    bookings = BookingRequest.objects.filter(user=request.user).order_by('-created_at')
-    context = {'bookings': bookings}
+    status = request.GET.get('status', '').strip()
+    search = request.GET.get('search', '').strip()
+
+    base_queryset = BookingRequest.objects.filter(user=request.user)
+    bookings = base_queryset.order_by('-created_at')
+
+    if status:
+        bookings = bookings.filter(status=status)
+
+    if search:
+        bookings = bookings.filter(
+            Q(studio__studio_name__icontains=search)
+            | Q(event_type__icontains=search)
+            | Q(location__icontains=search)
+        )
+
+    context = {
+        'bookings': bookings,
+        'status': status,
+        'search': search,
+        'total_bookings': base_queryset.count(),
+        'pending_count': base_queryset.filter(status='Pending').count(),
+        'confirmed_count': base_queryset.filter(status='Confirmed').count(),
+        'completed_count': base_queryset.filter(status='Completed').count(),
+        'cancelled_count': base_queryset.filter(status='Cancelled').count(),
+    }
     return render(request, 'user/dashboard/user_bookings.html', context)
 
 @login_required
@@ -133,9 +445,40 @@ def user_reviews(request):
 @role_required(['USER'])
 def user_payments(request):
     from payments.models import Payment
-    payments = Payment.objects.filter(user=request.user).order_by('-created_at')
-    total_amount = sum(p.amount for p in payments if p.status == "Completed")
-    context = {'payments': payments, 'total_amount': total_amount }
+    status = request.GET.get('status', '').strip()
+    method = request.GET.get('method', '').strip()
+    search = request.GET.get('search', '').strip()
+
+    base_queryset = Payment.objects.filter(user=request.user)
+    payments = base_queryset.order_by('-created_at')
+
+    if status:
+        payments = payments.filter(status=status)
+
+    if method:
+        payments = payments.filter(payment_method=method)
+
+    if search:
+        payments = payments.filter(
+            Q(transaction_id__icontains=search)
+            | Q(booking__studio__studio_name__icontains=search)
+        )
+
+    completed_queryset = base_queryset.filter(status='Completed')
+    total_amount = completed_queryset.aggregate(total=Sum('amount'))['total'] or 0
+
+    context = {
+        'payments': payments,
+        'total_amount': total_amount,
+        'status': status,
+        'method': method,
+        'search': search,
+        'total_payments': base_queryset.count(),
+        'completed_count': completed_queryset.count(),
+        'processing_count': base_queryset.filter(status='Processing').count(),
+        'pending_count': base_queryset.filter(status='Pending').count(),
+        'failed_count': base_queryset.filter(status='Failed').count(),
+    }
     return render(request, 'user/dashboard/user_payments.html', context)
 
 

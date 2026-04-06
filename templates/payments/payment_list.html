@@ -25,12 +25,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="studio-wrapper">
-    {% include 'includes/sidebar.html' %}
-
-    <main class="studio-main">
-        <div class="container-fluid">
+<div class="container py-4">
             <h1 class="h3 mb-4">Payment History</h1>
+
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'user_payments' %}" class="btn btn-outline-light btn-sm">Dashboard Payments</a>
+            </div>
 
             <!-- Summary -->
             <div class="row mb-4">
@@ -85,9 +85,5 @@
                 <p>Your payments will appear here once you make a booking.</p>
             </div>
             {% endif %}
-        </div>
-
-        {% include 'includes/footer.html' %}
-    </main>
 </div>
 {% endblock %}

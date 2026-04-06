@@ -1,380 +1,220 @@
-
-<head>
-    <meta charset="UTF-8">
-    <title>Studio Booking Payment</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        /* ================= ROOT COLORS (MATCH YOUR PROJECT) ================= */
-
-        :root {
-            --primary: #6366f1;
-            --secondary: #06b6d4;
-            --dark-bg: #020617;
-            --dark-bg-2: #0f172a;
-            --border: #334155;
-            --text: #ffffff;
-        }
-
-        /* ================= GLOBAL ================= */
-
-        body {
-            background: var(--dark-bg);
-            color: var(--text);
-            font-family: Segoe UI;
-            padding: 40px;
-        }
-
-        /* ================= CONTAINER ================= */
-
-        .payment-container {
-            display: flex;
-            gap: 30px;
-        }
-
-        /* ================= LEFT SUMMARY ================= */
-
-        .payment-summary {
-            width: 320px;
-            background: var(--dark-bg-2);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .summary-item {
-            margin-bottom: 20px;
-        }
-
-        .service {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        .service input {
-            margin-right: 6px;
-        }
-
-        .total-box {
-            margin-top: 20px;
-            padding: 15px;
-            background: #020617;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .total-box h3 {
-            color: var(--secondary);
-        }
-
-        /* ================= RIGHT PAYMENT ================= */
-
-        .payment-form {
-            flex: 1;
-            background: var(--dark-bg-2);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-
-        /* ================= PAYMENT METHOD ================= */
-
-        .method-box {
-            background: #020617;
-            border: 1px solid var(--border);
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .method-box:hover {
-            border-color: var(--primary);
-        }
-
-        .qr-box {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        /* ================= INPUTS ================= */
-
-        .form-control {
-            background: #020617;
-            border: 1px solid var(--border);
-            color: white;
-        }
-
-        .form-control:focus {
-            background: #020617;
-            border-color: var(--primary);
-            box-shadow: none;
-        }
-
-        /* ================= SUMMARY BOX ================= */
-
-        .summary-box {
-            background: #020617;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        /* ================= BUTTON ================= */
-
-        .pay-btn {
-            background: var(--primary);
-            border: none;
-            padding: 12px;
-            width: 100%;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-
-        .pay-btn:hover {
-            background: #4f46e5;
-        }
-
-        /* ================= SUCCESS SCREEN ================= */
-
-        .success-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .success-card {
-            background: var(--dark-bg-2);
-            padding: 40px;
-            border-radius: 16px;
-            text-align: center;
-            animation: pop .4s ease;
-        }
-
-        .checkmark {
-            font-size: 60px;
-            color: #22c55e;
-        }
-
-        @keyframes pop {
-            0% {
-                transform: scale(.5);
-                opacity: 0
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1
-            }
-        }
-    </style>
-
-</head>
 {% extends "user/dashboard/user_base.html" %}
-{% block title %}My Bookings{% endblock %}
+
+{% block title %}Studio Payment | StudioSync{% endblock %}
 
 {% block content %}
+<style>
+.payment-shell {
+    background: radial-gradient(circle at 94% -10%, rgba(14, 165, 233, 0.22), transparent 44%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 24px;
+    padding: 1.4rem;
+}
 
-    <div class="payment-container">
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 1rem;
+}
 
-        <!-- ================= LEFT SIDE SUMMARY ================= -->
+.panel {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+}
 
-        <div class="payment-summary">
+.booking-pick {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 0.7rem;
+    margin-bottom: 0.55rem;
+    background: rgba(30, 41, 59, 0.46);
+}
 
-            <h5>Payment Summary</h5>
+.booking-pick.active {
+    border-color: rgba(14, 165, 233, 0.75);
+    background: rgba(14, 165, 233, 0.12);
+}
 
-            <div class="summary-item">
-                <h6>Studio Slot</h6>
-                <p>Tue, 15 July 2026</p>
-                <p>10:00 AM - 12:00 PM</p>
-            </div>
+.meta-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.42rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+}
 
-            <h6>Extra Services</h6>
+.meta-line:last-child {
+    border-bottom: none;
+}
 
-            <label class="service">
-                <input type="checkbox" class="service-check" data-price="500">
-                Extra Lighting (₹500)
-            </label>
+.method-option {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    padding: 0.55rem;
+    cursor: pointer;
+}
 
-            <label class="service">
-                <input type="checkbox" class="service-check" data-price="1500">
-                Makeup Artist (₹1500)
-            </label>
+.method-option.active {
+    border-color: rgba(14, 165, 233, 0.78);
+    background: rgba(14, 165, 233, 0.1);
+}
 
-            <label class="service">
-                <input type="checkbox" class="service-check" data-price="2000">
-                Drone Camera (₹2000)
-            </label>
+.qr-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0.85rem;
+    text-align: center;
+}
 
-            <label class="service">
-                <input type="checkbox" class="service-check" data-price="800">
-                Background Props (₹800)
-            </label>
+.qr-box img {
+    width: 210px;
+    max-width: 100%;
+}
 
-            <div class="summary-item mt-3">
-                <h6>Studio Location</h6>
-                <p>Nagpur Studio</p>
-            </div>
+@media (max-width: 960px) {
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 
-            <div class="total-box">
-
-                <p>Total price</p>
-
-                <h3>₹<span id="finalTotal">3540</span></h3>
-
-                <small>Price includes GST</small>
-
-            </div>
-
+<section class="payment-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="fw-bold mb-1">Studio Payment Checkout</h2>
+            <p class="text-secondary mb-0">Select unpaid booking, choose payment method, and complete securely.</p>
         </div>
+        <a href="{% url 'studio_booking' %}" class="btn btn-outline-light btn-sm">Create New Booking</a>
+    </div>
 
-        <!-- ================= RIGHT SIDE PAYMENT ================= -->
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-        <div class="payment-form">
+    {% if not selected_booking %}
+    <div class="alert alert-success text-center py-5 mb-0">
+        <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+        <h5 class="mt-3">No unpaid bookings available</h5>
+        <p class="text-secondary">Create a booking first or check payment history.</p>
+        <a href="{% url 'studio_booking' %}" class="btn btn-warning btn-sm">Book a Studio</a>
+    </div>
+    {% else %}
+    <div class="payment-grid">
+        <div class="panel">
+            <h5 class="mb-3">Complete Payment</h5>
 
-            <h5 class="mb-3">Payment Method</h5>
+            <div class="mb-3">
+                <label class="form-label">Choose Unpaid Booking</label>
+                {% for booking in unpaid_bookings %}
+                <div class="booking-pick {% if selected_booking and booking.id == selected_booking.id %}active{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>
+                            <div class="fw-semibold">{{ booking.studio.studio_name }}</div>
+                            <div class="small text-secondary">{{ booking.event_type }} | {{ booking.date|date:"d M Y" }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-semibold">Rs. {{ booking.amount }}</div>
+                            {% if not selected_booking or booking.id != selected_booking.id %}
+                            <a href="{% url 'studio_payment' %}?booking_id={{ booking.id }}" class="btn btn-outline-info btn-sm mt-1">Select</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
-            <div class="row mb-3">
+            <form method="post" id="paymentForm">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ selected_booking.id }}">
 
-                <div class="col-6">
-                    <div class="method-box text-center">
-                        <img src="https://cdn-icons-png.flaticon.com/512/825/825454.png" width="50">
-                        <p>UPI</p>
+                <div class="mb-3">
+                    <label class="form-label">Payment Method</label>
+                    <div class="d-grid gap-2" id="methodWrap">
+                        {% for method_code, method_label in payment_methods %}
+                        <label class="method-option" data-method="{{ method_code }}">
+                            <input type="radio" class="form-check-input me-2" name="payment_method" value="{{ method_code }}" {% if method_code == 'UPI' %}checked{% endif %}>
+                            {{ method_label }}
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
 
-            </div>
+                <div id="upiFields" class="panel mb-3" style="background: rgba(15, 23, 42, 0.55);">
+                    <h6 class="mb-2">UPI Verification</h6>
+                    <div class="mb-2">
+                        <label class="form-label small">Your UPI ID (optional)</label>
+                        <input type="text" class="form-control" name="payer_upi_id" placeholder="name@bank">
+                    </div>
+                    <div>
+                        <label class="form-label small">UPI UTR / Reference <span class="text-warning">*</span></label>
+                        <input type="text" class="form-control" name="upi_reference" placeholder="Minimum 8 characters">
+                    </div>
+                </div>
 
-            <!-- ================= BOOKING SUMMARY ================= -->
+                <button type="submit" class="btn btn-info w-100">
+                    <i class="bi bi-lock"></i> Pay Rs. {{ selected_booking.amount }}
+                </button>
+            </form>
+        </div>
 
-            <div class="summary-box">
+        <aside class="panel">
+            <h5 class="mb-3">Booking Summary</h5>
+            <div class="meta-line"><span>Studio</span><strong>{{ selected_booking.studio.studio_name }}</strong></div>
+            <div class="meta-line"><span>Event</span><strong>{{ selected_booking.event_type }}</strong></div>
+            <div class="meta-line"><span>Date</span><strong>{{ selected_booking.date|date:"d M Y" }}</strong></div>
+            <div class="meta-line"><span>Time Slot</span><strong>{{ selected_booking.time_slot|default:"Not selected" }}</strong></div>
+            <div class="meta-line"><span>Amount</span><strong>Rs. {{ selected_booking.amount }}</strong></div>
+            <div class="meta-line"><span>Payment Status</span><strong>{{ selected_booking.payment_status }}</strong></div>
 
-                <h6>Booking Summary</h6>
-
-                <div id="servicesList"></div>
-
-                <hr>
-
-                <p>Studio Slot: ₹<span id="slotPrice">3000</span></p>
-
-                <p>Subtotal: ₹<span id="subtotal">3000</span></p>
-
-                <p>GST (18%): ₹<span id="gst">540</span></p>
-
-                <h5>Total: ₹<span id="total">3540</span></h5>
-
-            </div>
-
-            <!-- ================= UPI PAYMENT ================= -->
-
-            <h6>UPI Payment</h6>
-
+            {% if upi_payload %}
+            <hr class="border-secondary">
+            <h6 class="mb-2">UPI QR</h6>
             <div class="qr-box">
-
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=studio@upi"
-                    width="150">
-
-                <p class="mt-2">UPI ID: <b>studio@upi</b></p>
-
+                <img src="{{ upi_payload.upi_qr_url }}" alt="UPI QR">
             </div>
-
-            <input type="text" class="form-control mt-3" placeholder="Enter UPI Transaction ID">
-
-            <button class="pay-btn" onclick="showSuccess()">
-                Make Payment
-            </button>
-
-        </div>
-
+            <div class="small mt-2">Payee: <strong>{{ upi_payload.upi_name }}</strong> ({{ upi_payload.upi_id }})</div>
+            <a class="btn btn-outline-success btn-sm w-100 mt-2" href="{{ upi_payload.upi_intent }}">Open UPI App</a>
+            {% endif %}
+        </aside>
     </div>
+    {% endif %}
+</section>
 
-    <!-- ================= SUCCESS SCREEN ================= -->
+<script>
+(function () {
+    const methodOptions = document.querySelectorAll('.method-option');
+    const upiFields = document.getElementById('upiFields');
 
-    <div id="successScreen" class="success-screen">
-
-        <div class="success-card">
-
-            <div class="checkmark">✓</div>
-
-            <h3>Payment Successful</h3>
-
-            <p>Your studio booking has been confirmed.</p>
-
-            <a href="{% url 'user_dashboard' %}" class="btn btn-primary mt-3">
-    Back to Home
-</a>
-
-        </div>
-
-    </div>
-
-    <script>
-
-        /* ================= PRICE CALCULATION ================= */
-
-        const basePrice = 3000
-        const gstRate = 0.18
-
-        const services = document.querySelectorAll(".service-check")
-
-        services.forEach(service => {
-            service.addEventListener("change", calculateTotal)
-        })
-
-        function calculateTotal() {
-
-            let serviceTotal = 0
-            let servicesHTML = ""
-
-            services.forEach(service => {
-
-                if (service.checked) {
-
-                    let price = parseInt(service.dataset.price)
-
-                    serviceTotal += price
-
-                    servicesHTML += `<p>${service.parentElement.innerText}</p>`
-
-                }
-
-            })
-
-            document.getElementById("servicesList").innerHTML = servicesHTML
-
-            let subtotal = basePrice + serviceTotal
-
-            let gst = subtotal * gstRate
-
-            let total = subtotal + gst
-
-            document.getElementById("subtotal").innerText = subtotal.toFixed(0)
-
-            document.getElementById("gst").innerText = gst.toFixed(0)
-
-            document.getElementById("total").innerText = total.toFixed(0)
-
-            document.getElementById("finalTotal").innerText = total.toFixed(0)
-
+    function refreshMethodUI() {
+        let selected = 'UPI';
+        methodOptions.forEach((option) => {
+            const input = option.querySelector('input[type="radio"]');
+            if (input.checked) {
+                selected = input.value;
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        if (upiFields) {
+            upiFields.style.display = selected === 'UPI' ? 'block' : 'none';
         }
+    }
 
-        /* ================= SUCCESS SCREEN ================= */
+    methodOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+            const input = option.querySelector('input[type="radio"]');
+            input.checked = true;
+            refreshMethodUI();
+        });
+    });
 
-        function showSuccess() {
-
-            document.getElementById("successScreen").style.display = "flex"
-
-        }
-
-    </script>
-
+    refreshMethodUI();
+})();
+</script>
 {% endblock %}

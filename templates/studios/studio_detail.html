@@ -1,186 +1,323 @@
-{% extends 'base.html' %}
+{% extends "user/dashboard/user_base.html" %}
 {% load static %}
 
-{% block title %}{{ studio.studio_name }} - StudioSync{% endblock %}
-
-{% block extra_css %}
-<style>
-    .detail-hero {
-        height: 400px;
-        object-fit: cover;
-        border-radius: 15px;
-    }
-    .info-card {
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(99, 102, 241, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 25px;
-        margin-bottom: 20px;
-    }
-    .stat {
-        text-align: center;
-        padding: 20px;
-    }
-    .stat-number {
-        font-size: 28px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #6366f1, #06b6d4);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        -webkit-text-fill-color: transparent;
-    }
-    .stat-label {
-        color: #cbd5e1;
-        font-size: 0.9em;
-        margin-top: 5px;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ studio.studio_name }} | Studio Details{% endblock %}
 
 {% block content %}
-<div class="studio-wrapper">
-    {% include 'includes/sidebar.html' %}
+<style>
+.detail-shell {
+    background: radial-gradient(circle at 8% -8%, rgba(245, 158, 11, 0.24), transparent 42%), radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.18), transparent 45%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 24px;
+    padding: 1.2rem;
+}
 
-    <main class="studio-main">
-        <div class="container-fluid">
-            <!-- BACK BUTTON -->
-            <a href="{% url 'studios:studio_list' %}" class="btn btn-outline-secondary mb-4">
-                <i class="bi bi-arrow-left"></i> Back to Studios
+.hero {
+    min-height: 340px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    position: relative;
+    background: rgba(2, 6, 23, 0.7);
+}
+
+.hero img {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.32));
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+}
+
+.badge-soft {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+    padding: 0.26rem 0.74rem;
+    background: rgba(15, 23, 42, 0.62);
+    font-size: 0.8rem;
+}
+
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 1rem;
+}
+
+.panel {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 0.9rem;
+}
+
+.panel-title {
+    font-size: 1.03rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.stat-card {
+    background: rgba(30, 41, 59, 0.52);
+    border-radius: 12px;
+    padding: 0.65rem;
+}
+
+.stat-value {
+    font-size: 1.22rem;
+    font-weight: 700;
+}
+
+.service-item,
+.review-item,
+.related-item,
+.portfolio-item {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+}
+
+.service-item,
+.review-item,
+.related-item {
+    padding: 0.7rem;
+}
+
+.portfolio-item img,
+.related-item img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+.meta-line {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.24);
+    padding: 0.35rem 0;
+}
+
+.meta-line:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 992px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<section class="detail-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <a href="{% url 'studios:studio_list' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Studios
+        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-warning btn-sm">
+                <i class="bi bi-calendar-check"></i> Book Studio
             </a>
+            <a href="{% url 'studios:add_review' studio.id %}" class="btn btn-outline-info btn-sm">Write Review</a>
+        </div>
+    </div>
 
-            <!-- HERO IMAGE -->
-            {% if studio.profile_image %}
-                <img src="{{ studio.profile_image.url }}" class="detail-hero w-100 mb-4" alt="{{ studio.studio_name }}">
-            {% else %}
-                <div class="detail-hero w-100 mb-4 bg-secondary d-flex align-items-center justify-content-center">
-                    <i class="bi bi-image" style="font-size: 5rem; color: rgba(255,255,255,0.2);"></i>
+    <div class="hero mb-3">
+        {% if studio.profile_image %}
+        <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}">
+        {% else %}
+        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <i class="bi bi-camera" style="font-size: 4.5rem; opacity: 0.2;"></i>
+        </div>
+        {% endif %}
+        <div class="hero-overlay text-white">
+            <div class="w-100 d-flex justify-content-between flex-wrap gap-2 align-items-end">
+                <div>
+                    <h2 class="mb-1">{{ studio.studio_name }}</h2>
+                    <p class="mb-1"><i class="bi bi-geo-alt"></i> {{ studio.location }}</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge-soft">⭐ {{ avg_rating|floatformat:1 }} Rating</span>
+                        <span class="badge-soft">{{ total_reviews }} Reviews</span>
+                        <span class="badge-soft">{{ studio.experience_years }} Years</span>
+                        {% if studio.is_verified %}<span class="badge-soft">Verified</span>{% endif %}
+                        {% if studio.category %}<span class="badge-soft">{{ studio.category.name }}</span>{% endif %}
+                    </div>
                 </div>
-            {% endif %}
-
-            <!-- STUDIO INFO -->
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <h1 class="display-5 mb-2">{{ studio.studio_name }}</h1>
-                    <p class="text-muted mb-3">
-                        <i class="bi bi-geo-alt"></i> {{ studio.location }}
-                    </p>
-                    <p class="lead">{{ studio.description }}</p>
-                </div>
-                <div class="col-md-4">
-                    <div class="info-card">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">{{ avg_rating|floatformat:1 }}</div>
-                                    <div class="stat-label">Rating</div>
-                                    <div class="text-warning" style="margin-top: 5px;">
-                                        {% for i in "12345" %}
-                                            {% if i <= avg_rating %}
-                                                ⭐
-                                            {% else %}
-                                                ☆
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">{{ total_reviews }}</div>
-                                    <div class="stat-label">Reviews</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {% if user.is_authenticated %}
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'studios:book_studio' studio.id %}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-calendar-check"></i> Book Now
-                        </a>
-                        <a href="{% url 'studios:add_review' studio.id %}" class="btn btn-outline-primary">
-                            <i class="bi bi-chat-left-quote"></i> Write Review
-                        </a>
-                    </div>
-                    {% else %}
-                    <a href="{% url 'auth_page' %}" class="btn btn-primary btn-lg w-100 mb-2">
-                        <i class="bi bi-calendar-check"></i> Login to Book
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- TABS -->
-            <ul class="nav nav-tabs mb-4" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="portfolio-tab" data-bs-toggle="tab" href="#portfolio" role="tab">
-                        <i class="bi bi-image"></i> Portfolio
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab">
-                        <i class="bi bi-star"></i> Reviews
-                    </a>
-                </li>
-            </ul>
-
-            <!-- TAB CONTENT -->
-            <div class="tab-content">
-                <!-- PORTFOLIO TAB -->
-                <div class="tab-pane fade show active" id="portfolio" role="tabpanel">
-                    {% if portfolios %}
-                    <div class="row g-3">
-                        {% for portfolio in portfolios %}
-                        <div class="col-md-4">
-                            <div class="card h-100 overflow-hidden">
-                                <img src="{{ portfolio.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                {% if portfolio.caption %}
-                                <div class="card-body">
-                                    <p class="card-text">{{ portfolio.caption }}</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> No portfolio items yet.
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- REVIEWS TAB -->
-                <div class="tab-pane fade" id="reviews" role="tabpanel">
-                    {% if reviews %}
-                        {% for review in reviews %}
-                        <div class="info-card mb-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="mb-0">{{ review.user.get_full_name|default:review.user.username }}</h6>
-                                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
-                                </div>
-                                <span class="badge bg-warning text-dark">
-                                    {% for i in "12345" %}
-                                        {% if i <= review.rating %}⭐{% else %}☆{% endif %}
-                                    {% endfor %}
-                                </span>
-                            </div>
-                            <p class="mb-0">{{ review.comment }}</p>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> No reviews yet. Be the first to review!
-                    </div>
-                    {% endif %}
+                <div class="text-end">
+                    <div class="small text-secondary">Starting Price</div>
+                    <h4 class="mb-0">Rs. {{ studio.price_per_hour }}/hr</h4>
                 </div>
             </div>
         </div>
+    </div>
 
-        {% include 'includes/footer.html' %}
-    </main>
-</div>
+    <div class="layout-grid">
+        <div class="d-flex flex-column gap-3">
+            <div class="panel">
+                <div class="panel-title">Studio Overview</div>
+                <p class="mb-2">{{ studio.description|default:"No description uploaded yet." }}</p>
+                <div class="small text-secondary">
+                    {% if specialization_tags %}
+                    <strong>Specializations:</strong>
+                    {% for tag in specialization_tags %}
+                    <span class="badge-soft me-1">{{ tag }}</span>
+                    {% endfor %}
+                    {% else %}
+                    <strong>Specializations:</strong> Not added yet.
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Portfolio Highlights</div>
+                {% if portfolios %}
+                <div class="row g-2">
+                    {% for item in portfolios %}
+                    <div class="col-md-4">
+                        <div class="portfolio-item h-100 overflow-hidden">
+                            <img src="{{ item.image.url }}" alt="Portfolio">
+                            {% if item.caption %}<div class="p-2 small text-secondary">{{ item.caption }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% elif studio_images %}
+                <div class="row g-2">
+                    {% for item in studio_images %}
+                    <div class="col-md-4">
+                        <div class="portfolio-item h-100 overflow-hidden">
+                            {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="Gallery">
+                            {% elif item.image_url %}
+                            <img src="{{ item.image_url }}" alt="Gallery">
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-secondary mb-0">Portfolio has not been uploaded yet.</div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Service Packages</div>
+                {% if services %}
+                <div class="row g-2">
+                    {% for service in services %}
+                    <div class="col-md-6">
+                        <article class="service-item h-100">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ service.service_name }}</strong>
+                                <span>Rs. {{ service.price }}</span>
+                            </div>
+                            {% if service.description %}<p class="small text-secondary mb-0 mt-1">{{ service.description }}</p>{% endif %}
+                        </article>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-secondary mb-0">No services added yet.</div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Recent Reviews</div>
+                {% if reviews %}
+                <div class="d-flex flex-column gap-2">
+                    {% for review in reviews %}
+                    <article class="review-item">
+                        <div class="d-flex justify-content-between mb-1">
+                            <div>
+                                <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                                <div class="small text-secondary">{{ review.created_at|date:"d M Y" }}</div>
+                            </div>
+                            <div>⭐ {{ review.rating }}/5</div>
+                        </div>
+                        <p class="small mb-0">{{ review.comment }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-secondary mb-0">No reviews posted yet.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+            <div class="panel">
+                <div class="panel-title">Performance Snapshot</div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="small text-secondary">Avg Rating</div><div class="stat-value">{{ avg_rating|floatformat:1 }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Total Reviews</div><div class="stat-value">{{ total_reviews }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Total Bookings</div><div class="stat-value">{{ total_bookings }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Confirmed</div><div class="stat-value">{{ confirmed_bookings }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Avg Booking</div><div class="stat-value">Rs. {{ avg_booking_value|floatformat:0 }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Portfolio Items</div><div class="stat-value">{{ portfolio_count|add:gallery_count }}</div></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Pricing & Contact</div>
+                <div class="meta-line"><span>Base Rate</span><strong>Rs. {{ studio.price_per_hour }}/hr</strong></div>
+                <div class="meta-line"><span>Service Range</span><strong>{% if min_service_price %}Rs. {{ min_service_price }} - Rs. {{ max_service_price }}{% else %}Not set{% endif %}</strong></div>
+                <div class="meta-line"><span>Phone</span><strong>{{ studio.phone|default:"Not provided" }}</strong></div>
+                <div class="meta-line"><span>Email</span><strong>{{ studio.email|default:"Not provided" }}</strong></div>
+                <div class="meta-line"><span>Website</span>
+                    <strong>
+                        {% if studio.website %}
+                        <a href="{{ studio.website }}" target="_blank" rel="noopener">Visit</a>
+                        {% else %}
+                        Not provided
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">How Booking Works</div>
+                <div class="small text-secondary mb-1">1. Review packages and portfolio.</div>
+                <div class="small text-secondary mb-1">2. Click Book Studio and submit event details.</div>
+                <div class="small text-secondary mb-1">3. Review GST-inclusive bill and continue.</div>
+                <div class="small text-secondary mb-1">4. Complete payment using UPI/other methods.</div>
+                <div class="small text-secondary">5. Track booking updates from your dashboard.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Similar Studios</div>
+                {% if related_studios %}
+                <div class="d-flex flex-column gap-2">
+                    {% for item in related_studios %}
+                    <article class="related-item">
+                        {% if item.profile_image %}
+                        <img src="{{ item.profile_image.url }}" alt="{{ item.studio_name }}">
+                        {% endif %}
+                        <div class="pt-2">
+                            <strong>{{ item.studio_name }}</strong>
+                            <div class="small text-secondary">{{ item.location }} | ⭐ {{ item.average_rating|floatformat:1 }}</div>
+                            <a href="{% url 'studios:studio_detail' item.id %}" class="btn btn-outline-light btn-sm mt-2">View Details</a>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-secondary mb-0">No similar studios found.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

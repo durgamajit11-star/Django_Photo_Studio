@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Count, Avg
 from django.db.models.functions import TruncMonth
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.utils import timezone
+from datetime import timedelta
 
 from accounts.decorators import role_required
 from studios.models import Studio
@@ -22,9 +24,35 @@ def admin_dashboard(request):
     total_studios = Studio.objects.count()
     total_bookings = BookingRequest.objects.count()
 
+    pending_studios = Studio.objects.filter(is_verified=False).count()
+    verified_studios = Studio.objects.filter(is_verified=True).count()
+    completed_bookings = BookingRequest.objects.filter(status='Completed').count()
+    pending_bookings = BookingRequest.objects.filter(status='Pending').count()
+    confirmed_bookings = BookingRequest.objects.filter(status='Confirmed').count()
+
     total_revenue = BookingRequest.objects.filter(
         status='Confirmed'
     ).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    avg_booking_value = BookingRequest.objects.filter(status='Confirmed').aggregate(Avg('amount'))['amount__avg'] or 0
+
+    recent_bookings = (
+        BookingRequest.objects.select_related('user', 'studio')
+        .order_by('-created_at')[:5]
+    )
+
+    recent_studios = Studio.objects.select_related('user').order_by('-created_at')[:5]
+
+    top_studios = (
+        Studio.objects.annotate(booking_count=Count('booking_requests'))
+        .order_by('-booking_count', '-is_verified', '-created_at')[:5]
+    )
+
+    payment_snapshot = {
+        'completed': Payment.objects.filter(status='Completed').count(),
+        'processing': Payment.objects.filter(status='Processing').count(),
+        'failed': Payment.objects.filter(status='Failed').count(),
+    }
 
     monthly_revenue = (
         BookingRequest.objects
@@ -45,6 +73,16 @@ def admin_dashboard(request):
         'total_studios': total_studios,
         'total_bookings': total_bookings,
         'total_revenue': total_revenue,
+        'avg_booking_value': avg_booking_value,
+        'pending_studios': pending_studios,
+        'verified_studios': verified_studios,
+        'completed_bookings': completed_bookings,
+        'pending_bookings': pending_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'recent_bookings': recent_bookings,
+        'recent_studios': recent_studios,
+        'top_studios': top_studios,
+        'payment_snapshot': payment_snapshot,
         'revenue_labels': labels,
         'revenue_data': revenue_data,
     }
@@ -187,6 +225,32 @@ def admin_bookings(request):
     pending_count = bookings.filter(status='Pending').count()
     cancelled_count = bookings.filter(status='Cancelled').count()
 
+    priority_bookings = []
+    stale_pending = []
+    now = timezone.now()
+    for booking in bookings.filter(status='Pending').select_related('user', 'studio')[:10]:
+        age_days = max(0, (now - booking.created_at).days)
+        payload = {
+            'booking': booking,
+            'age_days': age_days,
+            'is_urgent': age_days >= 2 or float(booking.amount or 0) >= 10000,
+        }
+        priority_bookings.append(payload)
+        if age_days >= 2:
+            stale_pending.append(payload)
+
+    priority_bookings = sorted(priority_bookings, key=lambda item: (not item['is_urgent'], -float(item['booking'].amount or 0), item['age_days']))[:5]
+
+    aging_buckets = {
+        '0-1 Days': bookings.filter(status='Pending', created_at__gte=now - timedelta(days=1)).count(),
+        '2-3 Days': bookings.filter(status='Pending', created_at__lt=now - timedelta(days=1), created_at__gte=now - timedelta(days=3)).count(),
+        '4+ Days': bookings.filter(status='Pending', created_at__lt=now - timedelta(days=3)).count(),
+    }
+    aging_rows = []
+    for label, count in aging_buckets.items():
+        percent = int((count / pending_count) * 100) if pending_count else 0
+        aging_rows.append({'label': label, 'count': count, 'percent': percent})
+
     monthly_revenue = (
         BookingRequest.objects
         .filter(status='Confirmed')
@@ -207,6 +271,10 @@ def admin_bookings(request):
         'confirmed_count': confirmed_count,
         'pending_count': pending_count,
         'cancelled_count': cancelled_count,
+        'priority_bookings': priority_bookings,
+        'stale_pending': stale_pending[:5],
+        'aging_buckets': aging_buckets,
+        'aging_rows': aging_rows,
         'revenue_labels': labels,
         'revenue_data': revenue_data,
         'query': query,

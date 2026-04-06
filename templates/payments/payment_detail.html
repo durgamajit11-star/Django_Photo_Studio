@@ -1,0 +1,80 @@
+{% extends "user/dashboard/user_base.html" %}
+
+{% block title %}Payment Receipt | StudioSync{% endblock %}
+
+{% block content %}
+<style>
+.receipt-shell {
+    max-width: 920px;
+    margin: 0 auto;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.92));
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 22px;
+    padding: 1.4rem;
+}
+
+.receipt-card {
+    background: rgba(2, 6, 23, 0.65);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.line {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+    padding: 0.45rem 0;
+    font-size: 0.94rem;
+}
+
+.line:last-child {
+    border-bottom: none;
+}
+
+.status-chip {
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.status-completed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.status-processing { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+.status-pending { background: rgba(245, 158, 11, 0.2); color: #facc15; }
+.status-failed { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.status-refunded { background: rgba(129, 140, 248, 0.2); color: #c7d2fe; }
+</style>
+
+<section class="receipt-shell">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h3 class="mb-0">Payment Receipt</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'user_payments' %}" class="btn btn-outline-light btn-sm">Back</a>
+            {% if can_request_refund %}
+            <a href="{% url 'payments:request_refund' payment.id %}" class="btn btn-outline-warning btn-sm">Request Refund</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="receipt-card mb-3">
+        <div class="line"><span>Transaction ID</span><strong>{{ payment.transaction_id|default:"Pending" }}</strong></div>
+        <div class="line"><span>Status</span><span class="status-chip status-{{ payment.status|lower }}">{{ payment.status }}</span></div>
+        <div class="line"><span>Amount</span><strong>Rs. {{ payment.amount }}</strong></div>
+        <div class="line"><span>Method</span><strong>{{ payment.get_payment_method_display }}</strong></div>
+        <div class="line"><span>Paid On</span><strong>{{ payment.completed_at|default:payment.created_at|date:"d M Y, h:i A" }}</strong></div>
+        <div class="line"><span>Booking</span><strong>#{{ payment.booking.id }} - {{ payment.booking.event_type }}</strong></div>
+        <div class="line"><span>Studio</span><strong>{{ payment.booking.studio.studio_name }}</strong></div>
+    </div>
+
+    <div class="receipt-card">
+        <h6>Refund Requests</h6>
+        {% for refund in refunds %}
+        <div class="line"><span>{{ refund.created_at|date:"d M Y" }} - {{ refund.status }}</span><strong>Rs. {{ refund.amount }}</strong></div>
+        <div class="small text-secondary mb-2">{{ refund.reason }}</div>
+        {% empty %}
+        <p class="text-secondary mb-0">No refund request raised for this payment.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

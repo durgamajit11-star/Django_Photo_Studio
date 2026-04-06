@@ -1,205 +1,361 @@
-{% extends  "user/dashboard/user_base.html"  %}
+{% extends "user/dashboard/user_base.html" %}
+{% load static %}
+
 {% block title %}User Dashboard{% endblock %}
 
 {% block content %}
-{% load static %}
-  <main class="main-content">
-        <!-- HERO -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1 class="hero-title">Find Studios That Match Your Style</h1>
-                <p class="hero-subtitle" style="color: rgb(114, 136, 236);">Browse verified studios, compare portfolios, and book with confidence</p>
+<style>
+.dashboard-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
 
-                <div class="search-bar glass">
-                    <div class="search-container">
-                        <input type="text" id="cityFilter" placeholder="📍 City (e.g. Nagpur)" class="search-input">
+.glass-panel {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 16px;
+    padding: 1rem;
+}
 
-                        <select id="typeFilter" class="search-select">
-                            <option value="">All Types</option>
-                            <option value="wedding">Wedding</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="events">Events</option>
-                            <option value="product">Product</option>
-                        </select>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.7rem;
+}
 
-                        <select id="ratingFilter" class="search-select">
-                            <option value="">Any Rating</option>
-                            <option value="4">4★ & above</option>
-                            <option value="4.5">4.5★ & above</option>
-                        </select>
+.stats-grid .stat-card {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
 
-                        <select id="priceFilter" class="search-select">
-                            <option value="">Any Price</option>
-                            <option value="low">₹ Budget</option>
-                            <option value="mid">₹₹ Standard</option>
-                            <option value="high">₹₹₹ Premium</option>
-                        </select>
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+}
 
-                        <button class="btn btn-primary search-btn" onclick="applyFilters()">
-                            <i class="bi bi-search"></i> Search
-                        </button>
-                    </div>
+.quick-link {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 12px;
+    padding: 0.65rem;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(30, 41, 59, 0.45);
+}
+
+.quick-link:hover {
+    border-color: rgba(6, 182, 212, 0.6);
+    color: inherit;
+}
+
+.mini-item {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    background: rgba(30, 41, 59, 0.45);
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.mini-item:last-child {
+    margin-bottom: 0;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 1rem;
+}
+
+@media (max-width: 992px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="dashboard-shell">
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Find Studios That Match Your Style</h1>
+            <p class="hero-subtitle" style="color: rgb(114, 136, 236);">Browse verified studios, compare portfolios, and book with confidence</p>
+
+            <div class="search-bar glass">
+                <div class="search-container">
+                    <input type="text" id="cityFilter" placeholder="📍 City (e.g. Nagpur)" class="search-input">
+
+                    <select id="typeFilter" class="search-select">
+                        <option value="">All Types</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="events">Events</option>
+                        <option value="product">Product</option>
+                    </select>
+
+                    <select id="ratingFilter" class="search-select">
+                        <option value="">Any Rating</option>
+                        <option value="4">4★ & above</option>
+                        <option value="4.5">4.5★ & above</option>
+                    </select>
+
+                    <select id="priceFilter" class="search-select">
+                        <option value="">Any Price</option>
+                        <option value="low">₹ Budget</option>
+                        <option value="mid">₹₹ Standard</option>
+                        <option value="high">₹₹₹ Premium</option>
+                    </select>
+
+                    <button class="btn btn-primary search-btn" onclick="applyFilters()">
+                        <i class="bi bi-search"></i> Search
+                    </button>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- FEATURED STUDIOS -->
-        <section class="section">
-            <h3 class="section-title">🌟 Featured Studios</h3>
-            <p class="section-subtitle">Hand-picked studios trusted by thousands</p>
+    <section class="glass-panel">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <h4 class="mb-0">Dashboard Overview</h4>
+            <a href="{% url 'explore_studios' %}" class="btn btn-outline-info btn-sm">Explore More Studios</a>
+        </div>
 
+        <div class="stats-grid mb-3">
+            <div class="stat-card"><div class="small text-secondary">Total Bookings</div><div class="h5 mb-0">{{ total_bookings }}</div></div>
+            <div class="stat-card"><div class="small text-secondary">Pending</div><div class="h5 mb-0 text-warning">{{ pending_bookings }}</div></div>
+            <div class="stat-card"><div class="small text-secondary">Confirmed</div><div class="h5 mb-0 text-success">{{ confirmed_bookings }}</div></div>
+            <div class="stat-card"><div class="small text-secondary">Completed</div><div class="h5 mb-0 text-info">{{ completed_bookings }}</div></div>
+        </div>
+
+        <div class="quick-grid">
+            <a class="quick-link" href="{% url 'explore_studios' %}"><i class="bi bi-search"></i> Find Studios</a>
+            <a class="quick-link" href="{% url 'user_bookings' %}"><i class="bi bi-calendar-check"></i> Manage Bookings</a>
+            <a class="quick-link" href="{% url 'user_payments' %}"><i class="bi bi-credit-card"></i> Payment History</a>
+            <a class="quick-link" href="{% url 'user_recommendations' %}"><i class="bi bi-stars"></i> AI Recommendations</a>
+            <a class="quick-link" href="{% url 'user_reviews' %}"><i class="bi bi-star"></i> Your Reviews</a>
+            <a class="quick-link" href="{% url 'user_notifications' %}"><i class="bi bi-bell"></i> Notifications</a>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="glass-panel">
+            <h5 class="mb-3">🌟 Featured Studios</h5>
             <div class="studios-grid">
-                <div class="col studio-item" data-city="nagpur" data-type="wedding" data-rating="4.8" data-price="mid">
+                {% for studio in featured_studios %}
+                <div class="col studio-item" data-city="{{ studio.location|lower }}" data-type="{{ studio.specializations|default:''|lower }}" data-rating="{{ studio.rating|default:0 }}" data-price="{{ studio.price_range|default:''|lower }}">
                     <div class="studio-card">
                         <div class="studio-image-wrapper">
-                            <img src="{% static 'images/s1.png' %}" alt="DreamShot Studio" class="studio-image">
+                            {% if studio.profile_image %}
+                            <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="studio-image">
+                            {% else %}
+                            <img src="{% static 'images/s1.png' %}" alt="{{ studio.studio_name }}" class="studio-image">
+                            {% endif %}
                             <div class="studio-overlay">
-                                <button class="btn btn-light btn-sm">View Portfolio</button>
+                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-light btn-sm">View Portfolio</a>
                             </div>
                         </div>
                         <div class="studio-info">
-                            <h6>DreamShot Studio</h6>
-                            <p class="location">📍 Nagpur</p>
+                            <h6>{{ studio.studio_name }}</h6>
+                            <p class="location">📍 {{ studio.location }}</p>
                             <div class="rating-price">
-                                <span class="rating">⭐ 4.8</span>
-                                <span class="price">₹₹</span>
+                                <span class="rating">⭐ {{ studio.average_rating|floatformat:1 }}</span>
+                                <span class="price">{{ studio.price_range|default:'₹₹' }}</span>
                             </div>
-                            <a href="{% url 'studio_booking' %}" class="btn btn-primary btn-sm w-100 mt-2">
-                                Book Now
-                            </a>
+                            <div class="d-grid gap-2 mt-2">
+                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-light btn-sm w-100">View Details</a>
+                                <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-primary btn-sm w-100">Book Studio</a>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">No studios are available right now.</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-                <div class="col studio-item" data-city="mumbai" data-type="wedding" data-rating="4.5" data-price="mid">
-                    <div class="studio-card">
-                        <div class="studio-image-wrapper">
-                            <img src="{% static 'images/s2.png' %}" alt="Wedding Studio" class="studio-image">
-                            <div class="studio-overlay">
-                                <button class="btn btn-light btn-sm">View Portfolio</button>
-                            </div>
-                        </div>
-                        <div class="studio-info">
-                            <h6>Wedding Studio</h6>
-                            <p class="location">📍 Mumbai</p>
-                            <div class="rating-price">
-                                <span class="rating">⭐ 4.5</span>
-                                <span class="price">₹₹</span>
-                            </div>
-                            <a href="{% url 'studio_booking' %}" class="btn btn-primary btn-sm w-100 mt-2">
-                                Book Now
-                            </a>
-                        </div>
+        <div class="d-flex flex-column gap-3">
+            <div class="glass-panel">
+                <h5 class="mb-2">Next Upcoming Booking</h5>
+                {% if upcoming_booking %}
+                <div class="mini-item">
+                    <div class="fw-semibold">{{ upcoming_booking.studio.studio_name }}</div>
+                    <div class="small text-secondary">{{ upcoming_booking.event_type }} | {{ upcoming_booking.date|date:"d M Y" }}</div>
+                    <div class="small">{{ upcoming_booking.time_slot|default:"Time pending" }} | {{ upcoming_booking.status }}</div>
+                    <a href="{% url 'bookings:booking_detail' upcoming_booking.id %}" class="btn btn-outline-light btn-sm mt-2">Open Booking</a>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary mb-0">No upcoming booking scheduled.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-panel">
+                <h5 class="mb-2">Recent Bookings</h5>
+                {% for booking in recent_bookings %}
+                <div class="mini-item">
+                    <div class="fw-semibold">{{ booking.studio.studio_name }}</div>
+                    <div class="small text-secondary">{{ booking.event_type }} | {{ booking.date|date:"d M Y" }}</div>
+                    <div class="small">Status: {{ booking.status }} | Payment: {{ booking.payment_status }}</div>
+                </div>
+                {% empty %}
+                <div class="alert alert-secondary mb-0">No booking activity yet.</div>
+                {% endfor %}
+            </div>
+
+            <div class="glass-panel">
+                <h5 class="mb-2">Recent Payments</h5>
+                {% for payment in recent_payments %}
+                <div class="mini-item">
+                    <div class="fw-semibold">Rs. {{ payment.amount }} - {{ payment.booking.studio.studio_name }}</div>
+                    <div class="small text-secondary">{{ payment.get_payment_method_display }} | {{ payment.status }}</div>
+                    <div class="small">{{ payment.created_at|date:"d M Y, h:i A" }}</div>
+                </div>
+                {% empty %}
+                <div class="alert alert-secondary mb-0">No payments found.</div>
+                {% endfor %}
+            </div>
+
+            <div class="glass-panel">
+                <h5 class="mb-2">Recommended For You</h5>
+                {% for rec in recommendations %}
+                <div class="mini-item">
+                    <div class="fw-semibold">{{ rec.studio.studio_name }}</div>
+                    <div class="small text-secondary">{{ rec.studio.location }} | Match: {{ rec.score|floatformat:0 }}%</div>
+                    <a href="{% url 'studios:studio_detail' rec.studio.id %}" class="btn btn-outline-light btn-sm mt-2">View</a>
+                </div>
+                {% empty %}
+                <div class="small text-secondary">No recommendations yet. Explore studios to improve suggestions.</div>
+                {% endfor %}
+            </div>
+
+            <div class="glass-panel">
+                <h5 class="mb-2">Your Latest Reviews</h5>
+                {% for review in recent_reviews %}
+                <div class="mini-item">
+                    <div class="fw-semibold">{{ review.studio.studio_name }}</div>
+                    <div class="small text-secondary">⭐ {{ review.rating }}/5 | {{ review.created_at|date:"d M Y" }}</div>
+                    <div class="small">{{ review.comment|truncatechars:90 }}</div>
+                </div>
+                {% empty %}
+                <div class="small text-secondary">You have not posted reviews yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="glass-panel">
+            <h5 class="mb-3">Recommendation Reasons</h5>
+            {% for item in recommendation_reasons %}
+            <div class="mini-item">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="fw-semibold">{{ item.studio.studio_name }}</div>
+                        <div class="small text-secondary">{{ item.reason }}</div>
                     </div>
+                    <span class="badge bg-info">{{ item.score|floatformat:0 }}%</span>
                 </div>
+                <a href="{% url 'studios:studio_detail' item.studio.id %}" class="btn btn-outline-light btn-sm mt-2">View Studio</a>
+            </div>
+            {% empty %}
+            <div class="alert alert-secondary mb-0">No recommendation insights yet. Explore more studios to improve matching.</div>
+            {% endfor %}
+        </div>
 
-                <div class="col studio-item" data-city="mumbai" data-type="fashion" data-rating="4.7" data-price="high">
-                    <div class="studio-card">
-                        <div class="studio-image-wrapper">
-                            <img src="{% static 'images/s3.png' %}" alt="Fashion Hub" class="studio-image">
-                            <div class="studio-overlay">
-                                <button class="btn btn-light btn-sm">View Portfolio</button>
-                            </div>
-                        </div>
-                        <div class="studio-info">
-                            <h6>Fashion Hub</h6>
-                            <p class="location">📍 Mumbai</p>
-                            <div class="rating-price">
-                                <span class="rating">⭐ 4.7</span>
-                                <span class="price">₹₹₹</span>
-                            </div>
-                            <a href="{% url 'studio_booking' %}" class="btn btn-primary btn-sm w-100 mt-2">
-                                Book Now
-                            </a>
-                        </div>
-                    </div>
+        <div class="d-flex flex-column gap-3">
+            <div class="glass-panel">
+                <h5 class="mb-2">Price Intelligence</h5>
+                <div class="mini-item">
+                    <div class="small text-secondary">Average Hourly Price</div>
+                    <div class="h5 mb-0">Rs. {{ price_insights.avg_price|default:0|floatformat:0 }}</div>
                 </div>
-
-                <div class="col studio-item" data-city="nagpur" data-type="events" data-rating="4.6" data-price="mid">
-                    <div class="studio-card">
-                        <div class="studio-image-wrapper">
-                            <img src="{% static 'images/s4.jpg' %}" alt="Event Studios" class="studio-image">
-                            <div class="studio-overlay">
-                                <button class="btn btn-light btn-sm">View Portfolio</button>
-                            </div>
-                        </div>
-                        <div class="studio-info">
-                            <h6>Event Studios</h6>
-                            <p class="location">📍 Nagpur</p>
-                            <div class="rating-price">
-                                <span class="rating">⭐ 4.6</span>
-                                <span class="price">₹₹</span>
-                            </div>
-                            <a href="{% url 'studio_booking' %}" class="btn btn-primary btn-sm w-100 mt-2">
-                                Book Now
-                            </a>
-                        </div>
-                    </div>
+                <div class="mini-item">
+                    <div class="small text-secondary">Budget Range</div>
+                    <div class="small">Rs. {{ price_insights.min_price|default:0|floatformat:0 }} - Rs. {{ price_insights.max_price|default:0|floatformat:0 }}</div>
                 </div>
             </div>
-        </section>
 
-        <!-- HOW IT WORKS -->
-        <section class="section how-works">
-            <h3 class="section-title">🚀 How It Works</h3>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-icon">🔍</div>
-                    <h5>Discover</h5>
-                    <p>Browse through a curated selection of professional studios</p>
+            <div class="glass-panel">
+                <h5 class="mb-2">Trending Categories</h5>
+                {% for row in trending_categories %}
+                <div class="mini-item d-flex justify-content-between align-items-center">
+                    <span>{{ row.category__name }}</span>
+                    <span class="badge bg-secondary">{{ row.total }} studios</span>
                 </div>
-                <div class="step-card">
-                    <div class="step-icon">📸</div>
-                    <h5>Compare</h5>
-                    <p>View portfolios and compare prices and services</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-icon">📅</div>
-                    <h5>Book</h5>
-                    <p>Reserve your slot at your preferred studio</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-icon">✅</div>
-                    <h5>Shoot</h5>
-                    <p>Enjoy your photoshoot at the booked studio</p>
-                </div>
+                {% empty %}
+                <div class="small text-secondary">Category trend data will appear as studios are categorized.</div>
+                {% endfor %}
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- ACHIEVEMENTS -->
-        <section class="section achievements">
-            <h3 class="section-title">🏆 Our Achievements</h3>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Studios</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Bookings</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">4.8★</div>
-                    <div class="stat-label">Rating</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">24×7</div>
-                    <div class="stat-label">Support</div>
-                </div>
+    <section class="content-grid">
+        <div class="glass-panel">
+            <h5 class="mb-3">Active Booking Timeline</h5>
+            {% if active_booking %}
+            <div class="mini-item">
+                <div class="fw-semibold">{{ active_booking.studio.studio_name }} - {{ active_booking.event_type }}</div>
+                <div class="small text-secondary">{{ active_booking.date|date:"d M Y" }} | {{ active_booking.time_slot|default:"Time pending" }}</div>
             </div>
-        </section>
-
-        <!-- CTA -->
-        <section class="cta-section">
-            <div class="cta-content">
-                <h3>Ready to Book Your Next Shoot?</h3>
-                <p>Join thousands of happy customers today</p>
-                <button class="btn btn-light btn-lg">
-                    <i class="bi bi-arrow-right"></i> Browse Studios Now
-                </button>
+            <div class="d-flex flex-column gap-2">
+                {% for step in booking_timeline %}
+                <div class="mini-item d-flex justify-content-between align-items-center">
+                    <span>{{ step.label }}</span>
+                    {% if step.done %}
+                    <span class="badge bg-success">Done</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
-        </section>
-    </main>
+            {% else %}
+            <div class="alert alert-secondary mb-0">No active booking timeline available.</div>
+            {% endif %}
+        </div>
 
+        <div class="d-flex flex-column gap-3">
+            <div class="glass-panel">
+                <h5 class="mb-2">Trust & Safety</h5>
+                <div class="mini-item"><strong>{{ trust_metrics.verified_studios }}</strong> verified studios on platform</div>
+                <div class="mini-item">{{ trust_metrics.secure_payments }}</div>
+                <div class="mini-item">{{ trust_metrics.refund_policy }}</div>
+                <div class="mini-item">{{ trust_metrics.support }}</div>
+            </div>
+
+            <div class="glass-panel">
+                <h5 class="mb-2">Spotlight Offers</h5>
+                {% for offer in spotlight_offers %}
+                <div class="mini-item">
+                    <div class="fw-semibold">{{ offer.title }}</div>
+                    <div class="small text-secondary">{{ offer.desc }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section how-works">
+        <h3 class="section-title">🚀 How It Works</h3>
+        <div class="steps-grid">
+            <div class="step-card"><div class="step-icon">🔍</div><h5>Discover</h5><p>Browse through curated professional studios.</p></div>
+            <div class="step-card"><div class="step-icon">📸</div><h5>Compare</h5><p>Evaluate portfolio, pricing, and studio quality.</p></div>
+            <div class="step-card"><div class="step-icon">📅</div><h5>Book</h5><p>Submit details and review total bill.</p></div>
+            <div class="step-card"><div class="step-icon">✅</div><h5>Complete</h5><p>Pay securely and track booking status updates.</p></div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-content">
+            <h3>Ready for Your Next Shoot?</h3>
+            <p>Use smart filters and book your preferred studio in minutes.</p>
+            <a href="{% url 'explore_studios' %}" class="btn btn-light btn-lg">
+                <i class="bi bi-arrow-right"></i> Browse Studios Now
+            </a>
+        </div>
+    </section>
+</div>
 {% endblock %}
