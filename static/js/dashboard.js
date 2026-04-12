@@ -1,9 +1,13 @@
 // ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const contentWrapper = document.getElementById('contentWrapper');
+    const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
     if (!sidebar) return;
 
-    if (window.innerWidth <= 992) {
+    const isMobile = window.innerWidth <= 992;
+
+    if (isMobile) {
         sidebar.classList.toggle('show');   // mobile slide
         // Prevent body scroll when sidebar is open
         if (sidebar.classList.contains('show')) {
@@ -11,6 +15,22 @@ function toggleSidebar() {
         } else {
             document.body.style.overflow = 'auto';
         }
+        return;
+    }
+
+    sidebar.classList.toggle('collapsed');
+    document.body.classList.toggle('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+
+    if (contentWrapper) {
+        contentWrapper.classList.toggle('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+    }
+
+    localStorage.setItem('studiosync_user_sidebar', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+
+    if (sidebarToggleIcon) {
+        sidebarToggleIcon.className = sidebar.classList.contains('collapsed')
+            ? 'bi bi-layout-sidebar-inset-reverse'
+            : 'bi bi-layout-sidebar-inset';
     }
 }
 
@@ -33,11 +53,30 @@ document.addEventListener('click', function (event) {
 // Handle window resize - hide sidebar on desktop
 window.addEventListener('resize', function () {
     const sidebar = document.getElementById('sidebar');
+    const contentWrapper = document.getElementById('contentWrapper');
+    const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
     if (!sidebar) return;
     
     if (window.innerWidth > 992) {
         sidebar.classList.remove('show');
         document.body.style.overflow = 'auto';
+
+        const persisted = localStorage.getItem('studiosync_user_sidebar');
+        if (persisted === 'collapsed') {
+            sidebar.classList.add('collapsed');
+            document.body.classList.add('sidebar-collapsed');
+            contentWrapper?.classList.add('sidebar-collapsed');
+            if (sidebarToggleIcon) {
+                sidebarToggleIcon.className = 'bi bi-layout-sidebar-inset-reverse';
+            }
+        } else {
+            sidebar.classList.remove('collapsed');
+            document.body.classList.remove('sidebar-collapsed');
+            contentWrapper?.classList.remove('sidebar-collapsed');
+            if (sidebarToggleIcon) {
+                sidebarToggleIcon.className = 'bi bi-layout-sidebar-inset';
+            }
+        }
     }
 });
 
@@ -172,75 +211,27 @@ const animateCounters = () => {
     counters.forEach(counter => observer.observe(counter));
 };
 
-// ===== CHAT FUNCTIONALITY =====
-function toggleChat() {
-    const chatWindow = document.getElementById("chatWindow");
-    if (chatWindow) {
-        chatWindow.classList.toggle("active");
-        // Move chat window to top when opened on mobile
-        if (window.innerWidth <= 576 && chatWindow.classList.contains("active")) {
-            chatWindow.style.bottom = 'auto';
-            chatWindow.style.top = '70px';
-        }
-    }
-}
-
-function sendMessage() {
-    const input = document.getElementById("chatInput");
-    const chatBody = document.getElementById("chatBody");
-    const message = input?.value.trim();
-
-    if (!message) return;
-
-    // User message
-    const userMsg = document.createElement("div");
-    userMsg.className = "user-message";
-    userMsg.innerText = message;
-    chatBody?.appendChild(userMsg);
-
-    input.value = "";
-    if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
-
-    // Bot reply simulation with improved responses
-    setTimeout(() => {
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot-message";
-
-        const lowerMessage = message.toLowerCase();
-
-        if (lowerMessage.includes("booking") || lowerMessage.includes("book")) {
-            botMsg.innerText = "📅 You can book a studio from the 'Browse Studios' section. Select your preferred date and studio to proceed.";
-        } else if (lowerMessage.includes("price") || lowerMessage.includes("cost")) {
-            botMsg.innerText = "💰 Our packages start from ₹5,000 onwards. Premium studios may cost more. Use the price filter to find options within your budget.";
-        } else if (lowerMessage.includes("help") || lowerMessage.includes("support")) {
-            botMsg.innerText = "🆘 I'm here to help! You can ask me about bookings, pricing, studios, or any other questions. How can I assist you?";
-        } else if (lowerMessage.includes("studio") || lowerMessage.includes("find")) {
-            botMsg.innerText = "🔍 You can browse studios using our search filters. Filter by city, type, rating, and price range to find the perfect studio.";
-        } else if (lowerMessage.includes("hi") || lowerMessage.includes("hello")) {
-            botMsg.innerText = "👋 Hello! Welcome to StudioSync. How can I help you today?";
-        } else {
-            botMsg.innerText = "✅ Thank you for your message. Our team will assist you shortly. Is there anything else I can help with?";
-        }
-
-        chatBody?.appendChild(botMsg);
-        if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
-
-    }, 600);
-}
-
-// Allow Enter key to send message
-const chatInput = document.getElementById("chatInput");
-if (chatInput) {
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-}
+// Chatbot behavior is handled by static/js/core/chatbot.js.
 
 // ===== SMOOTH SCROLL ANIMATION =====
 document.addEventListener('DOMContentLoaded', () => {
     animateCounters();
+
+    const sidebar = document.getElementById('sidebar');
+    const contentWrapper = document.getElementById('contentWrapper');
+    const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+
+    if (sidebar && window.innerWidth > 992) {
+        const persisted = localStorage.getItem('studiosync_user_sidebar');
+        if (persisted === 'collapsed') {
+            sidebar.classList.add('collapsed');
+            document.body.classList.add('sidebar-collapsed');
+            contentWrapper?.classList.add('sidebar-collapsed');
+            if (sidebarToggleIcon) {
+                sidebarToggleIcon.className = 'bi bi-layout-sidebar-inset-reverse';
+            }
+        }
+    }
 
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

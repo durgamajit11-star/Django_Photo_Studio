@@ -26,3 +26,23 @@ class StudioPreference(models.Model):
 	def __str__(self):
 		return f"{self.user.username} studio preferences"
 
+
+class UserPreference(models.Model):
+	user = models.OneToOneField(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name='user_preference'
+	)
+	email_notifications = models.BooleanField(default=True)
+	sms_alerts = models.BooleanField(default=False)
+	marketing_emails = models.BooleanField(default=False)
+	dark_theme = models.BooleanField(default=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		verbose_name = 'User Preference'
+		verbose_name_plural = 'User Preferences'
+
+	def __str__(self):
+		return f"{self.user.username} user preferences"
+

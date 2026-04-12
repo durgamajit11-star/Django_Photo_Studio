@@ -102,6 +102,9 @@ function initCounters() {
 // ===============================
 
 function initCharts() {
+    if (document.body && document.body.classList.contains('studio-dashboard-page')) {
+        return;
+    }
 
     const revenueChart = document.getElementById("revenueChart");
     if (revenueChart && typeof Chart !== "undefined") {

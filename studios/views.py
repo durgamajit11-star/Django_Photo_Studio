@@ -94,6 +94,9 @@ def studio_detail(request, studio_id):
 
     min_service_price = services.order_by('price').values_list('price', flat=True).first()
     max_service_price = services.order_by('-price').values_list('price', flat=True).first()
+    existing_user_review = None
+    if request.user.is_authenticated:
+        existing_user_review = reviews.filter(user=request.user).first()
     
     context = {
         'studio': studio,
@@ -113,6 +116,7 @@ def studio_detail(request, studio_id):
         'service_count': services.count(),
         'min_service_price': min_service_price,
         'max_service_price': max_service_price,
+        'existing_user_review': existing_user_review,
     }
     
     return render(request, 'studios/studio_detail.html', context)
@@ -219,11 +223,22 @@ def book_studio(request, studio_id):
 
 @login_required
 def add_review(request, studio_id):
-    """Add a review for a studio"""
+    """Add or update a review for a studio"""
+    from bookings.models import BookingRequest
+
     studio = get_object_or_404(Studio, id=studio_id)
     
     # Check if user has already reviewed this studio
     existing_review = Review.objects.filter(studio=studio, user=request.user).first()
+    has_eligible_booking = BookingRequest.objects.filter(
+        user=request.user,
+        studio=studio,
+        status__in=['Confirmed', 'Completed']
+    ).exists()
+
+    if not has_eligible_booking:
+        messages.error(request, 'You can review this studio only after a confirmed booking.')
+        return redirect('studios:studio_detail', studio_id=studio.id)
     
     if request.method == 'POST':
         rating = request.POST.get('rating')
@@ -231,28 +246,32 @@ def add_review(request, studio_id):
         
         if not all([rating, comment]):
             messages.error(request, 'Rating and comment are required')
-            return redirect('studio_detail', studio_id=studio_id)
+            return redirect('studios:add_review', studio_id=studio_id)
         
         try:
+            rating_value = int(rating)
+            if rating_value < 1 or rating_value > 5:
+                raise ValueError('Rating out of range')
+
             if existing_review:
                 # Update existing review
-                existing_review.rating = rating
+                existing_review.rating = rating_value
                 existing_review.comment = comment
-                existing_review.save()
+                existing_review.save(update_fields=['rating', 'comment', 'updated_at'])
                 messages.success(request, 'Review updated successfully!')
             else:
                 # Create new review
                 Review.objects.create(
                     studio=studio,
                     user=request.user,
-                    rating=rating,
+                    rating=rating_value,
                     comment=comment
                 )
                 messages.success(request, 'Review added successfully!')
-            return redirect('studio_detail', studio_id=studio_id)
+            return redirect('studios:studio_detail', studio_id=studio_id)
         except Exception as e:
             messages.error(request, f'Error saving review: {str(e)}')
-            return redirect('studio_detail', studio_id=studio_id)
+            return redirect('studios:add_review', studio_id=studio_id)
     
     context = {
         'studio': studio,

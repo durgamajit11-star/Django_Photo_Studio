@@ -28,7 +28,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body>
+<body data-role="{{ user.role|default:'' }}">
 
     <!-- HEADER -->
     <header class="top-header glass">
@@ -36,6 +36,10 @@
             <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleSidebar()"
                 title="Toggle Menu">
                 <i class="bi bi-list"></i>
+            </button>
+            <button class="desktop-sidebar-toggle" id="sidebarToggleBtn" type="button" onclick="toggleSidebar()"
+                title="Collapse Sidebar" aria-label="Toggle sidebar">
+                <i class="bi bi-layout-sidebar-inset" id="sidebarToggleIcon"></i>
             </button>
             <div class="logo">
                 <i class="bi bi-camera-photo"></i> StudioSync
@@ -72,6 +76,8 @@
 
                 <!-- DASHBOARD -->
                 <a href="{% url 'user_dashboard' %}"
+                    data-label="Dashboard"
+                    title="Dashboard"
                     class="menu-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
                     <i class="bi bi-speedometer2"></i>
                     <span>Dashboard</span>
@@ -79,6 +85,8 @@
 
                 <!-- AI RECOMMENDATIONS -->
                 <a href="{% url 'user_recommendations' %}"
+                    data-label="AI Recommendations"
+                    title="AI Recommendations"
                     class="menu-item {% if request.resolver_match.url_name == 'user_recommendations' %}active{% endif %}">
                     <i class="bi bi-stars"></i>
                     <span>AI Recommendations</span>
@@ -86,6 +94,8 @@
 
                 <!-- EXPLORE STUDIOS -->
                 <a href="{% url 'explore_studios' %}"
+                    data-label="Explore Studios"
+                    title="Explore Studios"
                     class="menu-item {% if request.resolver_match.url_name == 'explore_studios' %}active{% endif %}">
                     <i class="bi bi-images"></i>
                     <span>Explore Studios</span>
@@ -93,13 +103,17 @@
 
                 <!-- BOOKINGS -->
                 <a href="{% url 'user_bookings' %}"
+                    data-label="My Bookings"
+                    title="My Bookings"
                     class="menu-item {% if request.resolver_match.url_name == 'user_bookings' %}active{% endif %}">
                     <i class="bi bi-calendar-check"></i>
                     <span>My Bookings</span>
                 </a>
 
                 <!-- REVIEWS -->
-                <a href="{% url 'user_reviews' %}"
+                <a href="{% url 'dashboard_user_reviews' %}"
+                    data-label="Reviews"
+                    title="Reviews"
                     class="menu-item {% if request.resolver_match.url_name == 'user_reviews' %}active{% endif %}">
                     <i class="bi bi-star"></i>
                     <span>Reviews</span>
@@ -107,6 +121,8 @@
 
                 <!-- PAYMENTS -->
                 <a href="{% url 'user_payments' %}"
+                    data-label="Payments"
+                    title="Payments"
                     class="menu-item {% if request.resolver_match.url_name == 'user_payments' %}active{% endif %}">
                     <i class="bi bi-credit-card"></i>
                     <span>Payments</span>
@@ -114,6 +130,8 @@
 
                 <!-- NOTIFICATIONS -->
                 <a href="{% url 'user_notifications' %}"
+                    data-label="Notifications"
+                    title="Notifications"
                     class="menu-item {% if request.resolver_match.url_name == 'user_notifications' %}active{% endif %}">
                     <i class="bi bi-bell"></i>
                     <span>Notifications</span>
@@ -123,6 +141,8 @@
 
                 <!-- PROFILE -->
                 <a href="{% url 'user_profile' %}"
+                    data-label="Profile Settings"
+                    title="Profile Settings"
                     class="menu-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
                     <i class="bi bi-person-circle"></i>
                     <span>Profile Settings</span>
@@ -196,35 +216,13 @@
         </div>
     </div>
 
-    <!-- ================= CHATBOT ================= -->
-    <!-- Chat Button -->
-    <div class="chat-toggle" onclick="toggleChat()" title="Open Chat">
-        <i class="bi bi-chat-dots-fill"></i>
-    </div>
-
-    <!-- Chat Window -->
-    <div class="chat-window glass" id="chatWindow">
-        <div class="chat-header">
-            <span>StudioSync AI Assistant</span>
-            <i class="bi bi-x-lg" onclick="toggleChat()" style="cursor: pointer;"></i>
-        </div>
-
-        <div class="chat-body" id="chatBody">
-            <div class="bot-message">👋 Hello! How can I help you today?</div>
-        </div>
-
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
-            <button onclick="sendMessage()" class="chat-send-btn" title="Send Message">
-                <i class="bi bi-send-fill"></i>
-            </button>
-        </div>
-    </div>
+    {% include "includes/chatbot.html" %}
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/global.js' %}"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
+    <script src="{% static 'js/core/chatbot.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

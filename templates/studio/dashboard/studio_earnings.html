@@ -37,7 +37,7 @@
             </div>
             <div class="stat-content">
                 <span class="stat-label">Total Earnings</span>
-                <h2 class="stat-value">${{ total_earnings|default:0 }}</h2>
+                <h2 class="stat-value">?{{ total_earnings|default:0 }}</h2>
                 <small class="stat-trend">📈 +15% vs last month</small>
             </div>
         </div>
@@ -50,7 +50,7 @@
             </div>
             <div class="stat-content">
                 <span class="stat-label">Pending Payment</span>
-                <h2 class="stat-value">${{ pending_amount|default:0 }}</h2>
+                <h2 class="stat-value">?{{ pending_amount|default:0 }}</h2>
                 <small class="stat-trend">⏳ Awaiting completion</small>
             </div>
         </div>
@@ -125,19 +125,19 @@
                 <div class="metrics-list">
                     <div class="metric-row">
                         <span class="metric-label">Average Booking Value</span>
-                        <span class="metric-value">$450</span>
+                        <span class="metric-value">?{{ avg_booking_value|floatformat:2 }}</span>
                     </div>
                     <div class="metric-row">
                         <span class="metric-label">Monthly Average</span>
-                        <span class="metric-value">$2,850</span>
+                        <span class="metric-value">?{{ monthly_average|floatformat:2 }}</span>
                     </div>
                     <div class="metric-row">
                         <span class="metric-label">Payment Completion Rate</span>
-                        <span class="metric-value">94%</span>
+                        <span class="metric-value">{{ payment_completion_rate }}%</span>
                     </div>
                     <div class="metric-row">
                         <span class="metric-label">Average Days to Payment</span>
-                        <span class="metric-value">3.5 days</span>
+                        <span class="metric-value">{{ avg_days_to_payment }} days</span>
                     </div>
                 </div>
             </div>
@@ -151,27 +151,17 @@
             </div>
             <div class="card-body">
                 <div class="service-list">
+                    {% for service in top_services %}
                     <div class="service-item">
-                        <div class="service-rank">1</div>
+                        <div class="service-rank">{{ forloop.counter }}</div>
                         <div class="service-details">
-                            <span class="service-name">Wedding Photography</span>
-                            <small class="text-muted">45 bookings • $28,500</small>
+                            <span class="service-name">{{ service.service__service_name|default:'General Session' }}</span>
+                            <small class="text-muted">{{ service.bookings_count }} bookings • ?{{ service.revenue|floatformat:2 }}</small>
                         </div>
                     </div>
-                    <div class="service-item">
-                        <div class="service-rank">2</div>
-                        <div class="service-details">
-                            <span class="service-name">Product Photography</span>
-                            <small class="text-muted">32 bookings • $12,800</small>
-                        </div>
-                    </div>
-                    <div class="service-item">
-                        <div class="service-rank">3</div>
-                        <div class="service-details">
-                            <span class="service-name">Portrait Session</span>
-                            <small class="text-muted">28 bookings • $8,400</small>
-                        </div>
-                    </div>
+                    {% empty %}
+                    <div class="text-muted small">No confirmed service revenue yet.</div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -203,14 +193,14 @@
                     {% for payment in recent_payments %}
                     <tr>
                         <td>
-                            <strong>{{ payment.booking_request.user.get_full_name|default:payment.booking_request.user.username }}</strong>
-                            <small class="d-block text-muted">{{ payment.booking_request.user.email }}</small>
+                            <strong>{{ payment.user.get_full_name|default:payment.user.username }}</strong>
+                            <small class="d-block text-muted">{{ payment.user.email }}</small>
                         </td>
                         <td>
-                            <span>{{ payment.booking_request.event_type }}</span>
-                            <small class="d-block text-muted">{{ payment.booking_request.date|date:"M d, Y" }}</small>
+                            <span>{{ payment.booking.event_type }}</span>
+                            <small class="d-block text-muted">{{ payment.booking.date|date:"M d, Y" }}</small>
                         </td>
-                        <td class="fw-bold">${{ payment.amount }}</td>
+                        <td class="fw-bold">?{{ payment.amount }}</td>
                         <td>
                             <span class="badge {% if payment.status == 'Completed' %}bg-success{% elif payment.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
                                 {{ payment.status }}
@@ -239,16 +229,23 @@
 
 <!-- Chart Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ revenue_labels|json_script:"studioEarningsLabels" }}
+{{ revenue_data|json_script:"studioEarningsData" }}
+{{ status_counts|json_script:"studioPaymentStatusCounts" }}
 <script>
+    const earningsLabels = JSON.parse(document.getElementById('studioEarningsLabels').textContent);
+    const earningsValues = JSON.parse(document.getElementById('studioEarningsData').textContent);
+    const paymentStatusCounts = JSON.parse(document.getElementById('studioPaymentStatusCounts').textContent);
+
     // Revenue Chart
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
     new Chart(revenueCtx, {
         type: 'line',
         data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            labels: earningsLabels.length ? earningsLabels : ['No Data'],
             datasets: [{
                 label: 'Revenue',
-                data: [800, 1200, 1100, 1800, 2000, 2200],
+                data: earningsValues.length ? earningsValues : [0],
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 borderWidth: 3,
@@ -286,7 +283,7 @@
         data: {
             labels: ['Paid', 'Pending', 'Failed'],
             datasets: [{
-                data: [75, 20, 5],
+                data: [paymentStatusCounts.paid || 0, paymentStatusCounts.pending || 0, paymentStatusCounts.failed || 0],
                 backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                 borderColor: '#0f172a',
                 borderWidth: 2

@@ -18,6 +18,14 @@
     padding: 1rem;
 }
 
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -59,6 +67,25 @@
     margin-bottom: 0.5rem;
 }
 
+.mini-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.notification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(6, 182, 212, 0.15);
+    color: #d9f3ff;
+    font-size: 0.8rem;
+}
+
 .mini-item:last-child {
     margin-bottom: 0;
 }
@@ -69,8 +96,70 @@
     gap: 1rem;
 }
 
+.balanced-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-tabs {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    gap: 0.45rem;
+}
+
+.dashboard-tabs .nav-link {
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    color: rgba(226, 232, 240, 0.92);
+    background: rgba(30, 41, 59, 0.45);
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.5rem 0.9rem;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    border-color: transparent;
+    color: #ffffff;
+}
+
+.tab-pane-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.panel-section {
+    background: rgba(15, 23, 42, 0.52);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 0.85rem;
+}
+
+.panel-section h6 {
+    margin-bottom: 0.7rem;
+    font-weight: 700;
+}
+
+.panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.panel-list .mini-item {
+    margin-bottom: 0;
+}
+
 @media (max-width: 992px) {
     .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .balanced-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-pane-stack {
         grid-template-columns: 1fr;
     }
 }
@@ -133,207 +222,299 @@
             <a class="quick-link" href="{% url 'user_bookings' %}"><i class="bi bi-calendar-check"></i> Manage Bookings</a>
             <a class="quick-link" href="{% url 'user_payments' %}"><i class="bi bi-credit-card"></i> Payment History</a>
             <a class="quick-link" href="{% url 'user_recommendations' %}"><i class="bi bi-stars"></i> AI Recommendations</a>
-            <a class="quick-link" href="{% url 'user_reviews' %}"><i class="bi bi-star"></i> Your Reviews</a>
-            <a class="quick-link" href="{% url 'user_notifications' %}"><i class="bi bi-bell"></i> Notifications</a>
+            <a class="quick-link" href="{% url 'dashboard_user_reviews' %}"><i class="bi bi-star"></i> Your Reviews</a>
+            <a class="quick-link d-flex justify-content-between align-items-center" href="{% url 'user_notifications' %}">
+                <span><i class="bi bi-bell"></i> Notifications</span>
+                <span class="notification-badge" id="dashboardUnreadCount">{{ unread_notifications_count|default:0 }}</span>
+            </a>
         </div>
     </section>
 
-    <section class="content-grid">
-        <div class="glass-panel">
-            <h5 class="mb-3">🌟 Featured Studios</h5>
-            <div class="studios-grid">
-                {% for studio in featured_studios %}
-                <div class="col studio-item" data-city="{{ studio.location|lower }}" data-type="{{ studio.specializations|default:''|lower }}" data-rating="{{ studio.rating|default:0 }}" data-price="{{ studio.price_range|default:''|lower }}">
-                    <div class="studio-card">
-                        <div class="studio-image-wrapper">
-                            {% if studio.profile_image %}
-                            <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="studio-image">
-                            {% else %}
-                            <img src="{% static 'images/s1.png' %}" alt="{{ studio.studio_name }}" class="studio-image">
-                            {% endif %}
-                            <div class="studio-overlay">
-                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-light btn-sm">View Portfolio</a>
-                            </div>
-                        </div>
-                        <div class="studio-info">
-                            <h6>{{ studio.studio_name }}</h6>
-                            <p class="location">📍 {{ studio.location }}</p>
-                            <div class="rating-price">
-                                <span class="rating">⭐ {{ studio.average_rating|floatformat:1 }}</span>
-                                <span class="price">{{ studio.price_range|default:'₹₹' }}</span>
-                            </div>
-                            <div class="d-grid gap-2 mt-2">
-                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-light btn-sm w-100">View Details</a>
-                                <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-primary btn-sm w-100">Book Studio</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info text-center">No studios are available right now.</div>
-                </div>
-                {% endfor %}
-            </div>
+    <section class="glass-panel" data-live-endpoint="{% url 'user_dashboard_live_notifications' %}" id="dashboardNotificationsPanel">
+        <div class="panel-header">
+            <h5 class="mb-0">Notifications</h5>
+            <a href="{% url 'user_notifications' %}" class="btn btn-outline-info btn-sm">Open Inbox</a>
         </div>
-
-        <div class="d-flex flex-column gap-3">
-            <div class="glass-panel">
-                <h5 class="mb-2">Next Upcoming Booking</h5>
-                {% if upcoming_booking %}
-                <div class="mini-item">
-                    <div class="fw-semibold">{{ upcoming_booking.studio.studio_name }}</div>
-                    <div class="small text-secondary">{{ upcoming_booking.event_type }} | {{ upcoming_booking.date|date:"d M Y" }}</div>
-                    <div class="small">{{ upcoming_booking.time_slot|default:"Time pending" }} | {{ upcoming_booking.status }}</div>
-                    <a href="{% url 'bookings:booking_detail' upcoming_booking.id %}" class="btn btn-outline-light btn-sm mt-2">Open Booking</a>
+        {% if recent_notifications %}
+        <div class="d-flex flex-column gap-2" id="dashboardRecentNotifications">
+            {% for n in recent_notifications %}
+            <div class="mini-item d-flex justify-content-between align-items-center gap-2 {% if not n.is_read %}border-info{% endif %}">
+                <div class="min-w-0">
+                    <div class="fw-semibold text-truncate">{{ n.message }}</div>
+                    <div class="small text-secondary">{{ n.created_at|timesince }} ago</div>
                 </div>
-                {% else %}
-                <div class="alert alert-secondary mb-0">No upcoming booking scheduled.</div>
+                {% if not n.is_read %}
+                <span class="badge bg-warning text-dark">New</span>
                 {% endif %}
             </div>
-
-            <div class="glass-panel">
-                <h5 class="mb-2">Recent Bookings</h5>
-                {% for booking in recent_bookings %}
-                <div class="mini-item">
-                    <div class="fw-semibold">{{ booking.studio.studio_name }}</div>
-                    <div class="small text-secondary">{{ booking.event_type }} | {{ booking.date|date:"d M Y" }}</div>
-                    <div class="small">Status: {{ booking.status }} | Payment: {{ booking.payment_status }}</div>
-                </div>
-                {% empty %}
-                <div class="alert alert-secondary mb-0">No booking activity yet.</div>
-                {% endfor %}
-            </div>
-
-            <div class="glass-panel">
-                <h5 class="mb-2">Recent Payments</h5>
-                {% for payment in recent_payments %}
-                <div class="mini-item">
-                    <div class="fw-semibold">Rs. {{ payment.amount }} - {{ payment.booking.studio.studio_name }}</div>
-                    <div class="small text-secondary">{{ payment.get_payment_method_display }} | {{ payment.status }}</div>
-                    <div class="small">{{ payment.created_at|date:"d M Y, h:i A" }}</div>
-                </div>
-                {% empty %}
-                <div class="alert alert-secondary mb-0">No payments found.</div>
-                {% endfor %}
-            </div>
-
-            <div class="glass-panel">
-                <h5 class="mb-2">Recommended For You</h5>
-                {% for rec in recommendations %}
-                <div class="mini-item">
-                    <div class="fw-semibold">{{ rec.studio.studio_name }}</div>
-                    <div class="small text-secondary">{{ rec.studio.location }} | Match: {{ rec.score|floatformat:0 }}%</div>
-                    <a href="{% url 'studios:studio_detail' rec.studio.id %}" class="btn btn-outline-light btn-sm mt-2">View</a>
-                </div>
-                {% empty %}
-                <div class="small text-secondary">No recommendations yet. Explore studios to improve suggestions.</div>
-                {% endfor %}
-            </div>
-
-            <div class="glass-panel">
-                <h5 class="mb-2">Your Latest Reviews</h5>
-                {% for review in recent_reviews %}
-                <div class="mini-item">
-                    <div class="fw-semibold">{{ review.studio.studio_name }}</div>
-                    <div class="small text-secondary">⭐ {{ review.rating }}/5 | {{ review.created_at|date:"d M Y" }}</div>
-                    <div class="small">{{ review.comment|truncatechars:90 }}</div>
-                </div>
-                {% empty %}
-                <div class="small text-secondary">You have not posted reviews yet.</div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <section class="content-grid">
-        <div class="glass-panel">
-            <h5 class="mb-3">Recommendation Reasons</h5>
-            {% for item in recommendation_reasons %}
-            <div class="mini-item">
-                <div class="d-flex justify-content-between align-items-start gap-2">
-                    <div>
-                        <div class="fw-semibold">{{ item.studio.studio_name }}</div>
-                        <div class="small text-secondary">{{ item.reason }}</div>
-                    </div>
-                    <span class="badge bg-info">{{ item.score|floatformat:0 }}%</span>
-                </div>
-                <a href="{% url 'studios:studio_detail' item.studio.id %}" class="btn btn-outline-light btn-sm mt-2">View Studio</a>
-            </div>
-            {% empty %}
-            <div class="alert alert-secondary mb-0">No recommendation insights yet. Explore more studios to improve matching.</div>
             {% endfor %}
         </div>
+        <div class="d-flex gap-2 mt-3">
+            <a href="{% url 'user_notifications' %}" class="btn btn-outline-light btn-sm">View All</a>
+            <form action="{% url 'clear_notifications' %}" method="post" onsubmit="return confirm('Clear all notifications?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-warning btn-sm">Clear All</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="alert alert-secondary mb-0" id="dashboardRecentNotificationsEmpty">No notifications right now.</div>
+        {% endif %}
+    </section>
 
-        <div class="d-flex flex-column gap-3">
-            <div class="glass-panel">
-                <h5 class="mb-2">Price Intelligence</h5>
-                <div class="mini-item">
-                    <div class="small text-secondary">Average Hourly Price</div>
-                    <div class="h5 mb-0">Rs. {{ price_insights.avg_price|default:0|floatformat:0 }}</div>
-                </div>
-                <div class="mini-item">
-                    <div class="small text-secondary">Budget Range</div>
-                    <div class="small">Rs. {{ price_insights.min_price|default:0|floatformat:0 }} - Rs. {{ price_insights.max_price|default:0|floatformat:0 }}</div>
+    <section class="glass-panel">
+        <h5 class="mb-3">🌟 Featured Studios</h5>
+        <div class="studios-grid">
+            {% for studio in featured_studios %}
+            <div class="col studio-item" data-city="{{ studio.location|lower }}" data-type="{{ studio.specializations|default:''|lower }}" data-rating="{{ studio.rating|default:0 }}" data-price="{{ studio.price_range|default:''|lower }}">
+                <div class="studio-card">
+                    <div class="studio-image-wrapper">
+                        {% if studio.profile_image %}
+                        <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="studio-image">
+                        {% else %}
+                        <img src="{% static 'images/s1.png' %}" alt="{{ studio.studio_name }}" class="studio-image">
+                        {% endif %}
+                        <div class="studio-overlay">
+                            <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-light btn-sm">View Portfolio</a>
+                        </div>
+                    </div>
+                    <div class="studio-info">
+                        <h6>{{ studio.studio_name }}</h6>
+                        <p class="location">📍 {{ studio.location }}</p>
+                        <div class="rating-price">
+                            <span class="rating">⭐ {{ studio.average_rating|floatformat:1 }}</span>
+                            <span class="price">{{ studio.price_range|default:'₹₹' }}</span>
+                        </div>
+                        <div class="d-grid gap-2 mt-2">
+                            <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-light btn-sm w-100">View Details</a>
+                            <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-primary btn-sm w-100">Book Studio</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="glass-panel">
-                <h5 class="mb-2">Trending Categories</h5>
-                {% for row in trending_categories %}
-                <div class="mini-item d-flex justify-content-between align-items-center">
-                    <span>{{ row.category__name }}</span>
-                    <span class="badge bg-secondary">{{ row.total }} studios</span>
-                </div>
-                {% empty %}
-                <div class="small text-secondary">Category trend data will appear as studios are categorized.</div>
-                {% endfor %}
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">No studios are available right now.</div>
             </div>
+            {% endfor %}
         </div>
     </section>
 
-    <section class="content-grid">
-        <div class="glass-panel">
-            <h5 class="mb-3">Active Booking Timeline</h5>
-            {% if active_booking %}
-            <div class="mini-item">
-                <div class="fw-semibold">{{ active_booking.studio.studio_name }} - {{ active_booking.event_type }}</div>
-                <div class="small text-secondary">{{ active_booking.date|date:"d M Y" }} | {{ active_booking.time_slot|default:"Time pending" }}</div>
-            </div>
-            <div class="d-flex flex-column gap-2">
-                {% for step in booking_timeline %}
-                <div class="mini-item d-flex justify-content-between align-items-center">
-                    <span>{{ step.label }}</span>
-                    {% if step.done %}
-                    <span class="badge bg-success">Done</span>
-                    {% else %}
-                    <span class="badge bg-warning text-dark">Pending</span>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="alert alert-secondary mb-0">No active booking timeline available.</div>
-            {% endif %}
+    <section class="glass-panel">
+        <div class="panel-header">
+            <h5 class="mb-0">Your Activity Hub</h5>
+            <small class="text-secondary">Switch tabs to focus on one area at a time.</small>
         </div>
 
-        <div class="d-flex flex-column gap-3">
-            <div class="glass-panel">
-                <h5 class="mb-2">Trust & Safety</h5>
-                <div class="mini-item"><strong>{{ trust_metrics.verified_studios }}</strong> verified studios on platform</div>
-                <div class="mini-item">{{ trust_metrics.secure_payments }}</div>
-                <div class="mini-item">{{ trust_metrics.refund_policy }}</div>
-                <div class="mini-item">{{ trust_metrics.support }}</div>
+        <ul class="nav nav-pills dashboard-tabs mb-3" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-bookings-tab" data-bs-toggle="pill" data-bs-target="#tab-bookings" type="button" role="tab" aria-controls="tab-bookings" aria-selected="true">
+                    <i class="bi bi-calendar-check"></i> Bookings
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-recommend-tab" data-bs-toggle="pill" data-bs-target="#tab-recommend" type="button" role="tab" aria-controls="tab-recommend" aria-selected="false">
+                    <i class="bi bi-stars"></i> Recommendations
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-insights-tab" data-bs-toggle="pill" data-bs-target="#tab-insights" type="button" role="tab" aria-controls="tab-insights" aria-selected="false">
+                    <i class="bi bi-graph-up"></i> Insights
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="dashboardTabsContent">
+            <div class="tab-pane fade show active" id="tab-bookings" role="tabpanel" aria-labelledby="tab-bookings-tab">
+                <div class="tab-pane-stack">
+                    <div class="panel-section">
+                        <h6>Next Upcoming Booking</h6>
+                        {% if upcoming_booking %}
+                        <div class="panel-list">
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ upcoming_booking.studio.studio_name }}</div>
+                                <div class="small text-secondary">{{ upcoming_booking.event_type }} | {{ upcoming_booking.date|date:"d M Y" }}</div>
+                                <div class="small">{{ upcoming_booking.time_slot|default:"Time pending" }} | {{ upcoming_booking.status }}</div>
+                                <a href="{% url 'bookings:booking_detail' upcoming_booking.id %}" class="btn btn-outline-light btn-sm mt-2">Open Booking</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No upcoming booking scheduled.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Recent Payments</h6>
+                        {% if recent_payments %}
+                        <div class="panel-list">
+                            {% for payment in recent_payments %}
+                            <div class="mini-item">
+                                <div class="fw-semibold">₹ {{ payment.amount }} - {{ payment.booking.studio.studio_name }}</div>
+                                <div class="small text-secondary">{{ payment.get_payment_method_display }} | {{ payment.status }}</div>
+                                <div class="small">{{ payment.created_at|date:"d M Y, h:i A" }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No payments found.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Recent Bookings</h6>
+                        {% if recent_bookings %}
+                        <div class="panel-list">
+                            {% for booking in recent_bookings %}
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ booking.studio.studio_name }}</div>
+                                <div class="small text-secondary">{{ booking.event_type }} | {{ booking.date|date:"d M Y" }}</div>
+                                <div class="small">Status: {{ booking.status }} | Payment: {{ booking.payment_status }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No booking activity yet.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Active Booking Timeline</h6>
+                        {% if active_booking %}
+                        <div class="panel-list">
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ active_booking.studio.studio_name }} - {{ active_booking.event_type }}</div>
+                                <div class="small text-secondary">{{ active_booking.date|date:"d M Y" }} | {{ active_booking.time_slot|default:"Time pending" }}</div>
+                            </div>
+                            {% for step in booking_timeline %}
+                            <div class="mini-item d-flex justify-content-between align-items-center">
+                                <span>{{ step.label }}</span>
+                                {% if step.done %}
+                                <span class="badge bg-success">Done</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No active booking timeline available.</div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
-            <div class="glass-panel">
-                <h5 class="mb-2">Spotlight Offers</h5>
-                {% for offer in spotlight_offers %}
-                <div class="mini-item">
-                    <div class="fw-semibold">{{ offer.title }}</div>
-                    <div class="small text-secondary">{{ offer.desc }}</div>
+            <div class="tab-pane fade" id="tab-recommend" role="tabpanel" aria-labelledby="tab-recommend-tab">
+                <div class="tab-pane-stack">
+                    <div class="panel-section">
+                        <h6>Recommended For You</h6>
+                        {% if recommendations %}
+                        <div class="panel-list">
+                            {% for rec in recommendations %}
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ rec.studio.studio_name }}</div>
+                                <div class="small text-secondary">{{ rec.studio.location }} | Match: {{ rec.score|floatformat:0 }}%</div>
+                                <a href="{% url 'studios:studio_detail' rec.studio.id %}" class="mini-link mt-2">View <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No recommendations yet. Explore studios to improve suggestions.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Recommendation Reasons</h6>
+                        {% if recommendation_reasons %}
+                        <div class="panel-list">
+                            {% for item in recommendation_reasons %}
+                            <div class="mini-item">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <div class="fw-semibold">{{ item.studio.studio_name }}</div>
+                                        <div class="small text-secondary">{{ item.reason }}</div>
+                                    </div>
+                                    <span class="badge bg-info">{{ item.score|floatformat:0 }}%</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">No recommendation insights yet. Explore more studios to improve matching.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Your Latest Reviews</h6>
+                        {% if recent_reviews %}
+                        <div class="panel-list">
+                            {% for review in recent_reviews %}
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ review.studio.studio_name }}</div>
+                                <div class="small text-secondary">⭐ {{ review.rating }}/5 | {{ review.created_at|date:"d M Y" }}</div>
+                                <div class="small">{{ review.comment|truncatechars:90 }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">You have not posted reviews yet.</div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="tab-insights" role="tabpanel" aria-labelledby="tab-insights-tab">
+                <div class="tab-pane-stack">
+                    <div class="panel-section">
+                        <h6>Price Intelligence</h6>
+                        <div class="panel-list">
+                            <div class="mini-item">
+                                <div class="small text-secondary">Average Hourly Price</div>
+                                <div class="h5 mb-0">₹ {{ price_insights.avg_price|default:0|floatformat:0 }}</div>
+                            </div>
+                            <div class="mini-item">
+                                <div class="small text-secondary">Budget Range</div>
+                                <div class="small">₹ {{ price_insights.min_price|default:0|floatformat:0 }} - ₹ {{ price_insights.max_price|default:0|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Trending Categories</h6>
+                        {% if trending_categories %}
+                        <div class="panel-list">
+                            {% for row in trending_categories %}
+                            <div class="mini-item d-flex justify-content-between align-items-center">
+                                <span>{{ row.category__name }}</span>
+                                <span class="badge bg-secondary">{{ row.total }} studios</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">Category trend data will appear as studios are categorized.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Trust & Safety</h6>
+                        <div class="panel-list">
+                            <div class="mini-item"><strong>{{ trust_metrics.verified_studios }}</strong> verified studios on platform</div>
+                            <div class="mini-item">{{ trust_metrics.secure_payments }}</div>
+                            <div class="mini-item">{{ trust_metrics.refund_policy }}</div>
+                            <div class="mini-item">{{ trust_metrics.support }}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h6>Spotlight Offers</h6>
+                        <div class="panel-list">
+                            {% for offer in spotlight_offers %}
+                            <div class="mini-item">
+                                <div class="fw-semibold">{{ offer.title }}</div>
+                                <div class="small text-secondary">{{ offer.desc }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -358,4 +539,8 @@
         </div>
     </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/user/dashboard_live.js' %}"></script>
 {% endblock %}

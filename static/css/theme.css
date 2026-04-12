@@ -9,13 +9,13 @@
 }
 
 html[data-theme='light'] {
-    --theme-bg: #f6f8fb;
-    --theme-surface: #ffffff;
-    --theme-surface-2: #eef3fa;
+    --theme-bg: #faf8f6;
+    --theme-surface: #fefdfb;
+    --theme-surface-2: #f3ede8;
     --theme-text: #172235;
     --theme-muted: #60728b;
     --theme-border: rgba(23, 34, 53, 0.13);
-    --theme-primary: #0f9d8f;
+    --theme-primary: #8b6f47;
 }
 
 html[data-theme='dark'] {
@@ -65,7 +65,7 @@ h1, h2, h3, h4, h5, h6, p, span, label, small, li, td, th, .form-label {
 .form-control:focus,
 .form-select:focus {
     border-color: var(--theme-primary);
-    box-shadow: 0 0 0 0.2rem rgba(15, 157, 143, 0.2);
+    box-shadow: 0 0 0 0.2rem rgba(139, 111, 71, 0.2);
 }
 
 .badge {
@@ -148,7 +148,8 @@ html[data-theme='light'] .footer * {
 }
 
 html[data-theme='light'] .footer {
-    background: linear-gradient(135deg, #eef3fa, #dfe8f5) !important;
+    background: linear-gradient(135deg, #f3ede8, #ede5dd) !important;
+    border-top-color: rgba(21, 34, 56, 0.12) !important;
 }
 
 html[data-theme='dark'] .admin-main,
@@ -169,7 +170,7 @@ html[data-theme='light'] section {
 }
 
 html[data-theme='light'] .page-header {
-    background: linear-gradient(135deg, #0f9d8f, #22b7a8) !important;
+    background: linear-gradient(135deg, #8b6f47, #a88366) !important;
     color: #ffffff !important;
 }
 
@@ -245,7 +246,7 @@ html[data-theme='light'] .btn-outline-secondary {
 
 html[data-theme='light'] header,
 html[data-theme='light'] .top-header {
-    background: rgba(255, 255, 255, 0.94) !important;
+    background: rgba(254, 253, 251, 0.97) !important;
     border-bottom-color: rgba(21, 34, 56, 0.14) !important;
 }
 

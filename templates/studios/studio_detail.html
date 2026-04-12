@@ -13,7 +13,7 @@
 }
 
 .hero {
-    min-height: 340px;
+    height: clamp(220px, 38vh, 320px);
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid rgba(148, 163, 184, 0.2);
@@ -24,7 +24,6 @@
 .hero img {
     width: 100%;
     height: 100%;
-    min-height: 340px;
     object-fit: cover;
 }
 
@@ -119,6 +118,10 @@
     .layout-grid {
         grid-template-columns: 1fr;
     }
+
+    .hero {
+        height: clamp(200px, 32vh, 260px);
+    }
 }
 </style>
 
@@ -131,7 +134,11 @@
             <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-warning btn-sm">
                 <i class="bi bi-calendar-check"></i> Book Studio
             </a>
-            <a href="{% url 'studios:add_review' studio.id %}" class="btn btn-outline-info btn-sm">Write Review</a>
+            {% if existing_user_review %}
+            <a href="{% url 'edit_review' existing_user_review.id %}" class="btn btn-outline-info btn-sm">Edit Your Review</a>
+            {% else %}
+            <a href="{% url 'add_review' studio.id %}" class="btn btn-outline-info btn-sm">Write Review</a>
+            {% endif %}
         </div>
     </div>
 
@@ -158,7 +165,7 @@
                 </div>
                 <div class="text-end">
                     <div class="small text-secondary">Starting Price</div>
-                    <h4 class="mb-0">Rs. {{ studio.price_per_hour }}/hr</h4>
+                    <h4 class="mb-0">₹ {{ studio.price_per_hour }}/hr</h4>
                 </div>
             </div>
         </div>
@@ -222,7 +229,7 @@
                         <article class="service-item h-100">
                             <div class="d-flex justify-content-between">
                                 <strong>{{ service.service_name }}</strong>
-                                <span>Rs. {{ service.price }}</span>
+                                <span>₹ {{ service.price }}</span>
                             </div>
                             {% if service.description %}<p class="small text-secondary mb-0 mt-1">{{ service.description }}</p>{% endif %}
                         </article>
@@ -265,15 +272,15 @@
                     <div class="stat-card"><div class="small text-secondary">Total Reviews</div><div class="stat-value">{{ total_reviews }}</div></div>
                     <div class="stat-card"><div class="small text-secondary">Total Bookings</div><div class="stat-value">{{ total_bookings }}</div></div>
                     <div class="stat-card"><div class="small text-secondary">Confirmed</div><div class="stat-value">{{ confirmed_bookings }}</div></div>
-                    <div class="stat-card"><div class="small text-secondary">Avg Booking</div><div class="stat-value">Rs. {{ avg_booking_value|floatformat:0 }}</div></div>
+                    <div class="stat-card"><div class="small text-secondary">Avg Booking</div><div class="stat-value">₹ {{ avg_booking_value|floatformat:0 }}</div></div>
                     <div class="stat-card"><div class="small text-secondary">Portfolio Items</div><div class="stat-value">{{ portfolio_count|add:gallery_count }}</div></div>
                 </div>
             </div>
 
             <div class="panel">
                 <div class="panel-title">Pricing & Contact</div>
-                <div class="meta-line"><span>Base Rate</span><strong>Rs. {{ studio.price_per_hour }}/hr</strong></div>
-                <div class="meta-line"><span>Service Range</span><strong>{% if min_service_price %}Rs. {{ min_service_price }} - Rs. {{ max_service_price }}{% else %}Not set{% endif %}</strong></div>
+                <div class="meta-line"><span>Base Rate</span><strong>₹ {{ studio.price_per_hour }}/hr</strong></div>
+                <div class="meta-line"><span>Service Range</span><strong>{% if min_service_price %}₹ {{ min_service_price }} - ₹ {{ max_service_price }}{% else %}Not set{% endif %}</strong></div>
                 <div class="meta-line"><span>Phone</span><strong>{{ studio.phone|default:"Not provided" }}</strong></div>
                 <div class="meta-line"><span>Email</span><strong>{{ studio.email|default:"Not provided" }}</strong></div>
                 <div class="meta-line"><span>Website</span>

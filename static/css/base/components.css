@@ -74,3 +74,49 @@
     flex: 1;
     padding: 12px 16px;
 }
+
+/* ===== RESPONSIVE DESIGN - FORM ELEMENTS ===== */
+
+@media (max-width: 575.98px) {
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-input,
+    textarea {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .file-input-label {
+        padding: 20px;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        gap: 8px;
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        flex: none;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .form-input {
+        padding: 11px 14px;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        flex-wrap: wrap;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .form-actions {
+        gap: 15px;
+    }
+}

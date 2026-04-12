@@ -51,24 +51,34 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="{% url 'studio_portfolio' %}">
+        <a href="{% url 'studio_portfolio' %}"
+            class="{% if request.resolver_match.url_name == 'studio_portfolio' or request.resolver_match.url_name == 'delete_photo' %}active{% endif %}">
             <i class="bi bi-camera"></i>
             <span>Portfolio</span>
         </a>
 
-        <a href="{% url 'studio_bookings' %}">
+        <a href="{% url 'studio_bookings' %}"
+            class="{% if request.resolver_match.url_name == 'studio_bookings' or request.resolver_match.url_name == 'approve_booking' or request.resolver_match.url_name == 'cancel_booking' %}active{% endif %}">
             <i class="bi bi-calendar-event"></i>
             <span>Bookings</span>
         </a>
 
-        <a href="{% url 'studio_earnings' %}">
+        <a href="{% url 'studio_earnings' %}"
+            class="{% if request.resolver_match.url_name == 'studio_earnings' %}active{% endif %}">
             <i class="bi bi-wallet2"></i>
             <span>Earnings</span>
         </a>
 
-        <a href="{% url 'studio_reviews' %}">
+        <a href="{% url 'dashboard_studio_reviews' %}"
+            class="{% if request.resolver_match.url_name == 'studio_reviews' %}active{% endif %}">
             <i class="bi bi-star-half"></i>
             <span>Reviews</span>
+        </a>
+
+        <a href="{% url 'studio_notifications' %}"
+            class="{% if request.resolver_match.url_name == 'studio_notifications' or request.resolver_match.url_name == 'studio_mark_notification_read' or request.resolver_match.url_name == 'studio_mark_all_notifications_read' or request.resolver_match.url_name == 'studio_clear_notifications' %}active{% endif %}">
+            <i class="bi bi-bell"></i>
+            <span>Notifications</span>
         </a>
         <!-- PROFILE -->
         <a href="{% url 'studio_profile' %}"
@@ -95,9 +105,6 @@
         {% include "includes/footer.html" %}
 
     </main>
-
-    <!-- Global Chatbot -->
-    {% include "includes/chatbot.html" %}
 
 </div>
 

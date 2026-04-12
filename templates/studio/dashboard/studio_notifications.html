@@ -1,0 +1,249 @@
+{% extends "studio/dashboard/studio_base.html" %}
+{% load static %}
+
+{% block title %}Studio Notifications{% endblock %}
+
+{% block studio_content %}
+<style>
+.notifications-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notifications-panel {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.notifications-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.notifications-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.stat-card-compact {
+    background: rgba(30, 41, 59, 0.45);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 0.7rem;
+}
+
+.stat-card-compact .label {
+    color: #9eb0cb;
+    font-size: 0.8rem;
+}
+
+.stat-card-compact .value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 0.15rem;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.notification-item {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(30, 41, 59, 0.42);
+    border-radius: 12px;
+    padding: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+.notification-item.unread {
+    border-color: rgba(56, 189, 248, 0.65);
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.22) inset;
+}
+
+.notification-main {
+    display: flex;
+    gap: 0.7rem;
+    min-width: 0;
+}
+
+.notification-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(56, 189, 248, 0.15);
+    color: #7dd3fc;
+    flex-shrink: 0;
+}
+
+.notification-text {
+    min-width: 0;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin: 0;
+    word-break: break-word;
+}
+
+.notification-meta {
+    margin-top: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.notification-time {
+    color: #9eb0cb;
+    font-size: 0.8rem;
+}
+
+.badge-new {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.55rem;
+}
+
+.notification-actions {
+    flex-shrink: 0;
+}
+
+.empty-state {
+    text-align: center;
+    border: 1px dashed rgba(148, 163, 184, 0.35);
+    border-radius: 14px;
+    padding: 2rem 1rem;
+    color: #9eb0cb;
+}
+
+@media (max-width: 992px) {
+    .notifications-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .notification-item {
+        flex-direction: column;
+    }
+
+    .notification-actions {
+        width: 100%;
+    }
+
+    .notification-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="notifications-shell">
+    <div class="notifications-panel" id="studioNotificationsPanel" data-live-endpoint="{% url 'studio_notifications_live' %}">
+        <div class="notifications-header mb-3">
+            <div>
+                <h1 class="h4 fw-bold mb-1">Admin Notifications</h1>
+                <p class="mb-0 text-muted">All notices sent by administrators are shown here.</p>
+            </div>
+            <div class="notifications-actions">
+                <form method="post" action="{% url 'studio_mark_all_notifications_read' %}" onsubmit="return confirm('Mark all notifications as read?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-info">Mark All Read</button>
+                </form>
+                <form method="post" action="{% url 'studio_clear_notifications' %}" onsubmit="return confirm('Clear all admin notifications? This cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Clear All</button>
+                </form>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="notifications-stats mb-3">
+            <div class="stat-card-compact">
+                <div class="label">Total</div>
+                <div class="value" id="studioNotifTotalCount">{{ total_count }}</div>
+            </div>
+            <div class="stat-card-compact">
+                <div class="label">Unread</div>
+                <div class="value text-warning" id="studioNotifUnreadCount">{{ unread_count }}</div>
+            </div>
+            <div class="stat-card-compact">
+                <div class="label">Read</div>
+                <div class="value text-info" id="studioNotifReadCount">{{ read_count }}</div>
+            </div>
+        </div>
+
+        {% if notifications %}
+        <div class="notifications-list" id="studioNotificationsList">
+            {% for n in notifications %}
+            <article class="notification-item {% if not n.is_read %}unread{% endif %}">
+                <div class="notification-main">
+                    <div class="notification-icon">
+                        <i class="bi bi-megaphone"></i>
+                    </div>
+                    <div class="notification-text">
+                        <p class="notification-title">{{ n.message }}</p>
+                        <div class="notification-meta">
+                            <span class="notification-time">{{ n.created_at|date:"M d, Y, h:i A" }}</span>
+                            {% if not n.is_read %}
+                            <span class="badge-new">New</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-actions">
+                    {% if not n.is_read %}
+                    <form method="post" action="{% url 'studio_mark_notification_read' n.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-light">Mark Read</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state" id="studioNotificationsEmptyState">
+            <i class="bi bi-bell-slash" style="font-size: 2.4rem;"></i>
+            <h5 class="mt-3 mb-1">No Admin Notifications</h5>
+            <p class="mb-0">You are all caught up. Any notices from admin will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/studio/studio_notifications_live.js' %}"></script>
+{% endblock %}

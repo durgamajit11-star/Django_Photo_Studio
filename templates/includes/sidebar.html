@@ -1,0 +1,29 @@
+<style>
+    .context-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin: 0 0 1rem;
+    }
+
+    .context-actions .btn {
+        border-radius: 10px;
+        min-width: 110px;
+    }
+
+    @media (max-width: 768px) {
+        .context-actions {
+            justify-content: flex-start;
+            margin-bottom: 0.75rem;
+        }
+    }
+</style>
+
+<div class="context-actions">
+    {% if user.is_authenticated and user.role == 'USER' %}
+    <a href="{% url 'user_dashboard' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+    {% elif user.is_authenticated and user.role == 'STUDIO' %}
+    <a href="{% url 'studio_dashboard' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+    {% else %}
+    <a href="{% url 'landing' %}" class="btn btn-outline-light btn-sm">Home</a>
+    {% endif %}
+</div>

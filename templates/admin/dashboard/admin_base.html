@@ -55,17 +55,23 @@
         </a>
 
         <a href="{% url 'manage_users' %}"
-            class="{% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+            class="{% if request.resolver_match.url_name == 'manage_users' or request.resolver_match.url_name == 'toggle_user_status' or request.resolver_match.url_name == 'delete_user' %}active{% endif %}">
             <i class="bi bi-people"></i>
             <span>Manage Users</span>
         </a>
 
-        <a href="{% url 'manage_studios' %}" class="{% if request.resolver_match.url_name == 'manage_studios' or request.resolver_match.url_name == 'approve_studio' or request.resolver_match.url_name == 'reject_studio' %}active{% endif %}">
+        <a href="{% url 'manage_admins' %}"
+            class="{% if request.resolver_match.url_name == 'manage_admins' or request.resolver_match.url_name == 'toggle_admin_status' %}active{% endif %}">
+            <i class="bi bi-person-badge"></i>
+            <span>Manage Admins</span>
+        </a>
+
+        <a href="{% url 'manage_studios' %}" class="{% if request.resolver_match.url_name == 'manage_studios' or request.resolver_match.url_name == 'approve_studio' or request.resolver_match.url_name == 'reject_studio' or request.resolver_match.url_name == 'notify_studio' or request.resolver_match.url_name == 'notify_selected_studios' %}active{% endif %}">
             <i class="bi bi-building"></i>
             <span>Manage Studios</span>
         </a>
 
-        <a href="{% url 'admin_bookings' %}" class="{% if request.resolver_match.url_name == 'admin_bookings' %}active{% endif %}">
+        <a href="{% url 'admin_bookings' %}" class="{% if request.resolver_match.url_name == 'admin_bookings' or request.resolver_match.url_name == 'admin_cancel_booking' %}active{% endif %}">
             <i class="bi bi-calendar-event"></i>
             <span>Bookings</span>
         </a>
@@ -100,9 +106,8 @@
 
     </main>
 
-</div>
 
-{% include "includes/chatbot.html" %}
+</div>
 
 {% endblock %}
 

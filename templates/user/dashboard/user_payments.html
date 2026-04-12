@@ -111,7 +111,7 @@
         <div class="stat-card"><small class="text-secondary">Processing</small><div class="value text-info">{{ processing_count }}</div></div>
         <div class="stat-card"><small class="text-secondary">Pending</small><div class="value text-warning">{{ pending_count }}</div></div>
         <div class="stat-card"><small class="text-secondary">Failed</small><div class="value text-danger">{{ failed_count }}</div></div>
-        <div class="stat-card"><small class="text-secondary">Total Paid</small><div class="value">Rs. {{ total_amount }}</div></div>
+        <div class="stat-card"><small class="text-secondary">Total Paid</small><div class="value">₹ {{ total_amount }}</div></div>
     </div>
 
     <form class="pay-toolbar" method="get">
@@ -150,7 +150,7 @@
                 <small class="text-secondary">{{ payment.created_at|date:"d M Y, h:i A" }}</small>
             </div>
             <div class="text-end">
-                <h5 class="mb-1">Rs. {{ payment.amount }}</h5>
+                <h5 class="mb-1">₹ {{ payment.amount }}</h5>
                 <span class="pill pill-{{ payment.status|lower }}">{{ payment.status }}</span>
             </div>
         </div>

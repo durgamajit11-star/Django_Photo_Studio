@@ -93,7 +93,7 @@
                 <div>
                     <div class="fw-semibold">{{ item.booking.user.get_full_name|default:item.booking.user.username }} - {{ item.booking.studio.studio_name }}</div>
                     <div class="small text-muted">{{ item.booking.event_type }} | {{ item.booking.booking_date|default:item.booking.date|date:"M d, Y" }}</div>
-                    <div class="small text-muted">Age: {{ item.age_days }} day{{ item.age_days|pluralize }} | Amount: ${{ item.booking.amount }}</div>
+                    <div class="small text-muted">Age: {{ item.age_days }} day{{ item.age_days|pluralize }} | Amount: ₹ {{ item.booking.amount }}</div>
                 </div>
                 <div class="text-end">
                     {% if item.is_urgent %}
@@ -179,6 +179,8 @@
                             <span class="badge bg-success">Confirmed</span>
                         {% elif booking.status == "Pending" %}
                             <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif booking.status == "Completed" %}
+                            <span class="badge bg-info">Completed</span>
                         {% else %}
                             <span class="badge bg-danger">Cancelled</span>
                         {% endif %}
@@ -192,7 +194,7 @@
                         {% endif %}
                     </td>
 
-                    <td>${{ booking.total_price|default:booking.amount }}</td>
+                    <td>₹ {{ booking.total_price|default:booking.amount }}</td>
                     <td>{{ booking.created_at|date:"M d, Y" }}</td>
 
                     <td>

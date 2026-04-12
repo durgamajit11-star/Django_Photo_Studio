@@ -86,7 +86,7 @@
             <div class="meta-line"><span>Date</span><strong>{{ booking.date|date:"d M Y" }}</strong></div>
             <div class="meta-line"><span>Time Slot</span><strong>{{ booking.time_slot|default:"Not selected" }}</strong></div>
             <div class="meta-line"><span>Booking Status</span><strong>{{ booking.status }}</strong></div>
-            <div class="meta-line"><span>Amount</span><strong>Rs. {{ booking.amount }}</strong></div>
+            <div class="meta-line"><span>Amount</span><strong>₹ {{ booking.amount }}</strong></div>
 
             <hr class="border-secondary">
 
@@ -117,7 +117,7 @@
                 </div>
 
                 <button class="btn btn-info w-100" type="submit">
-                    <i class="bi bi-shield-check"></i> Pay Rs. {{ booking.amount }}
+                    <i class="bi bi-shield-check"></i> Pay ₹ {{ booking.amount }}
                 </button>
             </form>
         </div>

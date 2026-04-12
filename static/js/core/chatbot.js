@@ -1,139 +1,212 @@
 // ===============================
-// GLOBAL CHATBOT SYSTEM
+// SHARED CHATBOT WIDGET
 // ===============================
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('chatbot-container');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatToggle = document.getElementById('chatToggle');
+    const chatCloseBtn = document.getElementById('chatCloseBtn');
+    const chatClearBtn = document.getElementById('chatClearBtn');
+    const chatInput = document.getElementById('chatInput');
+    const chatBody = document.getElementById('chatBody');
+    const chatSendBtn = document.getElementById('chatSendBtn');
 
-    const chatWindow = document.getElementById("chatWindow");
-    const chatToggle = document.getElementById("chatToggle");
-    const chatCloseBtn = document.getElementById("chatCloseBtn");
-    const chatInput = document.getElementById("chatInput");
-    const chatBody = document.getElementById("chatBody");
-    const chatSendBtn = document.getElementById("chatSendBtn");
+    if (!container || !chatWindow || !chatBody || !chatInput || !chatSendBtn) {
+        return;
+    }
 
-    if (!chatWindow) return;
+    const messagesUrl = container.dataset.chatbotUrl || '/chatbot/messages/';
+    const clearUrl = container.dataset.chatbotClearUrl || '/chatbot/clear/';
+    let historyLoaded = false;
+    let sending = false;
 
-    // ===============================
-    // Toggle Chat
-    // ===============================
+    function getCsrfToken() {
+        const cookie = document.cookie.split('; ').find((row) => row.startsWith('csrftoken='));
+        return cookie ? decodeURIComponent(cookie.split('=')[1]) : '';
+    }
+
     function toggleChat() {
-        chatWindow.classList.toggle("active");
-
-        // Mobile positioning
-        if (window.innerWidth <= 576 && chatWindow.classList.contains("active")) {
-            chatWindow.style.bottom = "auto";
-            chatWindow.style.top = "70px";
+        chatWindow.classList.toggle('active');
+        if (window.innerWidth <= 576 && chatWindow.classList.contains('active')) {
+            chatWindow.style.bottom = 'auto';
+            chatWindow.style.top = '70px';
         } else {
-            chatWindow.style.bottom = "100px";
-            chatWindow.style.top = "auto";
+            chatWindow.style.bottom = '100px';
+            chatWindow.style.top = 'auto';
+        }
+
+        if (chatWindow.classList.contains('active') && !historyLoaded) {
+            loadHistory();
         }
     }
 
-    chatToggle?.addEventListener("click", toggleChat);
-    chatCloseBtn?.addEventListener("click", toggleChat);
-
-    // ===============================
-    // Send Message
-    // ===============================
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (!message) return;
-
-        appendMessage("user", message);
-        chatInput.value = "";
-
-        showTyping();
-
-        setTimeout(() => {
-            removeTyping();
-            const reply = generateReply(message);
-            appendMessage("bot", reply);
-        }, 800);
+    function scrollToBottom() {
+        chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    chatSendBtn?.addEventListener("click", sendMessage);
+    function createMessageElement(className, text) {
+        const message = document.createElement('div');
+        message.className = className;
+        message.textContent = text;
+        return message;
+    }
 
-    chatInput?.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
+    function appendMessage(className, text) {
+        const message = createMessageElement(className, text);
+        chatBody.appendChild(message);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        removeTyping();
+        const typing = document.createElement('div');
+        typing.className = 'bot-message typing';
+        typing.id = 'typingIndicator';
+        typing.innerHTML = 'Typing<span>.</span><span>.</span><span>.</span>';
+        chatBody.appendChild(typing);
+        scrollToBottom();
+    }
+
+    function removeTyping() {
+        const typing = document.getElementById('typingIndicator');
+        if (typing) {
+            typing.remove();
+        }
+    }
+
+    function setDisabled(disabled) {
+        chatInput.disabled = disabled;
+        chatSendBtn.disabled = disabled;
+        if (chatClearBtn) {
+            chatClearBtn.disabled = disabled;
+        }
+    }
+
+    function renderHistory(messages) {
+        chatBody.innerHTML = '';
+        if (!messages.length) {
+            chatBody.appendChild(createMessageElement('bot-message', '👋 Hello! Ask me anything about StudioSync.'));
+            const suggestions = document.createElement('div');
+            suggestions.className = 'chat-suggestions mt-2 d-flex flex-wrap gap-2';
+            [
+                'What can I do on this platform?',
+                'How do bookings work?',
+                'How do payments and refunds work?'
+            ].forEach((prompt) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-outline-secondary chat-suggestion';
+                button.dataset.prompt = prompt;
+                button.textContent = prompt;
+                suggestions.appendChild(button);
+            });
+            chatBody.appendChild(suggestions);
+            scrollToBottom();
+            return;
+        }
+
+        messages.forEach((entry) => {
+            const className = entry.is_user ? 'user-message' : 'bot-message';
+            appendMessage(className, entry.message || '');
+        });
+    }
+
+    async function loadHistory() {
+        try {
+            const response = await fetch(messagesUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            renderHistory(Array.isArray(data.messages) ? data.messages : []);
+            historyLoaded = true;
+        } catch (error) {
+            console.error('Unable to load chatbot history', error);
+        }
+    }
+
+    async function sendMessage(messageOverride) {
+        const message = (messageOverride || chatInput.value || '').trim();
+        if (!message || sending) return;
+
+        sending = true;
+        setDisabled(true);
+        chatInput.value = '';
+        appendMessage('user-message', message);
+        showTyping();
+
+        try {
+            const response = await fetch(messagesUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            removeTyping();
+
+            if (!response.ok) {
+                appendMessage('bot-message', data.error || 'Sorry, I could not answer that right now.');
+                return;
+            }
+
+            appendMessage('bot-message', data.bot_response || 'I am here to help with StudioSync.');
+            historyLoaded = true;
+        } catch (error) {
+            removeTyping();
+            appendMessage('bot-message', 'Connection problem. Please try again.');
+            console.error('Chatbot send failed', error);
+        } finally {
+            sending = false;
+            setDisabled(false);
+            chatInput.focus();
+        }
+    }
+
+    async function clearHistory() {
+        if (!confirm('Clear chat history?')) return;
+
+        try {
+            const response = await fetch(clearUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+
+            if (response.ok) {
+                historyLoaded = false;
+                renderHistory([]);
+            }
+        } catch (error) {
+            console.error('Unable to clear chat history', error);
+        }
+    }
+
+    chatToggle?.addEventListener('click', toggleChat);
+    chatCloseBtn?.addEventListener('click', toggleChat);
+    chatSendBtn.addEventListener('click', () => sendMessage());
+    chatInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
             sendMessage();
         }
     });
 
-    // ===============================
-    // Append Message
-    // ===============================
-    function appendMessage(type, text) {
-        const msg = document.createElement("div");
-        msg.className = type === "user" ? "user-message" : "bot-message";
+    chatBody.addEventListener('click', (event) => {
+        const suggestion = event.target.closest('.chat-suggestion');
+        if (!suggestion) return;
+        sendMessage(suggestion.dataset.prompt || suggestion.textContent || '');
+    });
 
-        const time = new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-
-        msg.innerHTML = `
-            <div>${text}</div>
-            <small class="chat-time">${time}</small>
-        `;
-
-        chatBody.appendChild(msg);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    // ===============================
-    // Typing Indicator
-    // ===============================
-    function showTyping() {
-        const typing = document.createElement("div");
-        typing.className = "bot-message typing";
-        typing.id = "typingIndicator";
-        typing.innerHTML = "Typing<span>.</span><span>.</span><span>.</span>";
-        chatBody.appendChild(typing);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function removeTyping() {
-        const typing = document.getElementById("typingIndicator");
-        if (typing) typing.remove();
-    }
-
-    // ===============================
-    // Smart Reply Logic
-    // ===============================
-    function generateReply(message) {
-        const text = message.toLowerCase();
-        const role = document.body.dataset.role || "USER";
-
-        if (text.includes("booking") || text.includes("book")) {
-            return "📅 You can manage bookings from your dashboard.";
-        }
-
-        if (text.includes("price") || text.includes("cost")) {
-            return "💰 Packages start from ₹5,000. Use filters to compare.";
-        }
-
-        if (text.includes("studio")) {
-            return "🔍 Browse studios using filters like city and rating.";
-        }
-
-        if (text.includes("help")) {
-            return "🆘 I'm here to assist you. Ask me anything!";
-        }
-
-        if (text.includes("hello") || text.includes("hi")) {
-            return "👋 Hello! Welcome to StudioSync.";
-        }
-
-        if (role === "STUDIO") {
-            return "📊 As a Studio Owner, you can manage portfolio, bookings, and earnings.";
-        }
-
-        if (role === "ADMIN") {
-            return "🛠 Admin panel allows you to manage users and platform settings.";
-        }
-
-        return "✅ Thanks for your message! How else can I help?";
-    }
-
+    chatClearBtn?.addEventListener('click', clearHistory);
 });

@@ -60,7 +60,7 @@
     <div class="receipt-card mb-3">
         <div class="line"><span>Transaction ID</span><strong>{{ payment.transaction_id|default:"Pending" }}</strong></div>
         <div class="line"><span>Status</span><span class="status-chip status-{{ payment.status|lower }}">{{ payment.status }}</span></div>
-        <div class="line"><span>Amount</span><strong>Rs. {{ payment.amount }}</strong></div>
+        <div class="line"><span>Amount</span><strong>₹ {{ payment.amount }}</strong></div>
         <div class="line"><span>Method</span><strong>{{ payment.get_payment_method_display }}</strong></div>
         <div class="line"><span>Paid On</span><strong>{{ payment.completed_at|default:payment.created_at|date:"d M Y, h:i A" }}</strong></div>
         <div class="line"><span>Booking</span><strong>#{{ payment.booking.id }} - {{ payment.booking.event_type }}</strong></div>
@@ -70,7 +70,7 @@
     <div class="receipt-card">
         <h6>Refund Requests</h6>
         {% for refund in refunds %}
-        <div class="line"><span>{{ refund.created_at|date:"d M Y" }} - {{ refund.status }}</span><strong>Rs. {{ refund.amount }}</strong></div>
+        <div class="line"><span>{{ refund.created_at|date:"d M Y" }} - {{ refund.status }}</span><strong>₹ {{ refund.amount }}</strong></div>
         <div class="small text-secondary mb-2">{{ refund.reason }}</div>
         {% empty %}
         <p class="text-secondary mb-0">No refund request raised for this payment.</p>

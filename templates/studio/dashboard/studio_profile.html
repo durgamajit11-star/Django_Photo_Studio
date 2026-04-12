@@ -5,613 +5,317 @@
 
 {% block extra_css %}
 {{ block.super }}
-<style>
-    :root {
-        --sp-primary: #0d6efd;
-        --sp-accent: #20c997;
-        --sp-danger: #dc3545;
-        --sp-surface: rgba(255, 255, 255, 0.9);
-        --sp-border: rgba(13, 110, 253, 0.16);
-    }
-
-    .profile-shell {
-        padding: 1.25rem;
-    }
-
-    .profile-hero {
-        border: 1px solid var(--sp-border);
-        border-radius: 24px;
-        background: linear-gradient(120deg, rgba(13, 110, 253, 0.15), rgba(32, 201, 151, 0.15)), #ffffff;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .profile-hero::before {
-        content: "";
-        position: absolute;
-        width: 260px;
-        height: 260px;
-        border-radius: 50%;
-        right: -80px;
-        top: -80px;
-        background: radial-gradient(circle, rgba(13, 110, 253, 0.2), transparent 70%);
-    }
-
-    .profile-kpi {
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 14px;
-        background: var(--sp-surface);
-        backdrop-filter: blur(4px);
-        padding: 0.85rem 1rem;
-    }
-
-    .profile-card {
-        border: 1px solid #e8eefc;
-        border-radius: 18px;
-        box-shadow: 0 10px 24px rgba(20, 30, 70, 0.06);
-    }
-
-    .avatar-wrap {
-        width: 108px;
-        height: 108px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid #d7e7ff;
-        box-shadow: 0 8px 18px rgba(13, 110, 253, 0.2);
-    }
-
-    .avatar-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .section-pill {
-        font-size: 0.76rem;
-        border-radius: 999px;
-        padding: 0.28rem 0.7rem;
-        letter-spacing: 0.02em;
-    }
-
-    .profile-tabs .nav-link {
-        border: 0;
-        border-radius: 12px;
-        font-weight: 600;
-        color: #496083;
-        padding: 0.65rem 0.95rem;
-    }
-
-    .profile-tabs .nav-link.active {
-        background: linear-gradient(120deg, #0d6efd, #2d8cff);
-        color: #fff;
-        box-shadow: 0 8px 18px rgba(13, 110, 253, 0.28);
-    }
-
-    .field-note {
-        font-size: 0.8rem;
-        color: #6a7994;
-    }
-
-    .security-meter {
-        height: 8px;
-        border-radius: 20px;
-        overflow: hidden;
-        background: #e9edf5;
-    }
-
-    .security-meter .progress-bar {
-        transition: width 0.25s ease;
-    }
-
-    .switch-card {
-        border: 1px solid #ecf1fb;
-        border-radius: 14px;
-        padding: 0.9rem;
-        background: #fff;
-    }
-
-    .danger-zone {
-        border: 1px dashed rgba(220, 53, 69, 0.4);
-        border-radius: 14px;
-        background: rgba(220, 53, 69, 0.04);
-    }
-
-    .slide-up {
-        animation: slideUp 0.45s ease;
-    }
-
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(16px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @media (max-width: 991.98px) {
-        .profile-shell {
-            padding: 0.7rem;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/studio/profile.css' %}">
 {% endblock %}
 
 {% block studio_content %}
-<div class="profile-shell container-fluid">
+<section class="studio-profile-header">
+    <h1><i class="bi bi-building"></i> Studio Profile</h1>
+    <p>Manage your account identity, studio details, services, and security settings.</p>
+</section>
+
+<div class="studio-profile-container">
     {% if messages %}
-    <div class="mb-3 slide-up">
         {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags|default:'success' }} alert-dismissible fade show" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
-    </div>
     {% endif %}
 
-    <section class="profile-hero p-4 p-lg-5 mb-4 slide-up">
-        <div class="row g-3 align-items-center position-relative">
-            <div class="col-lg-7">
-                <span class="badge text-bg-light section-pill mb-2">Studio Control Panel</span>
-                <h2 class="fw-bold mb-2">Profile Settings</h2>
-                <p class="text-secondary mb-0">Manage identity, security preferences, and account controls from one place.</p>
-            </div>
-            <div class="col-lg-5">
-                <div class="row g-2">
-                    <div class="col-6">
-                        <div class="profile-kpi">
-                            <div class="text-muted small">Completion</div>
-                            <div class="fw-bold" id="completionValue">0%</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="profile-kpi">
-                            <div class="text-muted small">Profile Status</div>
-                            <div class="fw-bold text-success">Active</div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="progress mt-1" style="height: 8px;">
-                            <div class="progress-bar bg-success" id="completionBar" role="progressbar" style="width: 0%;"></div>
-                        </div>
-                    </div>
+    <form method="POST" enctype="multipart/form-data" id="studioProfileForm">
+        {% csrf_token %}
+
+        <div class="studio-profile-grid">
+            <section class="profile-card">
+                <div class="card-header">
+                    <h3>Account + Studio Information</h3>
+                    <button type="button" class="btn btn-outline-info btn-sm" id="editStudioProfileBtn">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <div class="row g-4">
-        <div class="col-xl-4">
-            <div class="card profile-card slide-up">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="avatar-wrap">
-                            {% if user.profile_image %}
-                            <img src="{{ user.profile_image.url }}" alt="Profile" id="avatarPreview">
-                            {% else %}
-                            <img src="https://ui-avatars.com/api/?background=0d6efd&color=fff&name={{ user.username }}" alt="Profile" id="avatarPreview">
-                            {% endif %}
-                        </div>
-                        <div>
-                            <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
-                            <div class="text-muted small">{{ user.email|default:"No email added" }}</div>
-                            <span class="badge text-bg-primary mt-2">Studio Owner</span>
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#panel-profile">
-                            <i class="bi bi-person-lines-fill me-1"></i>Edit Basic Info
-                        </button>
-                        <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="tab" data-bs-target="#panel-security">
-                            <i class="bi bi-shield-check me-1"></i>Security Controls
+                <div class="profile-summary">
+                    <div class="profile-avatar">
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" id="avatarPreview" class="avatar-image">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?background=0d6efd&color=fff&name={{ user.username }}" alt="Profile" id="avatarPreview" class="avatar-image">
+                        {% endif %}
+                        <button type="button" class="btn-upload" id="triggerAvatarUpload" title="Upload profile photo">
+                            <i class="bi bi-camera"></i>
                         </button>
                     </div>
 
-                    <hr>
-
-                    <div class="small text-muted mb-2">Account Snapshot</div>
-                    <ul class="list-group list-group-flush small">
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span>Username</span>
-                            <strong>{{ user.username }}</strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span>Phone</span>
-                            <strong>{{ user.phone|default:"-" }}</strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span>Role</span>
-                            <strong>{{ user.role }}</strong>
-                        </li>
-                    </ul>
+                    <div class="summary-content">
+                        <h4>{{ studio.studio_name|default:user.username }}</h4>
+                        <p>{{ studio.location|default:'Location not set' }}</p>
+                        <span class="badge bg-primary">Studio Owner</span>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-xl-8">
-            <div class="card profile-card slide-up">
-                <div class="card-body p-4">
-                    <ul class="nav nav-pills profile-tabs mb-4" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#panel-profile" type="button" role="tab">
-                                <i class="bi bi-person me-1"></i>Profile
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#panel-preferences" type="button" role="tab">
-                                <i class="bi bi-sliders2 me-1"></i>Preferences
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#panel-security" type="button" role="tab">
-                                <i class="bi bi-lock me-1"></i>Security
-                            </button>
-                        </li>
-                    </ul>
+                <div id="studioProfileDisplay" class="display-grid">
+                    <div class="display-item"><span class="label">Username</span><p>{{ user.username }}</p></div>
+                    <div class="display-item"><span class="label">Owner Name</span><p>{{ user.owner_name|default:'Not set' }}</p></div>
+                    <div class="display-item"><span class="label">Account Email</span><p>{{ user.email|default:'Not set' }}</p></div>
+                    <div class="display-item"><span class="label">Studio Email</span><p>{{ studio.email|default:'Not set' }}</p></div>
+                    <div class="display-item"><span class="label">Studio Phone</span><p>{{ studio.phone|default:'Not set' }}</p></div>
+                    <div class="display-item"><span class="label">Base Price/Hour</span><p>Rs. {{ studio.price_per_hour|default:0 }}</p></div>
+                    <div class="display-item"><span class="label">Experience</span><p>{{ studio.experience_years|default:0 }} years</p></div>
+                    <div class="display-item"><span class="label">Address</span><p>{{ user.address|default:'Not set' }}</p></div>
+                    <div class="display-item"><span class="label">Bio</span><p>{{ user.bio|default:'Not set' }}</p></div>
+                    <div class="display-item">
+                        <span class="label">License Document</span>
+                        {% if user.license %}
+                        <p><a href="{{ user.license.url }}" target="_blank" rel="noopener">View uploaded license</a></p>
+                        {% else %}
+                        <p>Not uploaded</p>
+                        {% endif %}
+                    </div>
+                    <div class="display-item">
+                        <span class="label">Portfolio Document</span>
+                        {% if user.portfolio %}
+                        <p><a href="{{ user.portfolio.url }}" target="_blank" rel="noopener">View uploaded portfolio</a></p>
+                        {% else %}
+                        <p>Not uploaded</p>
+                        {% endif %}
+                    </div>
+                </div>
 
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="panel-profile" role="tabpanel">
-                            <form method="POST" enctype="multipart/form-data" id="profileForm">
-                                {% csrf_token %}
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">First Name</label>
-                                        {{ form.first_name }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Last Name</label>
-                                        {{ form.last_name }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Email Address</label>
-                                        {{ form.email }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Phone Number</label>
-                                        {{ form.phone }}
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Profile Image</label>
-                                        {{ form.profile_image }}
-                                        <div class="field-note mt-1">PNG/JPG recommended. Minimum 400x400 for sharp display.</div>
-                                    </div>
-                                    <div class="col-12 d-flex gap-2 mt-2">
-                                        <button type="submit" class="btn btn-primary px-4" id="saveBtn">
-                                            <i class="bi bi-check2-circle me-1"></i>Save Changes
-                                        </button>
-                                        <button type="button" class="btn btn-outline-secondary" id="resetBtn">Reset</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                <div id="studioProfileEditor" class="editor-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="form-group">
+                        <label>Account Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="form-group">
+                        <label>Account Phone</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Name</label>
+                        <input type="text" name="owner_name" class="form-control" value="{{ user.owner_name|default:'' }}" placeholder="Studio owner full name">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Profile Image</label>
+                        {{ form.profile_image }}
+                    </div>
 
-                        <div class="tab-pane fade" id="panel-preferences" role="tabpanel">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">Email Notifications</div>
-                                            <div class="small text-muted">Booking updates and payment alerts.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input pref-toggle" type="checkbox" id="prefEmail" {% if preferences.email_notifications %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">SMS Alerts</div>
-                                            <div class="small text-muted">Receive reminder text messages.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input pref-toggle" type="checkbox" id="prefSms" {% if preferences.sms_alerts %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">Portfolio Visibility</div>
-                                            <div class="small text-muted">Show studio activity publicly.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input pref-toggle" type="checkbox" id="prefVisibility" {% if preferences.portfolio_visibility %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">Marketing Emails</div>
-                                            <div class="small text-muted">Offers, features, and newsletters.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input pref-toggle" type="checkbox" id="prefMarketing" {% if preferences.marketing_emails %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <button type="button" class="btn btn-outline-primary" id="savePreferencesBtn">
-                                        <i class="bi bi-save me-1"></i>Save Preference State
-                                    </button>
-                                    <span class="small text-muted ms-2" id="prefStateText">Not saved yet</span>
-                                </div>
+                    <div class="form-group">
+                        <label>Studio Name</label>
+                        <input type="text" name="studio_name" class="form-control" value="{{ studio.studio_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Studio Location</label>
+                        <input type="text" name="studio_location" class="form-control" value="{{ studio.location }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Base Price Per Hour (Rs.)</label>
+                        <input type="number" step="0.01" min="0" name="price_per_hour" class="form-control" value="{{ studio.price_per_hour }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Experience (Years)</label>
+                        <input type="number" min="0" name="experience_years" class="form-control" value="{{ studio.experience_years }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Studio Contact Phone</label>
+                        <input type="text" name="studio_phone" class="form-control" value="{{ studio.phone|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Studio Contact Email</label>
+                        <input type="email" name="studio_email" class="form-control" value="{{ studio.email|default:'' }}">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Website</label>
+                        <input type="url" name="studio_website" class="form-control" value="{{ studio.website|default:'' }}" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Specializations (comma separated)</label>
+                        <input type="text" name="studio_specializations" class="form-control" value="{{ studio.specializations|default:'' }}" placeholder="Wedding, Product, Fashion">
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Studio Description</label>
+                        <textarea name="studio_description" class="form-control" rows="3" placeholder="Tell users about your studio...">{{ studio.description|default:'' }}</textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Owner Address</label>
+                        <textarea name="owner_address" class="form-control" rows="2" placeholder="Business/owner address">{{ user.address|default:'' }}</textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Owner Bio</label>
+                        <textarea name="owner_bio" class="form-control" rows="2" placeholder="Short owner bio">{{ user.bio|default:'' }}</textarea>
+                    </div>
+                    <div class="form-group form-full">
+                        <label>License Document</label>
+                        <input type="file" name="studio_license" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        {% if user.license %}
+                        <small class="text-muted mt-1 d-block">Current: <a href="{{ user.license.url }}" target="_blank" rel="noopener">{{ user.license.name }}</a></small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Portfolio Document</label>
+                        <input type="file" name="studio_portfolio" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.zip">
+                        {% if user.portfolio %}
+                        <small class="text-muted mt-1 d-block">Current: <a href="{{ user.portfolio.url }}" target="_blank" rel="noopener">{{ user.portfolio.name }}</a></small>
+                        {% endif %}
+                    </div>
+                    <div class="form-group form-full">
+                        <label>Studio Cover Image</label>
+                        <input type="file" name="studio_cover_image" class="form-control" id="studioCoverInput" accept="image/*">
+                        {% if studio.profile_image %}
+                        <img src="{{ studio.profile_image.url }}" class="cover-preview" id="studioCoverPreview" alt="Studio cover">
+                        {% else %}
+                        <img src="" class="cover-preview d-none" id="studioCoverPreview" alt="Studio cover preview">
+                        {% endif %}
+                    </div>
+                    <div class="form-actions form-full mt-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle"></i> Save Changes</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="profile-card is-collapsed" data-collapsible>
+                <div class="card-header">
+                    <h3>Services</h3>
+                    <div class="card-header-controls">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="addServiceBtn">
+                            <i class="bi bi-plus-circle"></i> Add Service
+                        </button>
+                        <button type="button" class="section-toggle-btn" data-toggle-card data-target="servicesBody" aria-expanded="false" title="Toggle section">
+                            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body" id="servicesBody" hidden>
+
+                <div id="servicesContainer" class="service-list">
+                    {% for service in studio_services %}
+                    <div class="service-row">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Service Name</label>
+                                <input type="text" name="service_name[]" class="form-control" value="{{ service.service_name }}" placeholder="Wedding Shoot">
                             </div>
-                        </div>
-
-                        <div class="tab-pane fade" id="panel-security" role="tabpanel">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">Create New Password</label>
-                                    <input type="password" class="form-control" id="newPassword" placeholder="Type a strong password">
-                                    <div class="security-meter mt-2">
-                                        <div class="progress-bar bg-danger" id="passwordMeter" style="width: 0%;"></div>
-                                    </div>
-                                    <div class="small text-muted mt-1" id="passwordHint">Use at least 8 characters with number and symbol.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">Two-Factor Authentication</div>
-                                            <div class="small text-muted">Extra login verification layer.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input" type="checkbox" id="twoFactorToggle" {% if preferences.two_factor_enabled %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="switch-card d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">New Device Login Alerts</div>
-                                            <div class="small text-muted">Email alert on unknown device sign in.</div>
-                                        </div>
-                                        <div class="form-check form-switch m-0">
-                                            <input class="form-check-input" type="checkbox" id="deviceAlertToggle" {% if preferences.device_login_alerts %}checked{% endif %}>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="danger-zone p-3 mt-1">
-                                        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="text-danger mb-1">Danger Zone</h6>
-                                                <div class="small text-muted">These actions are sensitive and should be used carefully.</div>
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-outline-warning btn-sm" id="logoutAllBtn">Logout All Devices</button>
-                                                <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAccountBtn">Delete Account</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="col-md-3">
+                                <label class="form-label mb-1">Price (Rs.)</label>
+                                <input type="number" step="0.01" min="0" name="service_price[]" class="form-control" value="{{ service.price }}" placeholder="2500">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Description</label>
+                                <input type="text" name="service_description[]" class="form-control" value="{{ service.description|default:'' }}" placeholder="2-hour package">
+                            </div>
+                            <div class="col-md-1 d-grid">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-service-btn" title="Remove service">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
+                    {% empty %}
+                    <div class="service-row">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Service Name</label>
+                                <input type="text" name="service_name[]" class="form-control" placeholder="Wedding Shoot">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label mb-1">Price (Rs.)</label>
+                                <input type="number" step="0.01" min="0" name="service_price[]" class="form-control" placeholder="2500">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label mb-1">Description</label>
+                                <input type="text" name="service_description[]" class="form-control" placeholder="2-hour package">
+                            </div>
+                            <div class="col-md-1 d-grid">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-service-btn" title="Remove service">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
-            </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="saveBtn"><i class="bi bi-check2-circle"></i> Save Changes</button>
+                    <button type="button" class="btn btn-outline-secondary" id="resetBtn">Reset</button>
+                </div>
+                </div>
+            </section>
+
+            <section class="profile-card is-collapsed" data-collapsible>
+                <div class="card-header">
+                    <h3>Preferences</h3>
+                    <button type="button" class="section-toggle-btn" data-toggle-card data-target="preferencesBody" aria-expanded="false" title="Toggle section">
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="card-body" id="preferencesBody" hidden>
+                <div class="pref-grid">
+                    <label class="pref-item">Email Notifications <input class="form-check-input pref-toggle" type="checkbox" id="prefEmail" {% if preferences.email_notifications %}checked{% endif %}></label>
+                    <label class="pref-item">SMS Alerts <input class="form-check-input pref-toggle" type="checkbox" id="prefSms" {% if preferences.sms_alerts %}checked{% endif %}></label>
+                    <label class="pref-item">Portfolio Visibility <input class="form-check-input pref-toggle" type="checkbox" id="prefVisibility" {% if preferences.portfolio_visibility %}checked{% endif %}></label>
+                    <label class="pref-item">Marketing Emails <input class="form-check-input pref-toggle" type="checkbox" id="prefMarketing" {% if preferences.marketing_emails %}checked{% endif %}></label>
+                    <label class="pref-item">Two-Factor Authentication <input class="form-check-input" type="checkbox" id="twoFactorToggle" {% if preferences.two_factor_enabled %}checked{% endif %}></label>
+                    <label class="pref-item">New Device Alerts <input class="form-check-input" type="checkbox" id="deviceAlertToggle" {% if preferences.device_login_alerts %}checked{% endif %}></label>
+                </div>
+                <div class="form-actions mt-2">
+                    <button type="button" class="btn btn-outline-primary" id="savePreferencesBtn"><i class="bi bi-save"></i> Save Preferences</button>
+                    <span class="small text-muted" id="prefStateText">Not saved yet</span>
+                </div>
+                </div>
+            </section>
+
+            <section class="profile-card danger-zone is-collapsed" data-collapsible>
+                <div class="card-header">
+                    <h3>Danger Zone</h3>
+                    <button type="button" class="section-toggle-btn" data-toggle-card data-target="dangerZoneBody" aria-expanded="false" title="Toggle section">
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="card-body" id="dangerZoneBody" hidden>
+                <p class="danger-intro mb-3">
+                    These actions can affect account access and data availability. Please review carefully before proceeding.
+                </p>
+
+                <div class="danger-guard mb-3">
+                    <label class="form-check-label d-flex align-items-center gap-2">
+                        <input class="form-check-input" type="checkbox" id="dangerAcknowledge">
+                        I understand these actions are sensitive and may be irreversible.
+                    </label>
+                </div>
+
+                <div class="danger-actions">
+                    <div class="danger-action-card">
+                        <h6>Logout All Devices</h6>
+                        <p>Ends all other active studio sessions and keeps only this current session signed in.</p>
+                        <button type="button" class="btn btn-outline-warning" id="logoutAllBtn" disabled>Logout All Devices</button>
+                    </div>
+                    <div class="danger-action-card danger-delete-card">
+                        <h6>Delete Account</h6>
+                        <p>Permanently removes your studio account and associated profile data.</p>
+                        <label for="deleteConfirmInput" class="form-label small mb-1">Type DELETE to enable</label>
+                        <input type="text" class="form-control mb-2" id="deleteConfirmInput" placeholder="DELETE">
+                        <button type="button" class="btn btn-outline-danger" id="deleteAccountBtn" disabled>Delete Account</button>
+                    </div>
+                </div>
+                </div>
+            </section>
         </div>
-    </div>
+    </form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
-<script>
-    (function () {
-        function byId(id) {
-            return document.getElementById(id);
-        }
-
-        const form = byId('profileForm');
-        const completionBar = byId('completionBar');
-        const completionValue = byId('completionValue');
-        const saveBtn = byId('saveBtn');
-        const resetBtn = byId('resetBtn');
-
-        function calculateCompletion() {
-            if (!form || !completionBar || !completionValue) return;
-
-            const fields = [
-                form.querySelector('[name="first_name"]'),
-                form.querySelector('[name="last_name"]'),
-                form.querySelector('[name="email"]'),
-                form.querySelector('[name="phone"]')
-            ];
-
-            const filled = fields.filter(function (field) {
-                return field && field.value && field.value.trim().length > 0;
-            }).length;
-
-            const percent = Math.round((filled / fields.length) * 100);
-            completionBar.style.width = percent + '%';
-            completionValue.textContent = percent + '%';
-        }
-
-        function handleAvatarPreview() {
-            const imageInput = form ? form.querySelector('[name="profile_image"]') : null;
-            const preview = byId('avatarPreview');
-            if (!imageInput || !preview) return;
-
-            imageInput.addEventListener('change', function (event) {
-                const file = event.target.files && event.target.files[0];
-                if (!file) return;
-                const url = URL.createObjectURL(file);
-                preview.src = url;
-            });
-        }
-
-        function initPasswordStrength() {
-            const input = byId('newPassword');
-            const meter = byId('passwordMeter');
-            const hint = byId('passwordHint');
-            if (!input || !meter || !hint) return;
-
-            input.addEventListener('input', function () {
-                const value = input.value;
-                let score = 0;
-                if (value.length >= 8) score += 30;
-                if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 20;
-                if (/\d/.test(value)) score += 20;
-                if (/[^A-Za-z0-9]/.test(value)) score += 30;
-
-                meter.style.width = score + '%';
-
-                if (score < 40) {
-                    meter.className = 'progress-bar bg-danger';
-                    hint.textContent = 'Weak password. Add length, number, and symbol.';
-                } else if (score < 70) {
-                    meter.className = 'progress-bar bg-warning';
-                    hint.textContent = 'Moderate password. Add more complexity.';
-                } else {
-                    meter.className = 'progress-bar bg-success';
-                    hint.textContent = 'Strong password.';
-                }
-            });
-        }
-
-        function getCsrfToken() {
-            const name = 'csrftoken=';
-            const decodedCookie = decodeURIComponent(document.cookie || '');
-            const cookieParts = decodedCookie.split(';');
-            for (let index = 0; index < cookieParts.length; index += 1) {
-                let item = cookieParts[index];
-                while (item.charAt(0) === ' ') {
-                    item = item.substring(1);
-                }
-                if (item.indexOf(name) === 0) {
-                    return item.substring(name.length, item.length);
-                }
-            }
-            return '';
-        }
-
-        function initPreferenceStorage() {
-            const savePrefBtn = byId('savePreferencesBtn');
-            const prefStateText = byId('prefStateText');
-            const toggles = Array.prototype.slice.call(document.querySelectorAll('.pref-toggle'));
-            const twoFactorToggle = byId('twoFactorToggle');
-            const deviceAlertToggle = byId('deviceAlertToggle');
-
-            if (!toggles.length) return;
-
-            if (savePrefBtn) {
-                savePrefBtn.addEventListener('click', function () {
-                    const payload = {
-                        email_notifications: byId('prefEmail') ? byId('prefEmail').checked : false,
-                        sms_alerts: byId('prefSms') ? byId('prefSms').checked : false,
-                        portfolio_visibility: byId('prefVisibility') ? byId('prefVisibility').checked : false,
-                        marketing_emails: byId('prefMarketing') ? byId('prefMarketing').checked : false,
-                        two_factor_enabled: twoFactorToggle ? twoFactorToggle.checked : false,
-                        device_login_alerts: deviceAlertToggle ? deviceAlertToggle.checked : false
-                    };
-
-                    fetch('{% url "save_studio_preferences" %}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCsrfToken()
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                        .then(function (response) {
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            if (prefStateText) {
-                                prefStateText.textContent = data.message || ('Saved at ' + new Date().toLocaleTimeString());
-                                prefStateText.classList.remove('text-danger');
-                            }
-                        })
-                        .catch(function () {
-                            if (prefStateText) {
-                                prefStateText.textContent = 'Could not save preferences. Please retry.';
-                                prefStateText.classList.add('text-danger');
-                            }
-                        });
-                });
-            }
-        }
-
-        if (form) {
-            form.addEventListener('input', calculateCompletion);
-            calculateCompletion();
-            handleAvatarPreview();
-        }
-
-        if (resetBtn && form) {
-            resetBtn.addEventListener('click', function () {
-                form.reset();
-                calculateCompletion();
-            });
-        }
-
-        if (saveBtn && form) {
-            form.addEventListener('submit', function () {
-                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
-                saveBtn.disabled = true;
-            });
-        }
-
-        const logoutAllBtn = byId('logoutAllBtn');
-        const deleteAccountBtn = byId('deleteAccountBtn');
-
-        if (logoutAllBtn) {
-            logoutAllBtn.addEventListener('click', function () {
-                fetch('{% url "logout_all_devices" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCsrfToken()
-                    }
-                })
-                    .then(function (response) {
-                        return response.json();
-                    })
-                    .then(function (data) {
-                        alert(data.message || 'Other sessions logged out successfully.');
-                    })
-                    .catch(function () {
-                        alert('Could not logout all devices right now.');
-                    });
-            });
-        }
-
-        if (deleteAccountBtn) {
-            deleteAccountBtn.addEventListener('click', function () {
-                const confirmed = confirm('Delete account permanently? This cannot be undone.');
-                if (confirmed) {
-                    fetch('{% url "delete_studio_account" %}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': getCsrfToken()
-                        }
-                    })
-                        .then(function (response) {
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            if (data.redirect_url) {
-                                window.location.href = data.redirect_url;
-                                return;
-                            }
-                            window.location.href = '/';
-                        })
-                        .catch(function () {
-                            alert('Account deletion failed. Please try again.');
-                        });
-                }
-            });
-        }
-
-        initPasswordStrength();
-        initPreferenceStorage();
-    })();
-</script>
+<script src="{% static 'js/studio/profile.js' %}"></script>
 {% endblock %}

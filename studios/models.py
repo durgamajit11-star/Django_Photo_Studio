@@ -83,9 +83,18 @@ class Studio(models.Model):
 
 class Portfolio(models.Model):
     """Model to store portfolio items linked to the studio"""
+    CATEGORY_CHOICES = (
+        ('wedding', 'Wedding'),
+        ('product', 'Product'),
+        ('fashion', 'Fashion'),
+        ('other', 'Other'),
+    )
+
     studio = models.ForeignKey(Studio, on_delete=models.CASCADE, related_name='portfolios')
     image = models.ImageField(upload_to="portfolio/")
     caption = models.CharField(max_length=255, blank=True, null=True)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    tags = models.CharField(max_length=255, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -1,5 +1,7 @@
 <!-- ================= GLOBAL CHATBOT ================= -->
-<div id="chatbot-container">
+<div id="chatbot-container"
+    data-chatbot-url="{% url 'chatbot:chatbot_messages' %}"
+    data-chatbot-clear-url="{% url 'chatbot:clear_chat_history' %}">
 
     <!-- Chat Toggle Button -->
     <div class="chat-toggle" id="chatToggle" title="Open Chat">
@@ -11,26 +13,36 @@
 
         <!-- Header -->
         <div class="chat-header">
-            <span>
-                <i class="bi bi-robot"></i> StudioSync AI Assistant
-            </span>
-            <button class="chat-close-btn" id="chatCloseBtn">
-                <i class="bi bi-x-lg"></i>
-            </button>
+            <div>
+                <div class="fw-semibold">
+                    <i class="bi bi-robot"></i> StudioSync AI Assistant
+                </div>
+                <div class="small text-secondary">Ask about bookings, payments, reviews, dashboards, and studio features.</div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="chat-close-btn btn btn-sm btn-outline-light" id="chatClearBtn" type="button" title="Clear Chat">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                <button class="chat-close-btn" id="chatCloseBtn" type="button" title="Close Chat">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Messages -->
         <div class="chat-body" id="chatBody">
-            <div class="bot-message">
-                👋 Hello! How can I help you today?
+            <div class="bot-message">👋 Hello! Ask me anything about StudioSync.</div>
+            <div class="chat-suggestions mt-2 d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="What can I do on this platform?">Platform help</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do bookings work?">Bookings</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do payments and refunds work?">Payments</button>
             </div>
         </div>
 
         <!-- Input -->
         <div class="chat-input">
-            <input type="text" id="chatInput"
-                placeholder="Type your message..." autocomplete="off">
-            <button id="chatSendBtn" class="chat-send-btn">
+            <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
+            <button id="chatSendBtn" class="chat-send-btn" type="button">
                 <i class="bi bi-send-fill"></i>
             </button>
         </div>

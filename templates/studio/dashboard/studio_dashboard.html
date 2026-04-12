@@ -3,259 +3,205 @@
 
 {% block title %}Studio Dashboard{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/studio/dashboard_home.css' %}">
+{% endblock %}
+
 {% block studio_content %}
-
-<!-- ================= HEADER ================= -->
-<div class="dashboard-header mb-3">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <h1 class="h4 fw-bold mb-1">📊 Studio Dashboard</h1>
+<div class="studio-home" id="studioDashboardRoot" data-live-endpoint="{% url 'studio_dashboard_live' %}">
+    <section class="studio-home-header">
+        <div>
+            <h1><i class="bi bi-grid-1x2-fill"></i> Studio Dashboard</h1>
+            <p>Track bookings, revenue, and daily workload from one place.</p>
         </div>
-        <div class="col-md-4 text-md-end">
-            <small class="text-muted" style="font-size: 0.8rem;">Last updated: <span id="lastUpdate">Just now</span></small>
+        <div class="last-updated-badge">
+            Last updated: <strong id="lastUpdate">Just now</strong>
         </div>
-    </div>
-</div>
+    </section>
 
-<!-- ================= STATS CARDS ================= -->
-<div class="row g-4 mb-5">
+    <section class="metric-grid">
+        <article class="metric-tile metric-primary">
+            <div class="metric-icon"><i class="bi bi-calendar-check"></i></div>
+            <div>
+                <div class="metric-label">Total Bookings</div>
+                <div class="metric-value" id="statTotalBookings">{{ total_bookings }}</div>
+                <small>All booked requests</small>
+            </div>
+        </article>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card stat-card-primary">
-            <div class="stat-icon">
-                <i class="bi bi-calendar-check"></i>
+        <article class="metric-tile metric-success">
+            <div class="metric-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="metric-label">Upcoming Shoots</div>
+                <div class="metric-value" id="statUpcomingBookings">{{ confirmed_bookings }}</div>
+                <small>Confirmed sessions</small>
             </div>
-            <div class="stat-content">
-                <span class="stat-label">Total Bookings</span>
-                <h2 class="stat-value">{{ total_bookings }}</h2>
-                <small class="stat-trend">📈 +12% this month</small>
-            </div>
-        </div>
-    </div>
+        </article>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card stat-card-success">
-            <div class="stat-icon">
-                <i class="bi bi-hourglass-split"></i>
+        <article class="metric-tile metric-warning">
+            <div class="metric-icon"><i class="bi bi-cash-coin"></i></div>
+            <div>
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value" id="statTotalRevenue">Rs. {{ total_earnings }}</div>
+                <small>Confirmed bookings revenue</small>
             </div>
-            <div class="stat-content">
-                <span class="stat-label">Upcoming Shoots</span>
-                <h2 class="stat-value">{{ confirmed_bookings }}</h2>
-                <small class="stat-trend">💪 Keep it up!</small>
-            </div>
-        </div>
-    </div>
+        </article>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card stat-card-warning">
-            <div class="stat-icon">
-                <i class="bi bi-cash-coin"></i>
+        <article class="metric-tile metric-info">
+            <div class="metric-icon"><i class="bi bi-star-fill"></i></div>
+            <div>
+                <div class="metric-label">Average Rating</div>
+                <div class="metric-value" id="statAverageRating">{{ avg_rating|floatformat:1 }}/5</div>
+                <small>From {{ total_reviews }} review{{ total_reviews|pluralize }}</small>
             </div>
-            <div class="stat-content">
-                <span class="stat-label">Total Revenue</span>
-                <h2 class="stat-value">${{ total_earnings }}</h2>
-                <small class="stat-trend">💰 Earnings tracked</small>
-            </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-    <div class="col-lg-3 col-md-6">
-        <div class="stat-card stat-card-info">
-            <div class="stat-icon">
-                <i class="bi bi-star-fill"></i>
-            </div>
-            <div class="stat-content">
-                <span class="stat-label">Average Rating</span>
-                <h2 class="stat-value">{{ average_rating|floatformat:1 }}/5</h2>
-                <small class="stat-trend">⭐ Excellent!</small>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- ================= CHARTS SECTION ================= -->
-<div class="row g-4 mb-5">
-
-    <!-- Revenue Chart -->
-    <div class="col-lg-8">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">📈 Monthly Revenue Trend</h5>
-                <div class="chart-controls">
-                    <button class="btn btn-sm btn-outline-secondary active">Month</button>
-                    <button class="btn btn-sm btn-outline-secondary">Quarter</button>
-                    <button class="btn btn-sm btn-outline-secondary">Year</button>
+    <section class="panel-grid panel-grid-charts">
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Revenue Trend</h5>
+                <div class="period-switch" id="revenuePeriodSwitch">
+                    <button type="button" class="active" data-period="month">Month</button>
+                    <button type="button" data-period="quarter">Quarter</button>
+                    <button type="button" data-period="year">Year</button>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="studio-panel-body chart-body">
                 <canvas id="revenueChart" height="160"></canvas>
             </div>
-        </div>
-    </div>
+        </article>
 
-    <!-- Booking Status Chart -->
-    <div class="col-lg-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">📊 Booking Status</h5>
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Booking Status</h5>
             </div>
-            <div class="card-body">
-                <canvas id="bookingStatusChart" height="120"></canvas>
+            <div class="studio-panel-body chart-body">
+                <canvas id="bookingStatusChart" height="130"></canvas>
             </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-</div>
-
-<!-- ================= QUICK ACTIONS ================= -->
-<div class="row g-4 mb-5">
-
-    <div class="col-lg-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">🚀 Quick Actions</h5>
+    <section class="panel-grid panel-grid-main">
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Quick Actions</h5>
             </div>
-            <div class="card-body">
+            <div class="studio-panel-body">
                 <div class="action-list">
                     <a href="{% url 'studio_portfolio' %}" class="action-item">
                         <i class="bi bi-camera"></i>
                         <div>
-                            <span class="action-title">Add Photos</span>
-                            <small class="action-desc">Update your portfolio</small>
+                            <span class="action-title">Add Portfolio Photos</span>
+                            <small class="action-desc">Keep your showcase fresh for discovery.</small>
                         </div>
                         <i class="bi bi-chevron-right"></i>
                     </a>
                     <a href="{% url 'studio_bookings' %}" class="action-item">
                         <i class="bi bi-calendar-event"></i>
                         <div>
-                            <span class="action-title">View Bookings</span>
-                            <small class="action-desc">Manage your schedule</small>
+                            <span class="action-title">Manage Bookings</span>
+                            <small class="action-desc">Approve, confirm, or update session status.</small>
                         </div>
                         <i class="bi bi-chevron-right"></i>
                     </a>
-                    <a href="{% url 'user_profile' %}" class="action-item">
+                    <a href="{% url 'studio_profile' %}" class="action-item">
                         <i class="bi bi-person-circle"></i>
                         <div>
                             <span class="action-title">Profile Settings</span>
-                            <small class="action-desc">Update studio details</small>
+                            <small class="action-desc">Update contact, services, and preferences.</small>
                         </div>
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
 
-    <!-- Today Schedule -->
-    <div class="col-lg-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">📅 Today's Schedule</h5>
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Today's Schedule</h5>
                 <span class="badge bg-primary">Live</span>
             </div>
-            <div class="card-body">
-                <div class="schedule-list">
+            <div class="studio-panel-body">
+                <div class="schedule-list" id="todayScheduleList">
+                    {% for booking in today_bookings %}
                     <div class="schedule-item">
-                        <div class="schedule-time">10:00 AM</div>
+                        <div class="schedule-time">{{ booking.time|time:"h:i A"|default:booking.time_slot|default:'--' }}</div>
                         <div class="schedule-details">
-                            <span class="schedule-event">Wedding Shoot</span>
-                            <small class="schedule-client">Client: John Doe</small>
+                            <span class="schedule-event">{{ booking.event_type|default:'Shoot Session' }}</span>
+                            <small class="schedule-client">Client: {{ booking.user.get_full_name|default:booking.user.username }}</small>
                         </div>
                     </div>
-                    <div class="schedule-item">
-                        <div class="schedule-time">03:00 PM</div>
-                        <div class="schedule-details">
-                            <span class="schedule-event">Product Shoot</span>
-                            <small class="schedule-client">Client: ABC Company</small>
-                        </div>
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="{% url 'studio_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
+                    {% empty %}
+                    <div class="text-muted small" id="todayScheduleEmpty">No bookings scheduled for today.</div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'studio_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
 
-    <!-- Recent Notifications -->
-    <div class="col-lg-4">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">🔔 Recent Activity</h5>
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Recent Activity</h5>
             </div>
-            <div class="card-body">
-                <div class="notification-list">
+            <div class="studio-panel-body">
+                <div class="notification-list" id="recentActivityList">
+                    {% for booking in recent_bookings|slice:":4" %}
                     <div class="notification-item notification-new">
                         <i class="bi bi-calendar-plus"></i>
                         <div class="notification-content">
-                            <span class="notification-title">New booking request</span>
-                            <small class="notification-time">2 minutes ago</small>
+                            <span class="notification-title">{{ booking.event_type }} booking {{ booking.status|lower }}</span>
+                            <small class="notification-time">{{ booking.created_at|timesince }} ago</small>
                         </div>
                     </div>
-                    <div class="notification-item notification-warning">
-                        <i class="bi bi-credit-card"></i>
-                        <div class="notification-content">
-                            <span class="notification-title">Payment received</span>
-                            <small class="notification-time">1 hour ago</small>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <i class="bi bi-star"></i>
-                        <div class="notification-content">
-                            <span class="notification-title">New 5-star review</span>
-                            <small class="notification-time">3 hours ago</small>
-                        </div>
-                    </div>
+                    {% empty %}
+                    <div class="text-muted small" id="recentActivityEmpty">No recent activity available yet.</div>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-</div>
-
-<!-- ================= PERFORMANCE METRICS ================= -->
-<div class="row g-4">
-
-    <div class="col-lg-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">📊 Performance Metrics</h5>
+    <section class="panel-grid panel-grid-bottom">
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Performance Metrics</h5>
             </div>
-            <div class="card-body">
+            <div class="studio-panel-body">
                 <div class="metrics-grid">
                     <div class="metric-item">
                         <label>Booking Rate</label>
                         <div class="progress-bar-custom">
-                            <div class="progress-fill" style="width: 75%"></div>
+                            <div class="progress-fill metric-progress-fill" style="width: 0%" data-width="{{ booking_rate }}"></div>
                         </div>
-                        <span class="metric-value">75%</span>
+                        <span class="metric-value">{{ booking_rate }}%</span>
                     </div>
                     <div class="metric-item">
                         <label>Client Satisfaction</label>
                         <div class="progress-bar-custom">
-                            <div class="progress-fill" style="width: 92%"></div>
+                            <div class="progress-fill metric-progress-fill" style="width: 0%" data-width="{{ satisfaction_rate }}"></div>
                         </div>
-                        <span class="metric-value">92%</span>
+                        <span class="metric-value">{{ avg_rating|floatformat:1 }}/5</span>
                     </div>
                     <div class="metric-item">
                         <label>Portfolio Completion</label>
                         <div class="progress-bar-custom">
-                            <div class="progress-fill" style="width: 60%"></div>
+                            <div class="progress-fill metric-progress-fill" style="width: 0%" data-width="{{ portfolio_completion_rate }}"></div>
                         </div>
-                        <span class="metric-value">60%</span>
+                        <span class="metric-value">{{ portfolio_count }} photos</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
 
-    <div class="col-lg-6">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">🎯 Studio Information</h5>
+        <article class="studio-panel">
+            <div class="studio-panel-header">
+                <h5>Studio Information</h5>
             </div>
-            <div class="card-body">
+            <div class="studio-panel-body">
                 <div class="studio-info-grid">
                     <div class="info-item">
                         <span class="info-label">Studio Name</span>
@@ -281,86 +227,17 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
+        </article>
+    </section>
 </div>
 
-
+{{ revenue_labels|json_script:"studioRevenueLabels" }}
+{{ revenue_data|json_script:"studioRevenueData" }}
+{{ booking_status_data|json_script:"studioBookingStatusData" }}
 {% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'Revenue ($)',
-                data: [1000, 1500, 2000, 1800, 2500, 3000],
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#6366f1',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#94a3b8' }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#94a3b8' }
-                }
-            }
-        }
-    });
-
-    // Booking Status Chart
-    const statusCtx = document.getElementById('bookingStatusChart').getContext('2d');
-    new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Confirmed', 'Pending', 'Completed'],
-            datasets: [{
-                data: [{{ confirmed_bookings }}, 5, 12],
-                backgroundColor: ['#10b981', '#f59e0b', '#6366f1'],
-                borderColor: '#0f172a',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { 
-                    position: 'bottom',
-                    labels: { color: '#e2e8f0' }
-                }
-            }
-        }
-    });
-
-    // Update last updated time
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
-</script>
-
+<script src="{% static 'js/studio/dashboard_home.js' %}"></script>
 {% endblock %}

@@ -105,8 +105,11 @@
                         </span>
                     </div>
 
-                    <p class="small">
-                        💰 {{ studio.price_range }}
+                    <p class="small mb-1">
+                        💰 Base: ₹ {{ studio.price_per_hour }}/hour
+                    </p>
+                    <p class="small text-muted mb-0">
+                        Services: {{ studio.services.count }} available
                     </p>
 
                     <div class="d-grid gap-2">
@@ -157,8 +160,11 @@
                         ⭐ {{ studio.average_rating|floatformat:1 }}
                     </p>
 
-                    <p class="small">
-                        💰 {{ studio.price_range }}
+                    <p class="small mb-1">
+                        💰 Base: ₹ {{ studio.price_per_hour }}/hour
+                    </p>
+                    <p class="small text-muted mb-0">
+                        Services: {{ studio.services.count }} available
                     </p>
 
                     <div class="d-grid gap-2">

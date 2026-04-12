@@ -8,7 +8,7 @@ def role_required(allowed_roles=[]):
             if request.user.role in allowed_roles:
                 return view_func(request, *args, **kwargs)
 
-            return redirect('login')
+            return redirect('auth_page')
 
         return wrapper
     return decorator

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Count, Avg
+from django.db import transaction
 from django.db.models.functions import TruncMonth
 from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_POST
@@ -12,6 +13,7 @@ from accounts.decorators import role_required
 from studios.models import Studio
 from bookings.models import BookingRequest
 from payments.models import Payment
+from notifications.models import Notification
 
 
 User = get_user_model()
@@ -118,8 +120,60 @@ def manage_users(request):
             'query': query,
             'status': status,
             'total_users': users.count(),
+            'active_users': users.filter(is_active=True).count(),
+            'blocked_users': users.filter(is_active=False).count(),
         },
     )
+
+
+@login_required
+@role_required(['ADMIN'])
+def manage_admins(request):
+    query = request.GET.get('q', '').strip()
+    status = request.GET.get('status', '').strip()
+
+    admins = User.objects.filter(role='ADMIN').order_by('-date_joined')
+    if query:
+        admins = admins.filter(
+            Q(username__icontains=query)
+            | Q(email__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(phone__icontains=query)
+        )
+
+    if status == 'active':
+        admins = admins.filter(is_active=True)
+    elif status == 'blocked':
+        admins = admins.filter(is_active=False)
+
+    return render(
+        request,
+        'admin/dashboard/manage_admins.html',
+        {
+            'admins': admins,
+            'query': query,
+            'status': status,
+            'total_admins': admins.count(),
+        },
+    )
+
+
+@login_required
+@role_required(['ADMIN'])
+@require_POST
+def toggle_admin_status(request, id):
+    admin_user = get_object_or_404(User, id=id, role='ADMIN')
+
+    if admin_user.id == request.user.id:
+        messages.error(request, 'You cannot block your own account.')
+        return redirect('manage_admins')
+
+    admin_user.is_active = not admin_user.is_active
+    admin_user.save(update_fields=['is_active'])
+    state = 'unblocked' if admin_user.is_active else 'blocked'
+    messages.success(request, f'Admin {admin_user.username} has been {state}.')
+    return redirect('manage_admins')
 
 
 @login_required
@@ -173,6 +227,8 @@ def manage_studios(request):
             'query': query,
             'status': status,
             'total_studios': studios.count(),
+            'verified_count': studios.filter(is_verified=True).count(),
+            'pending_count': studios.filter(is_verified=False).count(),
         },
     )
 
@@ -196,6 +252,86 @@ def reject_studio(request, id):
     studio_name = studio.studio_name
     studio.delete()
     messages.success(request, f'{studio_name} rejected and removed.')
+    return redirect('manage_studios')
+
+
+@login_required
+@role_required(['ADMIN'])
+@require_POST
+def notify_studio(request, id):
+    studio = get_object_or_404(Studio.objects.select_related('user'), id=id)
+    message_text = (request.POST.get('message') or '').strip()
+
+    if not message_text:
+        messages.error(request, 'Notification message is required.')
+        return redirect('manage_studios')
+
+    if len(message_text) < 5:
+        messages.error(request, 'Notification message is too short (minimum 5 characters).')
+        return redirect('manage_studios')
+
+    if len(message_text) > 500:
+        messages.error(request, 'Notification message is too long (maximum 500 characters).')
+        return redirect('manage_studios')
+
+    Notification.objects.create(
+        user=studio.user,
+        message=message_text,
+        type='admin_notice',
+    )
+    messages.success(request, f'Notification sent to {studio.studio_name}.')
+    return redirect('manage_studios')
+
+
+@login_required
+@role_required(['ADMIN'])
+@require_POST
+def notify_selected_studios(request):
+    message_text = (request.POST.get('message') or '').strip()
+    raw_ids = request.POST.getlist('studio_ids')
+
+    if not message_text:
+        messages.error(request, 'Notification message is required for bulk send.')
+        return redirect('manage_studios')
+
+    if len(message_text) < 5:
+        messages.error(request, 'Notification message is too short (minimum 5 characters).')
+        return redirect('manage_studios')
+
+    if len(message_text) > 500:
+        messages.error(request, 'Notification message is too long (maximum 500 characters).')
+        return redirect('manage_studios')
+
+    studio_ids = []
+    for value in raw_ids:
+        try:
+            studio_ids.append(int(value))
+        except (TypeError, ValueError):
+            continue
+
+    studio_ids = list(set(studio_ids))
+    if not studio_ids:
+        messages.error(request, 'Please select at least one studio.')
+        return redirect('manage_studios')
+
+    target_studios = list(Studio.objects.select_related('user').filter(id__in=studio_ids))
+    if not target_studios:
+        messages.error(request, 'No valid studios were selected.')
+        return redirect('manage_studios')
+
+    payload = [
+        Notification(
+            user=studio.user,
+            message=message_text,
+            type='admin_notice',
+        )
+        for studio in target_studios
+    ]
+
+    with transaction.atomic():
+        Notification.objects.bulk_create(payload)
+
+    messages.success(request, f'Notification sent to {len(payload)} selected studio(s).')
     return redirect('manage_studios')
 
 
@@ -319,8 +455,12 @@ def admin_payments(request):
     stats = {
         'completed_count': payments.filter(status='Completed').count(),
         'pending_count': payments.filter(status='Pending').count(),
+        'processing_count': payments.filter(status='Processing').count(),
+        'failed_count': payments.filter(status='Failed').count(),
+        'total_count': payments.count(),
         'total_amount': payments.filter(status='Completed').aggregate(total=Sum('amount'))['total'] or 0,
     }
+    stats['completion_rate'] = int((stats['completed_count'] / stats['total_count']) * 100) if stats['total_count'] else 0
 
     return render(
         request,

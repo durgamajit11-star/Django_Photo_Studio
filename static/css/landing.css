@@ -367,107 +367,320 @@ footer {
 
 
 /* ================= MOBILE RESPONSIVE ================= */
-@media (max-width: 992px) {
+
+/* ===== EXTRA SMALL DEVICES (Up to 575px) ===== */
+@media (max-width: 575.98px) {
+    .announcement {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    header {
+        z-index: 1000;
+    }
+
+    .navbar-brand {
+        font-size: 16px;
+    }
 
     /* Hero section adjustment */
     .hero {
         height: auto;
-        /* remove fixed 80vh */
+        padding: 60px 15px;
+    }
+
+    .hero-box {
+        padding: 25px 15px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .hero h1 {
+        font-size: 22px;
+        text-align: center;
+        line-height: 1.3;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        text-align: center;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+        padding: 11px 16px;
+        font-size: 13px;
+    }
+
+    .mockup {
+        margin-top: 20px;
+        padding: 15px;
+        text-align: center;
+        border-radius: 12px;
+    }
+
+    .hero::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* Stats section */
+    .stat-card {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card h3 {
+        font-size: 20px;
+    }
+
+    .stat-card p {
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    /* AI Steps */
+    .ai-step {
+        padding: 12px;
+        gap: 12px;
+        font-size: 13px;
+    }
+
+    .ai-step span {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    /* Section padding */
+    section {
+        padding: 50px 15px;
+    }
+
+    /* Glass boxes */
+    .glass {
+        padding: 20px;
+        border-radius: 14px;
+        margin-top: 20px;
+    }
+
+    .glass h2 {
+        font-size: 20px;
+    }
+
+    .glass p {
+        font-size: 13px;
+    }
+
+    /* Studio cards */
+    .studio-image {
+        height: 150px;
+    }
+
+    .studio-body {
+        padding: 15px;
+    }
+
+    .studio-card h3 {
+        font-size: 15px;
+    }
+
+    .location,
+    .price,
+    .verified {
+        font-size: 12px;
+    }
+
+    .badge-ai {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    /* Offer section */
+    .offer {
+        padding: 35px 15px;
+        border-radius: 16px;
+    }
+
+    .offer h2 {
+        font-size: 22px;
+    }
+
+    /* Footer */
+    footer {
+        padding: 30px 12px 15px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .footer-grid h6 {
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .footer-grid a {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    .footer-bottom {
+        margin-top: 15px;
+        padding-top: 12px;
+        font-size: 11px;
+    }
+}
+
+/* ===== SMALL DEVICES (576px to 767px) ===== */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .hero {
+        height: auto;
+        padding: 70px 20px;
+    }
+
+    .hero-box {
+        padding: 35px 20px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    .mockup {
+        margin-top: 25px;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .ai-step {
+        padding: 14px 16px;
+    }
+
+    section {
+        padding: 60px 20px;
+    }
+
+    .glass {
+        padding: 25px;
+    }
+
+    .studio-image {
+        height: 170px;
+    }
+
+    footer {
+        padding: 35px 20px 18px;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* ===== MEDIUM DEVICES (768px to 991px) ===== */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .hero {
+        height: auto;
         padding: 80px 20px;
     }
 
     .hero-box {
         padding: 40px 25px;
-        border-radius: 18px;
     }
 
     .hero h1 {
-        font-size: 28px;
+        font-size: 32px;
         text-align: center;
-    }
-
-    .hero p {
-        text-align: center;
-        font-size: 15px;
     }
 
     .hero-buttons {
         justify-content: center;
     }
 
-    .hero-buttons .btn {
-        width: 100%;
-        /* full width buttons */
-        text-align: center;
-    }
-
-    .mockup {
-        margin-top: 30px;
-        padding: 25px;
-        text-align: center;
-    }
-
-    /* AI Insights Section */
     .stat-card {
-        padding: 18px;
+        padding: 20px;
     }
 
-    .stat-card h3 {
-        font-size: 22px;
-    }
-
-    .ai-step {
-        padding: 15px;
-        font-size: 14px;
-    }
-
-    /* Featured Studios */
     .studio-image {
-        height: 180px;
+        height: 200px;
     }
 
-    /* Offer section */
-    .offer {
-        padding: 40px 20px;
+    section {
+        padding: 70px 20px;
     }
 
-    /* Commission glass box */
     .glass {
-        padding: 30px 20px;
-        margin-top: 30px;
+        padding: 30px;
     }
-}
-
-@media (max-width: 768px) {
 
     footer {
-        padding: 30px 15px 15px;
+        padding: 40px 20px 20px;
     }
 
     .footer-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2 columns */
-        gap: 20px;
-    }
-
-    .footer-grid h6 {
-        font-size: 14px;
-    }
-
-    .footer-grid a {
-        font-size: 12px;
-        margin-bottom: 5px;
-    }
-
-    .footer-bottom {
-        margin-top: 20px;
-        font-size: 12px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
     }
 }
 
-@media (max-width: 480px) {
+/* ===== LARGER DEVICES (992px+) ===== */
+@media (min-width: 992px) {
+
+    .hero {
+        height: 80vh;
+        padding: 0;
+    }
+
+    .hero-box {
+        padding: 60px 80px;
+    }
+
+    .hero-buttons {
+        gap: 15px;
+    }
+
+    .hero-buttons .btn {
+        width: auto;
+    }
+
+    section {
+        padding: 90px 20px;
+    }
+
+    .glass {
+        padding: 30px;
+    }
+
+    footer {
+        padding: 40px 20px 20px;
+    }
+
     .footer-grid {
-        grid-template-columns: 1fr;
-        text-align: center;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 25px;
     }
 }

@@ -10,6 +10,26 @@
     padding: 20px;
 }
 
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.notification-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(6, 182, 212, 0.15);
+    color: #d9f3ff;
+    font-size: 0.85rem;
+}
+
 .notification-card {
     background: rgba(255,255,255,0.05);
     border-radius: 15px;
@@ -43,14 +63,29 @@
 .mark-btn {
     font-size: 0.75rem;
 }
+
+.clear-form {
+    display: inline-block;
+}
 </style>
 
 <div class="container-fluid notifications-container">
 
     <!-- HEADER -->
-    <div class="mb-4">
-        <h2 class="fw-bold">🔔 Notifications</h2>
-        <p>Stay updated with your activities</p>
+    <div class="notifications-header">
+        <div>
+            <h2 class="fw-bold mb-1">🔔 Notifications</h2>
+            <p class="mb-0">Stay updated with your activities</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="notification-summary">{{ unread_count|default:0 }} unread</span>
+            {% if notifications %}
+            <form class="clear-form" action="{% url 'clear_notifications' %}" method="post" onsubmit="return confirm('Clear all notifications?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-warning btn-sm">Clear All</button>
+            </form>
+            {% endif %}
+        </div>
     </div>
 
     <!-- NOTIFICATIONS LIST -->
@@ -83,7 +118,7 @@
 
             <!-- ACTION -->
             {% if not n.is_read %}
-            <a href="{% url 'notifications:mark_read' n.id %}" 
+            <a href="{% url 'mark_read' n.id %}" 
                class="btn btn-outline-light btn-sm mark-btn">
                 Mark as read
             </a>

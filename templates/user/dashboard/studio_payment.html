@@ -118,7 +118,7 @@
                             <div class="small text-secondary">{{ booking.event_type }} | {{ booking.date|date:"d M Y" }}</div>
                         </div>
                         <div class="text-end">
-                            <div class="fw-semibold">Rs. {{ booking.amount }}</div>
+                            <div class="fw-semibold">₹ {{ booking.amount }}</div>
                             {% if not selected_booking or booking.id != selected_booking.id %}
                             <a href="{% url 'studio_payment' %}?booking_id={{ booking.id }}" class="btn btn-outline-info btn-sm mt-1">Select</a>
                             {% endif %}
@@ -157,7 +157,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-info w-100">
-                    <i class="bi bi-lock"></i> Pay Rs. {{ selected_booking.amount }}
+                    <i class="bi bi-lock"></i> Pay ₹ {{ selected_booking.amount }}
                 </button>
             </form>
         </div>
@@ -168,7 +168,7 @@
             <div class="meta-line"><span>Event</span><strong>{{ selected_booking.event_type }}</strong></div>
             <div class="meta-line"><span>Date</span><strong>{{ selected_booking.date|date:"d M Y" }}</strong></div>
             <div class="meta-line"><span>Time Slot</span><strong>{{ selected_booking.time_slot|default:"Not selected" }}</strong></div>
-            <div class="meta-line"><span>Amount</span><strong>Rs. {{ selected_booking.amount }}</strong></div>
+            <div class="meta-line"><span>Amount</span><strong>₹ {{ selected_booking.amount }}</strong></div>
             <div class="meta-line"><span>Payment Status</span><strong>{{ selected_booking.payment_status }}</strong></div>
 
             {% if upi_payload %}

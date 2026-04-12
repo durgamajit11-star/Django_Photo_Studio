@@ -1,15 +1,45 @@
 
 /* ===== PROFILE PAGE ===== */
+.page-header {
+    width: 100%;
+    margin: 10px 0 24px;
+    padding: 0 24px;
+}
+
+.page-header .header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-header .text-muted {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
 .profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px 60px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 24px 60px;
 }
 
 .profile-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 30px;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    width: 100%;
 }
 
 .profile-card {
@@ -18,6 +48,7 @@
     border-radius: 16px;
     padding: 30px;
     transition: all 0.3s ease;
+    width: 100%;
 }
 
 .profile-card:hover {
@@ -38,6 +69,51 @@
     font-size: 20px;
     font-weight: 600;
     margin: 0;
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-toggle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    color: #d9f3ff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.section-toggle-btn:hover {
+    border-color: #06b6d4;
+    color: #06b6d4;
+    transform: translateY(-1px);
+}
+
+.section-toggle-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25);
+}
+
+.card-body {
+    display: block;
+    width: 100%;
+}
+
+.profile-card.is-collapsed .card-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.profile-card.is-collapsed {
+    padding-bottom: 22px;
 }
 
 .btn-edit {
@@ -65,6 +141,62 @@
     width: 120px;
     height: 120px;
     margin: 0 auto 25px;
+}
+
+.profile-summary {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-summary-content {
+    min-width: 0;
+}
+
+.profile-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.profile-title-row h4 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profile-title-row p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    word-break: break-word;
+}
+
+.profile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(6, 182, 212, 0.16);
+    color: #d9f3ff;
+}
+
+.profile-badge-soft {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .avatar-image {
@@ -108,13 +240,17 @@
 
 .profile-display {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
 }
 
 .display-field {
     display: flex;
     flex-direction: column;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .display-field .label {
@@ -126,9 +262,10 @@
 }
 
 .display-field p {
-    font-size: 15px;
+    font-size: 14px;
     margin: 0;
     font-weight: 500;
+    word-break: break-word;
 }
 
 /* FORM ELEMENTS */
@@ -141,6 +278,36 @@
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 8px;
+}
+
+.profile-form .form-control,
+.profile-form input[type='file'] {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+.profile-form .form-control:focus,
+.profile-form input[type='file']:focus {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+}
+
+.profile-form input[type='file'] {
+    cursor: pointer;
+}
+
+.profile-form input[type='file']::file-selector-button {
+    margin-right: 12px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(6, 182, 212, 0.15);
+    color: #ffffff;
+    padding: 8px 10px;
 }
 
 .form-input {
@@ -216,9 +383,10 @@
 }
 
 .setting-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+    gap: 20px;
     padding: 20px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
@@ -241,6 +409,13 @@
     margin: 0;
 }
 
+.setting-item .btn {
+    justify-self: end;
+    white-space: nowrap;
+    min-width: 160px;
+    width: 160px;
+}
+
 /* PREFERENCES */
 .preferences-list {
     display: flex;
@@ -252,6 +427,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
     padding: 20px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
@@ -328,6 +504,20 @@
     gap: 20px;
 }
 
+.danger-intro {
+    margin: 0 0 12px;
+    color: #fecaca;
+    font-size: 0.95rem;
+}
+
+.danger-guard {
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    background: rgba(127, 29, 29, 0.24);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+}
+
 .danger-item {
     display: flex;
     justify-content: space-between;
@@ -337,6 +527,32 @@
     background: rgba(239, 68, 68, 0.08);
     border-radius: 12px;
     border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.danger-action-card {
+    flex-wrap: wrap;
+}
+
+.danger-delete-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+.danger-delete-card .danger-info {
+    margin-bottom: 2px;
+}
+
+.danger-delete-card .form-control {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fff;
+}
+
+.danger-delete-card .form-control:focus {
+    border-color: rgba(248, 113, 113, 0.9);
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
 }
 
 .danger-info h4 {
@@ -410,7 +626,7 @@
     margin: 0;
 }
 
-.btn-close {
+.modal-close {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.6);
@@ -419,7 +635,7 @@
     transition: all 0.3s ease;
 }
 
-.btn-close:hover {
+.modal-close:hover {
     color: #ffffff;
 }
 
@@ -439,9 +655,313 @@
 }
 
 /* PROFILE RESPONSIVE */
-@media (max-width: 768px) {
+
+html[data-theme='light'] .page-header .text-muted,
+html[data-theme='light'] .display-field .label,
+html[data-theme='light'] .setting-info p,
+html[data-theme='light'] .preference-info p,
+html[data-theme='light'] .danger-info p,
+html[data-theme='light'] .danger-intro {
+    color: rgba(23, 34, 53, 0.7) !important;
+}
+
+html[data-theme='light'] .profile-card,
+html[data-theme='light'] .modal-content {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(239, 246, 255, 0.9));
+    border-color: rgba(21, 34, 56, 0.12);
+}
+
+html[data-theme='light'] .profile-form .form-control,
+html[data-theme='light'] .profile-form input[type='file'] {
+    color: #172235;
+    border-color: rgba(21, 34, 56, 0.18);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+html[data-theme='light'] .profile-form input[type='file']::file-selector-button {
+    background: rgba(15, 157, 143, 0.12);
+    color: #172235;
+}
+
+html[data-theme='light'] .setting-item,
+html[data-theme='light'] .preference-item {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+html[data-theme='light'] .profile-badge {
+    background: rgba(15, 157, 143, 0.12);
+    color: #0f3f4a;
+}
+
+html[data-theme='light'] .profile-badge-soft {
+    background: rgba(15, 23, 42, 0.06);
+    color: #172235;
+}
+
+html[data-theme='light'] .profile-title-row p,
+html[data-theme='light'] .display-field .label {
+    color: rgba(23, 34, 53, 0.68) !important;
+}
+
+html[data-theme='light'] .display-field {
+    background: rgba(15, 23, 42, 0.03);
+    border-color: rgba(21, 34, 56, 0.08);
+}
+
+html[data-theme='light'] .danger-item {
+    background: rgba(239, 68, 68, 0.08);
+}
+
+html[data-theme='light'] .danger-guard {
+    background: rgba(254, 242, 242, 0.95);
+    border-color: rgba(239, 68, 68, 0.26);
+}
+
+html[data-theme='light'] .danger-delete-card .form-control {
+    background: #fff5f5;
+    color: #172235;
+    border-color: rgba(220, 38, 38, 0.36);
+}
+
+html[data-theme='light'] .section-toggle-btn {
+    border-color: rgba(21, 34, 56, 0.25);
+    background: rgba(15, 23, 42, 0.04);
+    color: #172235;
+}
+
+html[data-theme='light'] .section-toggle-btn:hover {
+    color: #0f9d8f;
+    border-color: rgba(15, 157, 143, 0.6);
+}
+
+/* PROFILE RESPONSIVE */
+
+/* ===== EXTRA SMALL DEVICES (Up to 575px) ===== */
+@media (max-width: 575.98px) {
+    .page-header {
+        padding: 0 15px;
+        margin-top: 8px;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .profile-container {
+        padding: 0 15px 30px;
+    }
+
     .profile-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .profile-card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+
+    .card-actions {
+        width: 100%;
+    }
+
+    .section-toggle-btn {
+        margin-left: auto;
+    }
+
+    .card-header h3 {
+        font-size: 18px;
+    }
+
+    .btn-edit {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+
+    .profile-summary {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .profile-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-badges {
+        justify-content: flex-start;
+    }
+
+    .profile-display {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-display,
+    .profile-form {
+        gap: 15px;
+    }
+
+    .display-field .label {
+        font-size: 11px;
+    }
+
+    .display-field p {
+        font-size: 14px;
+    }
+
+    .form-input,
+    .form-textarea {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .form-textarea {
+        min-height: 80px;
+    }
+
+    .file-input-label {
+        padding: 20px;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        flex: none;
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+
+    .setting-item,
+    .preference-item,
+    .danger-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .setting-item {
+        grid-template-columns: 1fr;
+    }
+
+    .setting-item .btn {
+        justify-self: stretch;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .setting-info h4,
+    .preference-info label,
+    .danger-info h4 {
+        font-size: 14px;
+    }
+
+    .setting-info p,
+    .preference-info p,
+    .danger-info p {
+        font-size: 12px;
+    }
+
+    .toggle-switch {
+        width: 45px;
+        height: 26px;
+    }
+
+    .toggle-label::after {
+        width: 22px;
+        height: 22px;
+        top: 2px;
+        left: 2px;
+    }
+
+    .toggle-input:checked+.toggle-label::after {
+        left: 21px;
+    }
+
+    .modal {
+        padding: 15px;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        border-radius: 14px;
+    }
+
+    .modal-header {
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .modal-actions .btn {
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+}
+
+/* ===== SMALL DEVICES (576px to 767px) ===== */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .page-header {
+        padding: 0 20px;
+    }
+
+    .profile-container {
+        padding: 0 20px 40px;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .profile-card {
+        padding: 20px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .btn-edit {
+        width: 100%;
     }
 
     .setting-item,
@@ -452,48 +972,43 @@
         gap: 15px;
     }
 
-    .profile-container {
-        padding: 0 20px 40px;
-    }
-
-    .profile-card {
-        padding: 20px;
-    }
-}
-
-@media (max-width: 576px) {
-    .profile-container {
-        padding: 0 15px 30px;
-    }
-
-    .profile-card {
-        padding: 15px;
-    }
-
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .btn-edit {
-        width: 100%;
-        justify-content: center;
-    }
-
     .modal {
         padding: 15px;
-    }
-
-    .modal-content {
-        width: 100%;
     }
 
     .form-actions {
         flex-direction: column;
     }
+}
 
-    .danger-item {
-        padding: 15px;
+/* ===== MEDIUM DEVICES (768px to 1023px) ===== */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .profile-container {
+        padding: 0 30px 50px;
     }
+
+    .profile-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .profile-card {
+        padding: 25px;
+    }
+
+    .setting-item,
+    .preference-item,
+    .danger-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* ===== LARGE DEVICES (1024px+) ===== */
+@media (min-width: 1024px) {
+    /* Default styles apply */
 }

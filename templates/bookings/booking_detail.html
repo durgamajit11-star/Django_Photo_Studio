@@ -83,7 +83,7 @@
                 <div class="info-line"><span>Time</span><strong>{{ booking.time_slot|default:booking.time|default:"Not specified" }}</strong></div>
                 <div class="info-line"><span>Location</span><strong>{{ booking.location|default:booking.studio.location }}</strong></div>
                 <div class="info-line"><span>Service</span><strong>{{ booking.service.service_name|default:"General Session" }}</strong></div>
-                <div class="info-line"><span>Amount</span><strong>Rs. {{ booking.amount }}</strong></div>
+                <div class="info-line"><span>Amount</span><strong>₹ {{ booking.amount }}</strong></div>
                 <div class="info-line"><span>Payment Status</span><strong>{{ booking.payment_status }}</strong></div>
                 <div class="info-line"><span>Created</span><strong>{{ booking.created_at|date:"d M Y, h:i A" }}</strong></div>
             </div>

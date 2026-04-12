@@ -9,6 +9,7 @@
 .review-header h3 {
     font-weight: 700;
     background: linear-gradient(45deg, #4facfe, #00f2fe);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -155,7 +156,7 @@
 
                 <!-- LOCATION -->
                 <p class="small text-muted mb-2">
-                    <i class="bi bi-geo-alt"></i> {{ review.studio.city }}, {{ review.studio.state }}
+                    <i class="bi bi-geo-alt"></i> {{ review.studio.location }}
                 </p>
 
                 <!-- COMMENT -->
@@ -183,11 +184,11 @@
                         </a>
 
                         <!-- DELETE -->
-                        <a href="{% url 'delete_review' review.id %}"
-                           class="btn btn-sm btn-delete btn-custom"
-                           onclick="return confirm('Delete this review?');">
-                            Delete
-                        </a>
+                                                <form method="POST" action="{% url 'delete_review' review.id %}" class="d-inline"
+                                                            onsubmit="return confirm('Delete this review?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-delete btn-custom">Delete</button>
+                                                </form>
 
                     </div>
                 </div>

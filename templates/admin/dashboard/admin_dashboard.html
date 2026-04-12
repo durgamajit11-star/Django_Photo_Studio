@@ -45,7 +45,7 @@
                 <h6 class="text-muted mb-0">Total Revenue</h6>
                 <span class="metric-tag">Finance</span>
             </div>
-            <h3 class="fw-bold mb-1">${{ total_revenue }}</h3>
+            <h3 class="fw-bold mb-1">₹ {{ total_revenue }}</h3>
             <p class="small text-primary mb-0">Revenue from confirmed bookings</p>
         </div>
     </div>
@@ -80,7 +80,7 @@
                 <div class="col-md-4">
                     <div class="stat-card h-100">
                         <h6 class="text-muted">Avg Booking Value</h6>
-                        <h3 class="mb-1">Rs. {{ avg_booking_value|floatformat:0 }}</h3>
+                        <h3 class="mb-1">₹ {{ avg_booking_value|floatformat:0 }}</h3>
                         <p class="small text-info mb-0">Higher value bookings increase platform growth</p>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                             </div>
                             <div class="text-end">
                                 <div class="small">{{ booking.status }}</div>
-                                <div class="small text-muted">Rs. {{ booking.amount }}</div>
+                                <div class="small text-muted">₹ {{ booking.amount }}</div>
                             </div>
                         </div>
                         {% empty %}

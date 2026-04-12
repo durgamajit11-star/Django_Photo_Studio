@@ -32,7 +32,7 @@ urlpatterns = [
     path('payments/', include('payments.urls')),
     path('notifications/', include('notifications.urls')),
     path('recommendations/', include('recommendations.urls')),
-    path('chatbot/', include('chatbot.urls')),
+    path('chatbot/', include(('chatbot.urls', 'chatbot'), namespace='chatbot')),
     path('api/', include('api.urls')),
 ]
 if settings.DEBUG:

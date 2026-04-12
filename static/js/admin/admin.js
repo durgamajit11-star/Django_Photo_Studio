@@ -129,6 +129,35 @@ document.addEventListener('DOMContentLoaded', function () {
     tooltipTriggerList.forEach(function (tooltipTriggerEl) {
         new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    const selectAllStudios = document.getElementById('selectAllStudios');
+    const studioChecks = Array.from(document.querySelectorAll('.studio-select'));
+    const selectedStudioCount = document.getElementById('selectedStudioCount');
+
+    function syncSelectedStudiosCount() {
+        if (!selectedStudioCount) return;
+        const selected = studioChecks.filter(function (item) { return item.checked; }).length;
+        selectedStudioCount.textContent = `${selected} selected`;
+    }
+
+    if (selectAllStudios && studioChecks.length) {
+        selectAllStudios.addEventListener('change', function () {
+            studioChecks.forEach(function (checkbox) {
+                checkbox.checked = selectAllStudios.checked;
+            });
+            syncSelectedStudiosCount();
+        });
+
+        studioChecks.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                const allSelected = studioChecks.every(function (item) { return item.checked; });
+                selectAllStudios.checked = allSelected;
+                syncSelectedStudiosCount();
+            });
+        });
+
+        syncSelectedStudiosCount();
+    }
 });
 
 

@@ -30,7 +30,7 @@
     <div class="refund-card mb-3">
         <div class="row g-2">
             <div class="col-md-6"><strong>Transaction:</strong> {{ payment.transaction_id|default:"Not available" }}</div>
-            <div class="col-md-6"><strong>Amount Paid:</strong> Rs. {{ payment.amount }}</div>
+            <div class="col-md-6"><strong>Amount Paid:</strong> ₹ {{ payment.amount }}</div>
             <div class="col-md-6"><strong>Method:</strong> {{ payment.get_payment_method_display }}</div>
             <div class="col-md-6"><strong>Date:</strong> {{ payment.created_at|date:"d M Y" }}</div>
         </div>
@@ -50,7 +50,7 @@
                 step="0.01"
                 required
             >
-            <small class="text-secondary">You can request full or partial refund up to Rs. {{ payment.amount }}.</small>
+            <small class="text-secondary">You can request full or partial refund up to ₹ {{ payment.amount }}.</small>
         </div>
 
         <div class="mb-3">

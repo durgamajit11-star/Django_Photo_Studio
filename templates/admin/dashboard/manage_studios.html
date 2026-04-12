@@ -4,15 +4,19 @@
 
 {% block page_actions %}
 <span class="metric-tag">Total: {{ total_studios }}</span>
+<span class="metric-tag">Verified: {{ verified_count }}</span>
+<span class="metric-tag">Pending: {{ pending_count }}</span>
 {% endblock %}
 
 {% block admin_content %}
 
 {% if messages %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    {% for message in messages %}{{ message }}{% endfor %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
+{% endfor %}
 {% endif %}
 
 <div class="admin-panel p-3 mb-4">
@@ -35,11 +39,47 @@
     </form>
 </div>
 
+<div class="admin-panel p-3 mb-4">
+    <form method="POST" action="{% url 'notify_selected_studios' %}" id="bulkNotifyForm" onsubmit="return confirmBulkNotify();">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div>
+                <h6 class="mb-0">Notify Selected Studios</h6>
+                <small class="text-muted">Select studios from the table and send one secure notice.</small>
+            </div>
+            <span class="badge text-bg-info" id="selectedStudioCount">0 selected</span>
+        </div>
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-9">
+                <label for="bulkNotifyMessage" class="form-label small text-muted">Message</label>
+                <textarea
+                    id="bulkNotifyMessage"
+                    name="message"
+                    class="form-control"
+                    rows="2"
+                    maxlength="500"
+                    minlength="5"
+                    required
+                    placeholder="Type a clear message for selected studios..."></textarea>
+                <small class="text-muted">5 to 500 characters.</small>
+            </div>
+            <div class="col-lg-3 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send me-1"></i>Send to Selected
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="admin-panel p-0 overflow-hidden">
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" id="selectAllStudios" aria-label="Select all studios">
+                    </th>
                     <th>ID</th>
                     <th>Studio</th>
                     <th>Owner</th>
@@ -52,6 +92,15 @@
             <tbody>
                 {% for studio in studios %}
                 <tr>
+                    <td>
+                        <input
+                            type="checkbox"
+                            class="studio-select"
+                            name="studio_ids"
+                            value="{{ studio.id }}"
+                            form="bulkNotifyForm"
+                            aria-label="Select {{ studio.studio_name }}">
+                    </td>
                     <td>#{{ studio.id }}</td>
                     <td>
                         <strong>{{ studio.studio_name }}</strong>
@@ -68,6 +117,9 @@
                         {% endif %}
                     </td>
                     <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#notifyStudioForm{{ studio.id }}" aria-expanded="false" aria-controls="notifyStudioForm{{ studio.id }}">
+                            Notify
+                        </button>
                         {% if not studio.is_verified %}
                         <form method="POST" action="{% url 'approve_studio' studio.id %}" class="d-inline">
                             {% csrf_token %}
@@ -80,14 +132,49 @@
                         </form>
                     </td>
                 </tr>
+                <tr class="collapse" id="notifyStudioForm{{ studio.id }}">
+                    <td colspan="8" class="bg-light-subtle">
+                        <form method="POST" action="{% url 'notify_studio' studio.id %}" class="row g-2 align-items-end" onsubmit="return confirm('Send this notification to {{ studio.studio_name }}?');">
+                            {% csrf_token %}
+                            <div class="col-lg-10">
+                                <label class="form-label small text-muted mb-1">Message for {{ studio.studio_name }}</label>
+                                <textarea name="message" class="form-control" rows="2" maxlength="500" minlength="5" required placeholder="Write your message for this studio..."></textarea>
+                            </div>
+                            <div class="col-lg-2 d-grid">
+                                <button type="submit" class="btn btn-sm btn-primary mt-lg-4">
+                                    <i class="bi bi-send me-1"></i>Send
+                                </button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center py-5 text-muted">No studios found for current filters.</td>
+                    <td colspan="8" class="text-center py-5 text-muted">No studios found for current filters.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+function confirmBulkNotify() {
+    const selected = document.querySelectorAll('.studio-select:checked').length;
+    const message = document.getElementById('bulkNotifyMessage');
+
+    if (!selected) {
+        alert('Please select at least one studio.');
+        return false;
+    }
+
+    if (!message || !message.value.trim() || message.value.trim().length < 5) {
+        alert('Please enter a message with at least 5 characters.');
+        return false;
+    }
+
+    return confirm(`Send notification to ${selected} selected studio(s)?`);
+}
+</script>
 
 {% endblock %}
