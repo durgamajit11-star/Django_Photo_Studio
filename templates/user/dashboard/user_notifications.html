@@ -1,73 +1,11 @@
 {% extends  "user/dashboard/user_base.html"  %}
+{% load static %}
 
 {% block title %}Notifications | StudioSync{% endblock %}
 
 {% block content %}
 
-<style>
-/* 🔥 Glass UI */
-.notifications-container {
-    padding: 20px;
-}
-
-.notifications-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
-.notification-summary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(6, 182, 212, 0.15);
-    color: #d9f3ff;
-    font-size: 0.85rem;
-}
-
-.notification-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 15px;
-    backdrop-filter: blur(10px);
-    border-left: 4px solid #3b82f6;
-    transition: 0.3s;
-}
-
-.notification-card.unread {
-    border-left: 4px solid #00f5c4;
-    background: rgba(0,245,196,0.05);
-}
-
-.notification-card:hover {
-    transform: translateX(5px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-}
-
-.notification-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-}
-
-.time {
-    font-size: 0.8rem;
-    color: #aaa;
-}
-
-.mark-btn {
-    font-size: 0.75rem;
-}
-
-.clear-form {
-    display: inline-block;
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/user/dashboard/user_notifications.css' %}">
 
 <div class="container-fluid notifications-container">
 

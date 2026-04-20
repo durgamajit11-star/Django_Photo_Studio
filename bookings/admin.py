@@ -9,7 +9,7 @@ class BookingRequestAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'studio__studio_name', 'event_type')
     readonly_fields = ('created_at', 'updated_at', 'confirmed_at')
     fieldsets = (
-        ('Booking Information', {'fields': ('user', 'studio', 'event_type', 'date', 'time', 'duration_hours')}),
+        ('Booking Information', {'fields': ('user', 'studio', 'event_type', 'date', 'start_time', 'end_time', 'time', 'time_slot', 'duration_hours')}),
         ('Location & Requirements', {'fields': ('location', 'special_requirements')}),
         ('Pricing', {'fields': ('amount', 'deposit_amount')}),
         ('Status', {'fields': ('status', 'payment_status')}),

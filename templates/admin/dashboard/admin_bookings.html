@@ -155,7 +155,7 @@
                     <th>Service</th>
                     <th>Event Type</th>
                     <th>Booking Date</th>
-                    <th>Time Slot</th>
+                    <th>Time</th>
                     <th>Status</th>
                     <th>Payment</th>
                     <th>Amount</th>
@@ -172,7 +172,7 @@
                     <td>{{ booking.service.service_name|default:'General Session' }}</td>
                     <td>{{ booking.event_type }}</td>
                     <td>{{ booking.booking_date|default:booking.date|date:"M d, Y" }}</td>
-                    <td>{{ booking.time_slot|default:'-' }}</td>
+                    <td>{{ booking.time_window_display }}</td>
 
                     <td>
                         {% if booking.status == "Confirmed" %}
@@ -198,14 +198,13 @@
                     <td>{{ booking.created_at|date:"M d, Y" }}</td>
 
                     <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Client: {{ booking.user.username }} | Studio: {{ booking.studio.studio_name }}">
-                            View
-                        </button>
                         {% if booking.status == 'Pending' %}
                         <form method="POST" action="{% url 'admin_cancel_booking' booking.id %}" class="d-inline" onsubmit="return confirm('Cancel this booking?');">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
                         </form>
+                        {% else %}
+                        <span class="text-muted small">--</span>
                         {% endif %}
                     </td>
                 </tr>

@@ -74,7 +74,7 @@ class BookingRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingRequest
         fields = ['id', 'user', 'user_name', 'studio', 'studio_name', 'event_type',
-                  'date', 'time', 'duration_hours', 'location', 'special_requirements',
+                  'date', 'time', 'start_time', 'end_time', 'time_slot', 'duration_hours', 'location', 'special_requirements',
                   'amount', 'deposit_amount', 'status', 'payment_status', 'notes', 'created_at']
 
 

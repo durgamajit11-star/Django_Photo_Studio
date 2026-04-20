@@ -4,172 +4,13 @@
 {% block title %}User Dashboard{% endblock %}
 
 {% block content %}
-<style>
-.dashboard-shell {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.glass-panel {
-    background: rgba(15, 23, 42, 0.72);
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    border-radius: 16px;
-    padding: 1rem;
-}
-
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 0.7rem;
-}
-
-.stats-grid .stat-card {
-    background: rgba(2, 6, 23, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 12px;
-    padding: 0.75rem;
-}
-
-.quick-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.6rem;
-}
-
-.quick-link {
-    border: 1px solid rgba(148, 163, 184, 0.24);
-    border-radius: 12px;
-    padding: 0.65rem;
-    text-decoration: none;
-    color: inherit;
-    background: rgba(30, 41, 59, 0.45);
-}
-
-.quick-link:hover {
-    border-color: rgba(6, 182, 212, 0.6);
-    color: inherit;
-}
-
-.mini-item {
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 10px;
-    background: rgba(30, 41, 59, 0.45);
-    padding: 0.6rem;
-    margin-bottom: 0.5rem;
-}
-
-.mini-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    color: inherit;
-}
-
-.notification-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.25rem 0.7rem;
-    border-radius: 999px;
-    background: rgba(6, 182, 212, 0.15);
-    color: #d9f3ff;
-    font-size: 0.8rem;
-}
-
-.mini-item:last-child {
-    margin-bottom: 0;
-}
-
-.content-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 1rem;
-}
-
-.balanced-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-}
-
-.dashboard-tabs {
-    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
-    gap: 0.45rem;
-}
-
-.dashboard-tabs .nav-link {
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    color: rgba(226, 232, 240, 0.92);
-    background: rgba(30, 41, 59, 0.45);
-    border-radius: 10px;
-    font-weight: 600;
-    padding: 0.5rem 0.9rem;
-}
-
-.dashboard-tabs .nav-link.active {
-    background: linear-gradient(135deg, #4f46e5, #06b6d4);
-    border-color: transparent;
-    color: #ffffff;
-}
-
-.tab-pane-stack {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-}
-
-.panel-section {
-    background: rgba(15, 23, 42, 0.52);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 14px;
-    padding: 0.85rem;
-}
-
-.panel-section h6 {
-    margin-bottom: 0.7rem;
-    font-weight: 700;
-}
-
-.panel-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-}
-
-.panel-list .mini-item {
-    margin-bottom: 0;
-}
-
-@media (max-width: 992px) {
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .balanced-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .tab-pane-stack {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/user/dashboard/user_dashboard.css' %}">
 
 <div class="dashboard-shell">
     <section class="hero">
         <div class="hero-content">
             <h1 class="hero-title">Find Studios That Match Your Style</h1>
-            <p class="hero-subtitle" style="color: rgb(114, 136, 236);">Browse verified studios, compare portfolios, and book with confidence</p>
+            <p class="hero-subtitle">Browse verified studios, compare portfolios, and book with confidence</p>
 
             <div class="search-bar glass">
                 <div class="search-container">
@@ -333,7 +174,7 @@
                             <div class="mini-item">
                                 <div class="fw-semibold">{{ upcoming_booking.studio.studio_name }}</div>
                                 <div class="small text-secondary">{{ upcoming_booking.event_type }} | {{ upcoming_booking.date|date:"d M Y" }}</div>
-                                <div class="small">{{ upcoming_booking.time_slot|default:"Time pending" }} | {{ upcoming_booking.status }}</div>
+                                <div class="small">{{ upcoming_booking.time_window_display }} | {{ upcoming_booking.status }}</div>
                                 <a href="{% url 'bookings:booking_detail' upcoming_booking.id %}" class="btn btn-outline-light btn-sm mt-2">Open Booking</a>
                             </div>
                         </div>
@@ -382,7 +223,7 @@
                         <div class="panel-list">
                             <div class="mini-item">
                                 <div class="fw-semibold">{{ active_booking.studio.studio_name }} - {{ active_booking.event_type }}</div>
-                                <div class="small text-secondary">{{ active_booking.date|date:"d M Y" }} | {{ active_booking.time_slot|default:"Time pending" }}</div>
+                                <div class="small text-secondary">{{ active_booking.date|date:"d M Y" }} | {{ active_booking.time_window_display }}</div>
                             </div>
                             {% for step in booking_timeline %}
                             <div class="mini-item d-flex justify-content-between align-items-center">

@@ -7,122 +7,192 @@
     <title>StudioPlatform | Authentication</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- add stylesheet -->
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 
 </head>
 
 <body>
+    <div class="auth-bg-orb auth-bg-orb-a" aria-hidden="true"></div>
+    <div class="auth-bg-orb auth-bg-orb-b" aria-hidden="true"></div>
+    <div class="auth-bg-grid" aria-hidden="true"></div>
 
-    <div class="form-container glass">
-
-        <h2 class="text-center mb-3">StudioPlatform</h2>
-
-        <!-- Django Messages -->
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-
-        <!-- Toggle Buttons -->
-        <div class="role-selection">
-            <button type="button" class="role-btn active" id="loginBtn">Login</button>
-            <button type="button" class="role-btn" id="userBtn">Register User</button>
-            <button type="button" class="role-btn" id="studioBtn">Register Studio</button>
-        </div>
-
-        <!-- ================= LOGIN FORM ================= -->
-        <form method="POST" id="loginForm" class="auth-form active-form">
-            {% csrf_token %}
-            <input type="hidden" name="login_submit">
-
-            <div class="input-group-modern">
-                {{ login_form.username }}
-                <label>Username</label>
+    <div class="auth-wrapper" data-active-tab="{{ active_tab|default:'login' }}">
+        <section class="auth-left-panel">
+            <div class="brand-stack">
+                <h1>StudioSync</h1>
+                <p>Secure access for creators, clients, and verified studio teams.</p>
             </div>
 
-            <div class="input-group-modern">
-                {{ login_form.password }}
-                <label>Password</label>
-                <span class="toggle-password" onclick="togglePassword()">👁</span>
+            <div class="trust-list">
+                <div class="trust-card">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <h6>Protected Authentication</h6>
+                        <small>Your credentials stay encrypted and private.</small>
+                    </div>
+                </div>
+                <div class="trust-card">
+                    <i class="bi bi-stars"></i>
+                    <div>
+                        <h6>Premium Discovery</h6>
+                        <small>Book verified studios with trusted ratings.</small>
+                    </div>
+                </div>
+                <div class="trust-card">
+                    <i class="bi bi-clock-history"></i>
+                    <div>
+                        <h6>Fast Verification</h6>
+                        <small>Studio onboarding usually completes in 24-48 hours.</small>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="remember">
-                    <label class="form-check-label" for="remember">
-                        Remember me
+
+            <div class="left-panel-footer">
+                <span><i class="bi bi-patch-check"></i> Trusted by photographers and studios nationwide</span>
+            </div>
+        </section>
+
+        <section class="form-container glass">
+            <div class="auth-top-row">
+                <div>
+                    <h2 class="mb-2">Welcome To StudioSync</h2>
+                    <p class="auth-subtitle mb-0">Sign in or create your account to continue.</p>
+                </div>
+                <a href="{% url 'landing' %}" class="home-link">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Home
+                </a>
+            </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Toggle Buttons -->
+            <div class="role-selection" role="tablist" aria-label="Authentication mode selector">
+                <button type="button" class="role-btn" id="loginBtn" role="tab" aria-controls="loginForm">Login</button>
+                <button type="button" class="role-btn" id="userBtn" role="tab" aria-controls="userForm">Register User</button>
+                <button type="button" class="role-btn" id="studioBtn" role="tab" aria-controls="studioForm">Register Studio</button>
+            </div>
+
+            <!-- ================= LOGIN FORM ================= -->
+            <form method="POST" id="loginForm" class="auth-form d-none" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="login_submit">
+
+                {% if login_form.non_field_errors %}
+                <div class="alert alert-danger">{{ login_form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="input-group-modern">
+                    {{ login_form.username }}
+                    <label>Username</label>
+                </div>
+
+                <div class="input-group-modern">
+                    {{ login_form.password }}
+                    <label>Password</label>
+                    <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3 auth-meta-row">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember_me" value="1">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="{% url 'password_reset' %}">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-submit w-100 mt-2">
+                    Login
+                </button>
+                <small class="form-footnote">Your login is secured with encrypted session handling.</small>
+            </form>
+
+            <!-- ================= USER REGISTER ================= -->
+            <form method="POST" id="userForm" class="auth-form d-none" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="user_register_submit">
+
+                {% if user_form.non_field_errors %}
+                <div class="alert alert-danger">{{ user_form.non_field_errors }}</div>
+                {% endif %}
+
+                {% for field in user_form %}
+                <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                    <small class="text-danger d-block mt-1">{{ field.errors }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="userTerms" name="user_terms" required>
+                    <label class="form-check-label" for="userTerms">
+                        I agree to the <a href="#">Terms &amp; Conditions</a>
                     </label>
                 </div>
-                <a href="{% url 'password_reset' %}">Forgot password?</a>
-            </div>
-            <button type="submit" class="btn btn-submit w-100 mt-3">
-                Login
-            </button>
-        </form>
 
+                <button type="submit" class="btn btn-submit w-100">
+                    Register as User
+                </button>
+                <small class="form-footnote">Create your profile to discover and book premium studios faster.</small>
+            </form>
 
-        <!-- ================= USER REGISTER ================= -->
-        <form method="POST" id="userForm" class="d-none">
-            {% csrf_token %}
-            <input type="hidden" name="user_register_submit">
+            <!-- ================= STUDIO REGISTER ================= -->
+            <form method="POST" enctype="multipart/form-data" id="studioForm" class="auth-form d-none" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="studio_register_submit">
 
-            {% for field in user_form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                <small class="text-danger">{{ field.errors }}</small>
+                {% if studio_form.non_field_errors %}
+                <div class="alert alert-danger">{{ studio_form.non_field_errors }}</div>
                 {% endif %}
-            </div>
-            {% endfor %}
 
-             <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" required>
-                <label class="form-check-label">
-                    I agree to the <a href="#">Terms & Conditions</a>
-                </label>
-            </div>
+                <div class="field-grid">
 
-            <button type="submit" class="btn btn-submit w-100">
-                Register as User
-            </button>
-        </form>
+                {% for field in studio_form %}
+                <div class="mb-3 {% if field.name == 'description' or field.name == 'license' or field.name == 'portfolio' %}field-span-2{% endif %}">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                    <small class="text-danger d-block mt-1">{{ field.errors }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
 
+                </div>
 
-        <!-- ================= STUDIO REGISTER ================= -->
-        <form method="POST" enctype="multipart/form-data" id="studioForm" class="d-none">
-            {% csrf_token %}
-            <input type="hidden" name="studio_register_submit">
-
-            {% for field in studio_form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                <small class="text-danger">{{ field.errors }}</small>
-                {% endif %}
-            </div>
-            {% endfor %}
-            
-             <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" required>
-                <label class="form-check-label">
-                    I agree to verification & <a href="#">Terms</a>
-                </label>
-            </div>
-            <button type="submit" class="btn btn-submit w-100">
-                Register as Studio
-            </button>
-            <small class="d-block mt-2 text-center opacity-75">
-                Studio accounts are verified within 24–48 hou? 
-            </small>
-        </form>
-
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="studioTerms" name="studio_terms" required>
+                    <label class="form-check-label" for="studioTerms">
+                        I agree to verification policy and <a href="#">Terms</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-submit w-100">
+                    Register as Studio
+                </button>
+                <small class="form-footnote d-block mt-2 text-center opacity-75">
+                    Studio accounts are reviewed within 24-48 hours.
+                </small>
+            </form>
+        </section>
     </div>
 
     <script src="{% static 'js/auth.js' %}"></script>

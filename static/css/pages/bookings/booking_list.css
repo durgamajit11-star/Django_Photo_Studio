@@ -1,0 +1,21 @@
+    .booking-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    .booking-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+    }
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+    .status-pending { background: #eab308; color: #000; }
+    .status-confirmed { background: #22c55e; color: #fff; }
+    .status-cancelled { background: #ef4444; color: #fff; }

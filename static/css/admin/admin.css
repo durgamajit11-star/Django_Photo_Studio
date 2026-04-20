@@ -1,29 +1,78 @@
 :root {
-    --adm-bg: #f6f8fb;
-    --adm-surface: #ffffff;
-    --adm-sidebar: #132238;
-    --adm-sidebar-2: #1f3552;
-    --adm-text: #152238;
-    --adm-muted: #6f7f95;
-    --adm-primary: #0f9d8f;
-    --adm-accent: #ffb84d;
+    --adm-bg: #061425;
+    --adm-surface: rgba(255, 255, 255, 0.08);
+    --adm-sidebar: #071428;
+    --adm-sidebar-2: #0d223c;
+    --adm-text: #e7eef9;
+    --adm-muted: #9cb1cd;
+    --adm-primary: #00c6b7;
+    --adm-accent: #c7a16b;
     --adm-danger: #d94c58;
-    --adm-border: #e5e9f2;
-    --adm-shadow: 0 18px 30px rgba(12, 27, 52, 0.08);
+    --adm-border: rgba(255, 255, 255, 0.14);
+    --adm-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
 }
 
 body {
     margin: 0;
-    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-    background: radial-gradient(circle at 0% 0%, #fff8ec 0%, transparent 30%), var(--adm-bg);
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    background:
+        radial-gradient(circle at 12% 6%, rgba(108, 230, 219, 0.18), transparent 36%),
+        radial-gradient(circle at 88% 14%, rgba(199, 161, 107, 0.22), transparent 34%),
+        linear-gradient(180deg, #061425 0%, #08172b 45%, #050f1b 100%);
     color: var(--adm-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.admin-logo strong {
+    font-family: "Sora", sans-serif;
+}
+
+.dashboard-bg-grid,
+.dashboard-bg-orb {
+    position: fixed;
+    pointer-events: none;
+}
+
+.dashboard-bg-grid {
+    inset: 0;
+    z-index: -3;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 24%, transparent 78%);
+}
+
+.dashboard-bg-orb {
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(10px);
+    z-index: -2;
+}
+
+.dashboard-orb-a {
+    top: -100px;
+    right: -90px;
+    background: radial-gradient(circle, rgba(108, 230, 219, 0.24), transparent 64%);
+}
+
+.dashboard-orb-b {
+    bottom: -160px;
+    left: -120px;
+    background: radial-gradient(circle, rgba(199, 161, 107, 0.16), transparent 68%);
 }
 
 .admin-header {
     position: sticky;
     top: 0;
     z-index: 1100;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(5, 16, 31, 0.82);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--adm-border);
     padding: 0.85rem 1.4rem;
@@ -40,7 +89,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    color: var(--adm-text);
+    color: #edf4ff;
 }
 
 .logo-mark {
@@ -50,9 +99,9 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: linear-gradient(130deg, #0f9d8f, #3abcae);
-    color: #fff;
-    box-shadow: 0 8px 16px rgba(15, 157, 143, 0.28);
+    background: linear-gradient(90deg, var(--adm-primary), #95f5ec);
+    color: #032022;
+    box-shadow: 0 8px 16px rgba(0, 198, 183, 0.34);
 }
 
 .header-nav {
@@ -75,7 +124,7 @@ body {
     width: 260px;
     background: linear-gradient(180deg, var(--adm-sidebar), var(--adm-sidebar-2));
     padding: 1rem 0.75rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(108, 230, 219, 0.14);
     transition: width 0.25s ease;
     position: sticky;
     top: 74px;
@@ -130,9 +179,9 @@ body {
 }
 
 .admin-sidebar a.active {
-    background: linear-gradient(130deg, rgba(15, 157, 143, 0.95), rgba(36, 185, 170, 0.95));
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(15, 157, 143, 0.28);
+    background: linear-gradient(90deg, var(--adm-primary), #95f5ec);
+    color: #032022;
+    box-shadow: 0 10px 20px rgba(0, 198, 183, 0.3);
 }
 
 .admin-sidebar.collapsed {
@@ -162,7 +211,7 @@ body {
 
 .page-intro {
     border: 1px solid var(--adm-border);
-    background: linear-gradient(130deg, #fff, #f7fbff);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
     border-radius: 18px;
     padding: 1rem 1.2rem;
     display: flex;
@@ -210,8 +259,8 @@ body {
 }
 
 .admin-panel .table td {
-    border-color: #f0f3f8;
-    color: #21344f;
+    border-color: rgba(148, 163, 184, 0.12);
+    color: #dbe5f3;
 }
 
 .metric-tag {
@@ -220,15 +269,15 @@ body {
     font-weight: 600;
     border-radius: 999px;
     padding: 0.2rem 0.65rem;
-    background: #eafaf8;
-    color: #118577;
+    background: rgba(108, 230, 219, 0.2);
+    color: #8ff6ee;
 }
 
 .mobile-toggle {
     display: none;
     border: 1px solid var(--adm-border);
-    background: #fff;
-    color: #1f3552;
+    background: rgba(255, 255, 255, 0.1);
+    color: #dbe5f3;
     width: 38px;
     height: 38px;
     border-radius: 10px;
@@ -245,6 +294,10 @@ body {
 }
 
 @media (max-width: 992px) {
+    .admin-wrapper {
+        display: block;
+    }
+
     .mobile-toggle {
         display: inline-flex;
         align-items: center;
@@ -273,20 +326,10 @@ body {
     }
 }
 
-@media (max-width: 576px) {
-    .admin-header {
-        padding: 0.65rem 0.8rem;
-    }
-
-    .welcome-text {
-        display: none;
-    }
-}
-
 /* ================= THEME CONTRAST ================= */
 html[data-theme='dark'] .admin-header {
-    background: rgba(15, 23, 42, 0.95);
-    border-bottom-color: rgba(148, 163, 184, 0.2);
+    background: rgba(5, 16, 31, 0.86);
+    border-bottom-color: rgba(108, 230, 219, 0.16);
 }
 
 html[data-theme='dark'] .admin-logo,
@@ -305,13 +348,13 @@ html[data-theme='dark'] .stat-card,
 html[data-theme='dark'] .admin-panel,
 html[data-theme='dark'] .mobile-toggle,
 html[data-theme='dark'] .theme-toggle-btn {
-    background: #16243a !important;
+    background: rgba(9, 25, 44, 0.72) !important;
     border-color: rgba(148, 163, 184, 0.22) !important;
     color: #dbe5f3 !important;
 }
 
 html[data-theme='dark'] .admin-sidebar {
-    background: linear-gradient(180deg, #101c2e, #152843);
+    background: linear-gradient(180deg, #071428, #0d223c);
 }
 
 html[data-theme='dark'] .admin-sidebar a {
@@ -347,6 +390,16 @@ html[data-theme='dark'] .metric-tag {
 
 html[data-theme='light'] .admin-panel .table-hover tbody tr:hover {
     background: rgba(15, 157, 143, 0.08);
+}
+
+html[data-theme='light'] body {
+    background: radial-gradient(circle at 0% 0%, #fff8ec 0%, transparent 30%), #f6f8fb;
+    color: #152238;
+}
+
+html[data-theme='light'] .dashboard-bg-grid,
+html[data-theme='light'] .dashboard-bg-orb {
+    display: none;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */

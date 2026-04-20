@@ -11,10 +11,10 @@ urlpatterns = [
     path('recommendations/', views.user_recommendations, name='user_recommendations'),
     path('explore/', views.explore_studios, name='explore_studios'),
     path('reviews/', views.user_reviews, name='user_reviews'),
-    path('reviews/', views.user_reviews, name='dashboard_user_reviews'),
+    path('reviews/all/', views.user_reviews, name='dashboard_user_reviews'),
     path('profile/logout-all/', views.user_logout_all_devices, name='user_logout_all_devices'),
     path('profile/delete-account/', views.delete_user_account, name='delete_user_account'),
-    path('reviews/studio/<int:studio_id>/add/', views.add_review, name='add_review'),
+    path('reviews/studio/<int:studio_id>/add/', views.add_review, name='dashboard_add_review'),
     path('reviews/<int:review_id>/edit/', views.edit_review, name='edit_review'),
     path('reviews/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('payments/', views.user_payments, name='user_payments'),
@@ -33,15 +33,15 @@ urlpatterns = [
 
     # ================= BOOKINGS =================
     path('studio/bookings/', views.studio_bookings, name='studio_bookings'),
-    path('studio/bookings/approve/<int:booking_id>/', views.approve_booking, name='approve_booking'),
-    path('studio/bookings/cancel/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('studio/bookings/approve/<int:booking_id>/', views.approve_booking, name='studio_approve_booking'),
+    path('studio/bookings/cancel/<int:booking_id>/', views.cancel_booking, name='studio_cancel_booking'),
 
     # ================= EARNINGS =================
     path('studio/earnings/', views.studio_earnings, name='studio_earnings'),
 
     # ================= REVIEWS =================
     path('studio/reviews/', views.studio_reviews, name='studio_reviews'),
-    path('studio/reviews/', views.studio_reviews, name='dashboard_studio_reviews'),
+    path('studio/reviews/all/', views.studio_reviews, name='dashboard_studio_reviews'),
 
     # ================= NOTIFICATIONS =================
     path('studio/notifications/', views.studio_notifications, name='studio_notifications'),

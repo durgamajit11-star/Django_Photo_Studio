@@ -84,6 +84,7 @@
                     <th>Studio</th>
                     <th>Owner</th>
                     <th>Contact</th>
+                    <th>Verification Docs</th>
                     <th>Location</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>
@@ -108,6 +109,15 @@
                     </td>
                     <td>{{ studio.user.username }}</td>
                     <td>{{ studio.user.email|default:'-' }}</td>
+                    <td>
+                        {% if studio.user.license %}
+                        <span class="badge text-bg-success">License uploaded</span>
+                        <div class="small text-muted mt-1">{% if studio.user.owner_name %}{{ studio.user.owner_name }}{% endif %}</div>
+                        {% else %}
+                        <span class="badge text-bg-danger">License missing</span>
+                        <div class="small text-muted mt-1">Admin review required</div>
+                        {% endif %}
+                    </td>
                     <td>{{ studio.location|default:'-' }}</td>
                     <td>
                         {% if studio.is_verified %}
@@ -117,6 +127,7 @@
                         {% endif %}
                     </td>
                     <td class="text-end">
+                        <a href="{% url 'studio_review' studio.id %}" class="btn btn-sm btn-outline-info">Review</a>
                         <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#notifyStudioForm{{ studio.id }}" aria-expanded="false" aria-controls="notifyStudioForm{{ studio.id }}">
                             Notify
                         </button>
@@ -133,7 +144,7 @@
                     </td>
                 </tr>
                 <tr class="collapse" id="notifyStudioForm{{ studio.id }}">
-                    <td colspan="8" class="bg-light-subtle">
+                    <td colspan="9" class="bg-light-subtle">
                         <form method="POST" action="{% url 'notify_studio' studio.id %}" class="row g-2 align-items-end" onsubmit="return confirm('Send this notification to {{ studio.studio_name }}?');">
                             {% csrf_token %}
                             <div class="col-lg-10">
@@ -150,7 +161,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-center py-5 text-muted">No studios found for current filters.</td>
+                    <td colspan="9" class="text-center py-5 text-muted">No studios found for current filters.</td>
                 </tr>
                 {% endfor %}
             </tbody>

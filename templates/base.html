@@ -32,7 +32,9 @@
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    {% if request.resolver_match.url_name != 'password_reset' and request.resolver_match.url_name != 'password_reset_done' and request.resolver_match.url_name != 'password_reset_confirm' and request.resolver_match.url_name != 'password_reset_complete' %}
     <link rel="stylesheet" href="{% static 'css/base/chatbot.css' %}">
+    {% endif %}
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
 
     <!-- Page Specific CSS -->
@@ -52,7 +54,9 @@
         <span data-theme-text>Light Mode</span>
     </button>
 
+    {% if request.resolver_match.url_name != 'password_reset' and request.resolver_match.url_name != 'password_reset_done' and request.resolver_match.url_name != 'password_reset_confirm' and request.resolver_match.url_name != 'password_reset_complete' %}
     {% include "includes/chatbot.html" %}
+    {% endif %}
 
   
 
@@ -62,8 +66,10 @@
     <!-- Global JS -->
     <script src="{% static 'js/global.js' %}"></script>
 
+    {% if request.resolver_match.url_name != 'password_reset' and request.resolver_match.url_name != 'password_reset_done' and request.resolver_match.url_name != 'password_reset_confirm' and request.resolver_match.url_name != 'password_reset_complete' %}
     <!-- Chatbot JS (Load Only Once) -->
     <script src="{% static 'js/core/chatbot.js' %}"></script>
+    {% endif %}
 
     <!-- Page Specific JS -->
     {% block extra_js %}{% endblock %}

@@ -6,6 +6,14 @@
     <meta charset="UTF-8">
     <title>StudioSync | Premium Photo Studio Platform</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="StudioSync helps clients discover and book verified photography studios with AI-powered recommendations, secure payments, and transparent pricing.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -17,72 +25,50 @@
 
 <body>
 
+    <div class="bg-orb orb-a" aria-hidden="true"></div>
+    <div class="bg-orb orb-b" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
     <!-- Announcement -->
     <div class="announcement">
         🚀 AI Recommendation Beta Live – First 100 Studios Get 0% Commission for 3 Months!
     </div>
 
     <!-- Header -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark container">
-            <a class="navbar-brand fw-bold" href="#">StudioSync</a>
+    <div class="header">
+        <a class="logo" href="{% url 'landing' %}">StudioSync <span>Premium</span></a>
 
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="nav">
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            Studios
-                        </a>
-                    </li> -->
-
-                    <li class="nav-item">
-                        <a class="btn btn-neon btn-sm ms-lg-3 mt-2 mt-lg-0" href="{% url 'landing_explore_studio' %}">
-                            Explore Studios
-                        </a>
-                    </li>
-
-                    {% if not user.is_authenticated %}
-
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light rounded-pill px-4 ms-lg-3 mt-2 mt-lg-0 fw-semibold"
-                            href="{% url 'auth_page' %}">
-                            Login
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="btn btn-primary rounded-pill px-4 ms-lg-2 mt-2 mt-lg-0 fw-semibold shadow-sm"
-                            href="{% url 'auth_page' %}">
-                            Sign Up
-                        </a>
-                    </li>
-
-                    {% endif %}
-
-                </ul>
-            </div>
-        </nav>
-    </header>
+        <div class="nav">
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{% url 'landing_explore_studio' %}">Studios</a>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'auth_page' %}">Login</a>
+            <a href="{% url 'auth_page' %}">Signup</a>
+            {% endif %}
+        </div>
+    </div>
 
 
     <!-- Hero -->
     <section class="hero">
-        <div class="container-fluid px-5">
+        <div class="container hero-shell">
             <div class="hero-box">
-                <div class="row align-items-center">
+                <div class="row align-items-center align-items-lg-stretch g-4 g-lg-5">
 
-                    <div class="col-md-6">
+                    <div class="col-lg-6 hero-copy-col">
+                        <div class="hero-kicker">Trusted by creators, agencies, and premium studios</div>
                         <h1>Find & Book Verified Photo Studios with AI</h1>
 
                         <p class="mt-3">
                             Discover top-rated studios, compare portfolios,
                             and book instantly with intelligent recommendations.
                         </p>
+
+                        <div class="hero-highlights mt-4">
+                            <span><i class="bi bi-shield-check"></i> Verified Studio Profiles</span>
+                            <span><i class="bi bi-cpu"></i> AI Matching Engine</span>
+                            <span><i class="bi bi-lock"></i> Secure Payment Flow</span>
+                        </div>
 
                         <div class="hero-buttons mt-4">
                             <a href="{% url 'landing_explore_studio' %}" class="btn btn-neon">
@@ -97,10 +83,29 @@
                                 Register Studio
                             </a>
                         </div>
+
+                        <div class="hero-proof mt-4">
+                            <div>
+                                <h4>10,000+</h4>
+                                <p>Sessions Booked</p>
+                            </div>
+                            <div>
+                                <h4>500+</h4>
+                                <p>Studios Onboarded</p>
+                            </div>
+                            <div>
+                                <h4>4.8/5</h4>
+                                <p>Average Ratings</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-6 mt-5 mt-md-0">
-                        <div class="mockup">
+                    <div class="col-lg-6 mt-4 mt-lg-0 d-flex">
+                        <div class="mockup w-100">
+                            <div class="mockup-chip-row">
+                                <span class="mockup-chip">Live AI Suggestions</span>
+                                <span class="mockup-chip">Fast Checkout</span>
+                            </div>
                             <h5>AI Dashboard Preview</h5>
                             <p>
                                 🤖 Smart Studio Suggestions <br>
@@ -108,10 +113,35 @@
                                 💳 Secure Online Payments <br>
                                 ⭐ Verified Ratings & Reviews
                             </p>
+                            <div class="mockup-snapshot">
+                                <div>
+                                    <small>Response Time</small>
+                                    <strong>&lt; 2 sec</strong>
+                                </div>
+                                <div>
+                                    <small>Match Quality</small>
+                                    <strong>98%</strong>
+                                </div>
+                                <div>
+                                    <small>Payment Success</small>
+                                    <strong>99.2%</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust-strip">
+        <div class="container">
+            <div class="trust-strip-inner">
+                <span>Trusted by wedding creators</span>
+                <span>Preferred by content agencies</span>
+                <span>Built for portrait professionals</span>
+                <span>Used by commercial teams</span>
             </div>
         </div>
     </section>
@@ -199,6 +229,40 @@
 
             </div>
 
+        </div>
+    </section>
+
+    <section class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Why Top Creators Choose StudioSync</h2>
+            <p class="text-secondary">Operational reliability and premium booking experience in one platform</p>
+        </div>
+
+        <div class="row g-4 premium-cards">
+            <div class="col-md-4">
+                <div class="glass h-100 premium-card">
+                    <div class="icon-wrap"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h5>Higher Conversion</h5>
+                    <p class="mb-0">AI intent matching brings clients who are ready to book, reducing drop-offs and long
+                        negotiation cycles.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass h-100 premium-card">
+                    <div class="icon-wrap"><i class="bi bi-stars"></i></div>
+                    <h5>Brand-Level Presentation</h5>
+                    <p class="mb-0">Verified profiles, portfolio-first discovery, and review transparency help studios look
+                        credible from first click.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass h-100 premium-card">
+                    <div class="icon-wrap"><i class="bi bi-clock-history"></i></div>
+                    <h5>Faster Operations</h5>
+                    <p class="mb-0">From discovery to payment, your team handles fewer manual steps with cleaner booking
+                        workflows.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -337,6 +401,78 @@
 
         </div>
     </section>
+
+    <section class="container pb-5 testimonials-wrap">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">What Professionals Are Saying</h2>
+            <p class="text-secondary">Real feedback from photographers and creative teams</p>
+        </div>
+        <div class="testimonials-stage" id="testimonialsStage">
+            <div class="testimonials-viewport">
+                <div class="testimonials-track" id="testimonialsTrack">
+                    <article class="testimonial-card h-100 is-visible">
+                        <div class="testimonial-quote"><i class="bi bi-quote"></i></div>
+                        <p>StudioSync made discovery effortless for our wedding team. Clients now shortlist our studio with higher confidence.</p>
+                        <div class="testimonial-author">
+                            <span class="avatar-dot">AS</span>
+                            <div>
+                                <h6 class="mb-0">Ananya Shah</h6>
+                                <small>Founder, Lens &amp; Light Collective</small>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="testimonial-card h-100 is-visible">
+                        <div class="testimonial-quote"><i class="bi bi-quote"></i></div>
+                        <p>We cut lead response time significantly and improved booking consistency. The recommendation quality is excellent.</p>
+                        <div class="testimonial-author">
+                            <span class="avatar-dot">RV</span>
+                            <div>
+                                <h6 class="mb-0">Rohit Verma</h6>
+                                <small>Operations Lead, PixelCraft</small>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="testimonial-card h-100 is-visible">
+                        <div class="testimonial-quote"><i class="bi bi-quote"></i></div>
+                        <p>The platform balances premium presentation with practical tools. Perfect for teams managing both studio and outdoor sessions.</p>
+                        <div class="testimonial-author">
+                            <span class="avatar-dot">MG</span>
+                            <div>
+                                <h6 class="mb-0">Meera Gupta</h6>
+                                <small>Creative Director, Moments Capture</small>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="testimonial-card h-100 is-visible">
+                        <div class="testimonial-quote"><i class="bi bi-quote"></i></div>
+                        <p>The onboarding was smooth and premium. We now close more bookings because trust signals are clearly visible.</p>
+                        <div class="testimonial-author">
+                            <span class="avatar-dot">KP</span>
+                            <div>
+                                <h6 class="mb-0">Karan Patel</h6>
+                                <small>Studio Director, FrameWorks</small>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="testimonial-card h-100 is-visible">
+                        <div class="testimonial-quote"><i class="bi bi-quote"></i></div>
+                        <p>Our team saves hours every week. Discovery, booking, and payment now feel like one polished workflow.</p>
+                        <div class="testimonial-author">
+                            <span class="avatar-dot">SN</span>
+                            <div>
+                                <h6 class="mb-0">Sana Naik</h6>
+                                <small>Brand Lead, Urban Portrait Lab</small>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <!-- Footer -->
     <footer>
@@ -375,6 +511,103 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const revealItems = document.querySelectorAll(".stat-card, .ai-step, .studio-card, .premium-card, .testimonial-card, .glass");
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            revealItems.forEach((item, index) => {
+                item.style.transitionDelay = (index % 6) * 80 + "ms";
+                observer.observe(item);
+            });
+
+            const stage = document.getElementById("testimonialsStage");
+            const track = document.getElementById("testimonialsTrack");
+            if (!stage || !track) {
+                return;
+            }
+
+            let originalCards = Array.from(track.querySelectorAll(".testimonial-card"));
+            if (originalCards.length < 2) {
+                return;
+            }
+
+            const getVisibleCards = () => window.innerWidth <= 767 ? 1 : 2;
+
+            const resetClones = () => {
+                track.querySelectorAll(".testimonial-clone").forEach((node) => node.remove());
+                const visible = getVisibleCards();
+                for (let i = 0; i < visible; i += 1) {
+                    const clone = originalCards[i % originalCards.length].cloneNode(true);
+                    clone.classList.add("testimonial-clone");
+                    track.appendChild(clone);
+                }
+            };
+
+            resetClones();
+
+            let index = 0;
+            let paused = false;
+            let transitioning = false;
+
+            const moveTo = (nextIndex, animate = true) => {
+                const firstCard = track.querySelector(".testimonial-card");
+                if (!firstCard) {
+                    return;
+                }
+                const gap = 18;
+                const step = firstCard.getBoundingClientRect().width + gap;
+                track.style.transition = animate ? "transform 650ms ease" : "none";
+                track.style.transform = `translateX(-${nextIndex * step}px)`;
+            };
+
+            const tick = () => {
+                if (paused || transitioning) {
+                    return;
+                }
+                transitioning = true;
+                index += 1;
+                moveTo(index, true);
+            };
+
+            track.addEventListener("transitionend", () => {
+                const total = originalCards.length;
+                if (index >= total) {
+                    index = 0;
+                    moveTo(index, false);
+                }
+                transitioning = false;
+            });
+
+            stage.addEventListener("mouseenter", () => {
+                paused = true;
+            });
+            stage.addEventListener("mouseleave", () => {
+                paused = false;
+            });
+
+            window.addEventListener("resize", () => {
+                const wasPaused = paused;
+                paused = true;
+                track.style.transition = "none";
+                index = 0;
+                moveTo(0, false);
+                resetClones();
+                setTimeout(() => {
+                    paused = wasPaused;
+                }, 100);
+            });
+
+            setInterval(tick, 3200);
+        });
+    </script>
 
 </body>
 

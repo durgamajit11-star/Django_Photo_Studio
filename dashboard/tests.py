@@ -53,7 +53,7 @@ class UserReviewFlowTests(TestCase):
 	def test_cannot_review_without_confirmed_booking(self):
 		self.client.login(username='reviewer', password='Pass123!@#')
 		response = self.client.post(
-			reverse('add_review', args=[self.studio.id]),
+			reverse('dashboard_add_review', args=[self.studio.id]),
 			{'rating': '5', 'comment': 'Great studio'},
 		)
 		self.assertRedirects(response, reverse('studios:studio_detail', args=[self.studio.id]))
@@ -64,7 +64,7 @@ class UserReviewFlowTests(TestCase):
 		self.client.login(username='reviewer', password='Pass123!@#')
 
 		response = self.client.post(
-			reverse('add_review', args=[self.studio.id]),
+			reverse('dashboard_add_review', args=[self.studio.id]),
 			{'rating': '4', 'comment': 'Nice experience'},
 		)
 
@@ -79,7 +79,7 @@ class UserReviewFlowTests(TestCase):
 		self.client.login(username='reviewer', password='Pass123!@#')
 
 		response = self.client.post(
-			reverse('add_review', args=[self.studio.id]),
+			reverse('dashboard_add_review', args=[self.studio.id]),
 			{'rating': '5', 'comment': 'Updated review text'},
 		)
 
@@ -113,3 +113,33 @@ class UserReviewFlowTests(TestCase):
 
 		response = self.client.get(reverse('edit_review', args=[foreign_review.id]))
 		self.assertEqual(response.status_code, 404)
+
+	def test_studio_detail_shows_locked_review_button_without_eligible_booking(self):
+		self.client.login(username='reviewer', password='Pass123!@#')
+		response = self.client.get(reverse('studios:studio_detail', args=[self.studio.id]))
+
+		self.assertContains(response, 'Write Review (Locked)')
+		self.assertContains(response, 'Need confirmed or paid booking')
+
+	def test_studio_detail_shows_review_modal_trigger_with_eligible_booking(self):
+		self._create_booking(status='Confirmed')
+		self.client.login(username='reviewer', password='Pass123!@#')
+		response = self.client.get(reverse('studios:studio_detail', args=[self.studio.id]))
+
+		self.assertContains(response, 'data-bs-target="#reviewModal"')
+		self.assertContains(response, 'id="reviewModal"')
+
+	def test_invalid_review_submission_reopens_modal_on_studio_detail(self):
+		self._create_booking(status='Confirmed')
+		self.client.login(username='reviewer', password='Pass123!@#')
+
+		response = self.client.post(
+			reverse('studios:add_review', args=[self.studio.id]),
+			{'rating': '5', 'comment': ''},
+		)
+
+		self.assertRedirects(response, f"{reverse('studios:studio_detail', args=[self.studio.id])}?open_review=1")
+
+		followed = self.client.get(f"{reverse('studios:studio_detail', args=[self.studio.id])}?open_review=1")
+		self.assertContains(followed, 'id="reviewModal"')
+		self.assertContains(followed, 'reviewModal.show();')

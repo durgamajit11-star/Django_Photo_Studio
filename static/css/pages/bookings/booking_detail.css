@@ -1,0 +1,47 @@
+.booking-detail-shell {
+    max-width: 1000px;
+    margin: 2rem auto;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 22px;
+    padding: 1.4rem;
+}
+
+.detail-card {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+}
+
+.info-line:last-child {
+    border-bottom: none;
+}
+
+.note-item {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+    background: rgba(30, 41, 59, 0.45);
+}
+
+.status-badge {
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.st-pending { background: rgba(245, 158, 11, 0.2); color: #facc15; }
+.st-confirmed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.st-completed { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+.st-cancelled { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }

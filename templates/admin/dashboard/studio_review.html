@@ -1,0 +1,215 @@
+{% extends "admin/dashboard/admin_base.html" %}
+
+{% block page_title %}Studio Review{% endblock %}
+{% block page_description %}Inspect the studio license, owner profile, and supporting details before approving.{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'manage_studios' %}" class="btn btn-outline-light btn-sm">Back to studios</a>
+{% if not studio.is_verified %}
+<form method="POST" action="{% url 'approve_studio' studio.id %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success btn-sm">Approve Studio</button>
+</form>
+{% endif %}
+<form method="POST" action="{% url 'reject_studio' studio.id %}" class="d-inline" onsubmit="return confirm('Reject and remove this studio?');">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+</form>
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card h-100">
+            <div class="small text-muted">Verification</div>
+            <h4 class="mb-1">{% if studio.is_verified %}Verified{% else %}Pending{% endif %}</h4>
+            <div class="small text-muted">Studio ID #{{ studio.id }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card h-100">
+            <div class="small text-muted">License</div>
+            <h4 class="mb-1">{% if owner.license %}Uploaded{% else %}Missing{% endif %}</h4>
+            <div class="small text-muted">Owner document</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card h-100">
+            <div class="small text-muted">Services</div>
+            <h4 class="mb-1">{{ service_count }}</h4>
+            <div class="small text-muted">Packages listed</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card h-100">
+            <div class="small text-muted">Media</div>
+            <h4 class="mb-1">{{ portfolio_count|add:gallery_count }}</h4>
+            <div class="small text-muted">Portfolio and gallery items</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="admin-panel p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">{{ studio.studio_name }}</h5>
+                    <p class="text-muted mb-0">{{ studio.location|default:'Location not set' }}</p>
+                </div>
+                <span class="metric-tag">{% if studio.category %}{{ studio.category.name }}{% else %}Uncategorized{% endif %}</span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="admin-panel p-3 h-100">
+                        <h6 class="fw-bold mb-3">Owner Profile</h6>
+                        <div class="small text-muted">Username</div>
+                        <div class="mb-2">{{ owner.username }}</div>
+                        <div class="small text-muted">Owner Name</div>
+                        <div class="mb-2">{{ owner.owner_name|default:'Not set' }}</div>
+                        <div class="small text-muted">Email</div>
+                        <div class="mb-2">{{ owner.email|default:'Not set' }}</div>
+                        <div class="small text-muted">Phone</div>
+                        <div class="mb-2">{{ owner.phone|default:'Not set' }}</div>
+                        <div class="small text-muted">Address</div>
+                        <div class="mb-2">{{ owner.address|default:'Not set' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="admin-panel p-3 h-100">
+                        <h6 class="fw-bold mb-3">Studio Details</h6>
+                        <div class="small text-muted">Studio Email</div>
+                        <div class="mb-2">{{ studio.email|default:'Not set' }}</div>
+                        <div class="small text-muted">Studio Phone</div>
+                        <div class="mb-2">{{ studio.phone|default:'Not set' }}</div>
+                        <div class="small text-muted">Website</div>
+                        <div class="mb-2">
+                            {% if studio.website %}
+                            <a href="{{ studio.website }}" target="_blank" rel="noopener">Open website</a>
+                            {% else %}
+                            Not set
+                            {% endif %}
+                        </div>
+                        <div class="small text-muted">Price / Hour</div>
+                        <div class="mb-2">₹ {{ studio.price_per_hour }}</div>
+                        <div class="small text-muted">Experience</div>
+                        <div class="mb-2">{{ studio.experience_years }} years</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel p-3 mt-3">
+                <h6 class="fw-bold mb-3">Verification Checklist</h6>
+                <div class="row g-2">
+                    {% for item in verification_items %}
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center border rounded p-2 h-100">
+                            <div>
+                                <div class="fw-semibold">{{ item.label }}</div>
+                                <div class="small text-muted">{% if item.value %}{{ item.value }}{% else %}No value available{% endif %}</div>
+                            </div>
+                            {% if item.done %}
+                            <span class="badge text-bg-success">Ready</span>
+                            {% else %}
+                            <span class="badge text-bg-warning">Missing</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="admin-panel p-3 mt-3">
+                <h6 class="fw-bold mb-2">Description</h6>
+                <p class="mb-0">{{ studio.description|default:'No description provided.' }}</p>
+            </div>
+        </div>
+
+        <div class="admin-panel p-4 mb-4">
+            <h5 class="fw-bold mb-3">License and Supporting Documents</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold mb-2">License File</div>
+                        {% if owner.license %}
+                        <a href="{{ owner.license.url }}" target="_blank" rel="noopener">Open uploaded license</a>
+                        {% else %}
+                        <div class="text-muted">No license uploaded</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <div class="fw-semibold mb-2">Portfolio Document</div>
+                        {% if owner.portfolio %}
+                        <a href="{{ owner.portfolio.url }}" target="_blank" rel="noopener">Open uploaded portfolio</a>
+                        {% else %}
+                        <div class="text-muted">No portfolio document uploaded</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="admin-panel p-4 mb-4">
+            <h5 class="fw-bold mb-3">Studio Media</h5>
+            {% if studio.profile_image %}
+            <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="img-fluid rounded mb-3">
+            {% endif %}
+
+            {% if portfolios %}
+            <div class="small text-muted mb-2">Portfolio Items</div>
+            <div class="d-grid gap-2">
+                {% for item in portfolios %}
+                <div class="border rounded p-2">
+                    {% if item.image %}
+                    <a href="{{ item.image.url }}" target="_blank" rel="noopener">{{ item.caption|default:'Portfolio item' }}</a>
+                    {% else %}
+                    <span>{{ item.caption|default:'Portfolio item' }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-muted">No portfolio items uploaded.</div>
+            {% endif %}
+        </div>
+
+        <div class="admin-panel p-4 mb-4">
+            <h5 class="fw-bold mb-3">Services</h5>
+            {% for service in services %}
+            <div class="d-flex justify-content-between border-bottom py-2">
+                <div>
+                    <div class="fw-semibold">{{ service.service_name }}</div>
+                    <div class="small text-muted">{{ service.description|default:'No description' }}</div>
+                </div>
+                <strong>₹ {{ service.price }}</strong>
+            </div>
+            {% empty %}
+            <div class="text-muted">No services listed.</div>
+            {% endfor %}
+        </div>
+
+        <div class="admin-panel p-4">
+            <h5 class="fw-bold mb-3">Recent Reviews</h5>
+            {% for review in reviews %}
+            <div class="border-bottom py-2">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ review.user.username }}</strong>
+                    <span>⭐ {{ review.rating }}/5</span>
+                </div>
+                <div class="small text-muted">{{ review.created_at|date:"M d, Y" }}</div>
+                <div class="small">{{ review.comment }}</div>
+            </div>
+            {% empty %}
+            <div class="text-muted">No reviews available.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

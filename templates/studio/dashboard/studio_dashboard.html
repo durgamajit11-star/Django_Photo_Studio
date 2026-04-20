@@ -20,6 +20,24 @@
         </div>
     </section>
 
+    {% if studio.is_verified %}
+    <section class="verification-banner verification-banner-success" role="status" aria-live="polite">
+        <i class="bi bi-patch-check-fill"></i>
+        <div>
+            <strong>Studio Verified</strong>
+            <p>Your studio is visible in user explore, recommendations, and booking screens.</p>
+        </div>
+    </section>
+    {% else %}
+    <section class="verification-banner verification-banner-pending" role="status" aria-live="polite">
+        <i class="bi bi-hourglass-split"></i>
+        <div>
+            <strong>Verification Pending</strong>
+            <p>Your studio is hidden from users until admin verifies your license and documents. Keep profile details complete for faster approval.</p>
+        </div>
+    </section>
+    {% endif %}
+
     <section class="metric-grid">
         <article class="metric-tile metric-primary">
             <div class="metric-icon"><i class="bi bi-calendar-check"></i></div>
@@ -127,7 +145,7 @@
                 <div class="schedule-list" id="todayScheduleList">
                     {% for booking in today_bookings %}
                     <div class="schedule-item">
-                        <div class="schedule-time">{{ booking.time|time:"h:i A"|default:booking.time_slot|default:'--' }}</div>
+                        <div class="schedule-time">{{ booking.time_window_display|default:'--' }}</div>
                         <div class="schedule-details">
                             <span class="schedule-event">{{ booking.event_type|default:'Shoot Session' }}</span>
                             <small class="schedule-client">Client: {{ booking.user.get_full_name|default:booking.user.username }}</small>

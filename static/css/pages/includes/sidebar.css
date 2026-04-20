@@ -1,0 +1,17 @@
+    .context-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin: 0 0 1rem;
+    }
+
+    .context-actions .btn {
+        border-radius: 10px;
+        min-width: 110px;
+    }
+
+    @media (max-width: 768px) {
+        .context-actions {
+            justify-content: flex-start;
+            margin-bottom: 0.75rem;
+        }
+    }

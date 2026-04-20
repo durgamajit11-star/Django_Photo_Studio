@@ -1,0 +1,26 @@
+    .studio-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    .studio-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        border-color: #6366f1;
+    }
+    .studio-card img {
+        height: 250px;
+        object-fit: cover;
+    }
+    .rating-badge {
+        background: linear-gradient(135deg, #6366f1, #06b6d4);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+    }
+    .filter-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        backdrop-filter: blur(10px);
+    }

@@ -1,0 +1,73 @@
+.payment-shell {
+    background: radial-gradient(circle at 94% -10%, rgba(14, 165, 233, 0.22), transparent 44%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 24px;
+    padding: 1.4rem;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 1rem;
+}
+
+.panel {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.booking-pick {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 0.7rem;
+    margin-bottom: 0.55rem;
+    background: rgba(30, 41, 59, 0.46);
+}
+
+.booking-pick.active {
+    border-color: rgba(14, 165, 233, 0.75);
+    background: rgba(14, 165, 233, 0.12);
+}
+
+.meta-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.42rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+}
+
+.meta-line:last-child {
+    border-bottom: none;
+}
+
+.method-option {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    padding: 0.55rem;
+    cursor: pointer;
+}
+
+.method-option.active {
+    border-color: rgba(14, 165, 233, 0.78);
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.qr-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0.85rem;
+    text-align: center;
+}
+
+.qr-box img {
+    width: 210px;
+    max-width: 100%;
+}
+
+@media (max-width: 960px) {
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+}

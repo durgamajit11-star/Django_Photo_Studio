@@ -3,12 +3,12 @@
    ========================================= */
 
 :root {
-    --studio-primary: #6366f1;
-    --studio-secondary: #06b6d4;
-    --studio-bg-dark: #0f172a;
-    --studio-bg-darker: #020617;
-    --studio-text-light: #e2e8f0;
-    --studio-border: rgba(255,255,255,0.08);
+    --studio-primary: #00c6b7;
+    --studio-secondary: #6ce6db;
+    --studio-bg-dark: #08172b;
+    --studio-bg-darker: #061425;
+    --studio-text-light: #e7eef9;
+    --studio-border: rgba(255,255,255,0.12);
     --studio-success: #10b981;
     --studio-warning: #f59e0b;
     --studio-danger: #ef4444;
@@ -16,7 +16,7 @@
 
 /* ===== GLOBAL STYLING ===== */
 body {
-    background: linear-gradient(135deg, #020617, #0f172a);
+    background: transparent;
     color: var(--studio-text-light);
 }
 
@@ -45,7 +45,7 @@ body {
     align-items: center;
     gap: 1.5rem;
     padding: 1.5rem;
-    background: rgba(148, 163, 184, 0.05);
+    background: rgba(9, 25, 44, 0.45);
     border: 1px solid var(--studio-border);
     border-radius: 12px;
     transition: all 0.3s ease;
@@ -115,7 +115,7 @@ body {
 
 /* ===== DASHBOARD CARD ===== */
 .dashboard-card {
-    background: rgba(15, 23, 42, 0.5);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
     border: 1px solid var(--studio-border);
     border-radius: 12px;
     overflow: hidden;
@@ -133,7 +133,7 @@ body {
     justify-content: space-between;
     padding: 1.5rem;
     border-bottom: 1px solid var(--studio-border);
-    background: rgba(99, 102, 241, 0.03);
+    background: rgba(108, 230, 219, 0.08);
 }
 
 .dashboard-card .card-header h5 {
@@ -170,7 +170,7 @@ body {
 .chart-controls .btn-outline-secondary.active {
     background: var(--studio-primary);
     border-color: var(--studio-primary);
-    color: #ffffff;
+    color: #032022;
 }
 
 /* ===== CANVAS STYLING ===== */

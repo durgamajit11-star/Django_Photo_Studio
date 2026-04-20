@@ -45,6 +45,17 @@ class UserRegisterForm(StyledUserCreationForm):
 # ================= STUDIO REGISTER FORM =================
 class StudioRegisterForm(StyledUserCreationForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field_name in ('address', 'description'):
+            if field_name in self.fields:
+                self.fields[field_name].widget = forms.Textarea(attrs={
+                    'class': 'form-control auto-grow-textarea',
+                    'placeholder': self.fields[field_name].label,
+                    'rows': 1,
+                })
+
     class Meta:
         model = CustomUser
         fields = [

@@ -3,24 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from .models import BookingRequest, BookingNote
-from studios.models import Studio
 
 
 @login_required
 def booking_list(request):
-    """Display all bookings for the current user"""
-    bookings = BookingRequest.objects.filter(user=request.user).order_by('-created_at')
-    
-    # Filter by status
-    status = request.GET.get('status', '')
-    if status:
-        bookings = bookings.filter(status=status)
-    
-    context = {
-        'bookings': bookings,
-        'status': status,
-    }
-    return render(request, 'bookings/booking_list.html', context)
+    """Legacy endpoint: route users to dashboard booking center."""
+    return redirect('user_bookings')
 
 
 @login_required
@@ -31,7 +19,7 @@ def booking_detail(request, booking_id):
     # Check permissions
     if booking.user != request.user and booking.studio.user != request.user:
         messages.error(request, 'You do not have permission to view this booking')
-        return redirect('booking_list')
+        return redirect('bookings:booking_list')
     
     notes = booking.notes.all()
     
@@ -50,7 +38,7 @@ def add_note(request, booking_id):
     # Check permissions
     if booking.user != request.user and booking.studio.user != request.user:
         messages.error(request, 'You do not have permission to add notes to this booking')
-        return redirect('booking_list')
+        return redirect('bookings:booking_list')
     
     if request.method == 'POST':
         message = request.POST.get('message')
@@ -73,7 +61,7 @@ def cancel_booking(request, booking_id):
     
     if booking.user != request.user:
         messages.error(request, 'Only the booker can cancel this booking')
-        return redirect('booking_list')
+        return redirect('bookings:booking_list')
     
     if booking.status != 'Pending':
         messages.error(request, 'Only pending bookings can be cancelled')
@@ -83,30 +71,6 @@ def cancel_booking(request, booking_id):
     booking.save()
     messages.success(request, 'Booking cancelled successfully!')
     return redirect('booking_detail', booking_id=booking_id)
-
-
-@login_required
-def studio_bookings(request):
-    """Display bookings for studio owner"""
-    studio = get_object_or_404(Studio, user=request.user)
-    bookings = studio.booking_requests.all().order_by('-created_at')
-    
-    # Filter by status
-    status = request.GET.get('status', '')
-    if status:
-        bookings = bookings.filter(status=status)
-    
-    # Summary stats
-    pending = bookings.filter(status='Pending').count()
-    confirmed = bookings.filter(status='Confirmed').count()
-    
-    context = {
-        'bookings': bookings,
-        'status': status,
-        'pending': pending,
-        'confirmed': confirmed,
-    }
-    return render(request, 'bookings/studio_bookings.html', context)
 
 
 @login_required

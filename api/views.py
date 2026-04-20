@@ -17,6 +17,15 @@ from .serializers import (
 class StudioViewSet(viewsets.ModelViewSet):
     queryset = Studio.objects.all()
     permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Studio.objects.all()
+        user = self.request.user
+
+        if user.is_authenticated and user.is_staff:
+            return queryset
+
+        return queryset.filter(is_verified=True)
     
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -39,7 +48,7 @@ class StudioViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def featured(self, request):
-        featured_studios = Studio.objects.filter(is_featured=True)[:6]
+        featured_studios = self.get_queryset().filter(is_featured=True)[:6]
         serializer = self.get_serializer(featured_studios, many=True)
         return Response(serializer.data)
 

@@ -4,15 +4,7 @@
 {% block title %}Book {{ studio.studio_name }} - StudioSync{% endblock %}
 
 {% block extra_css %}
-<style>
-    .booking-form {
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(99, 102, 241, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 30px;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/studios/book_studio.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -58,16 +50,15 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Time Slot</label>
-                                <select name="time_slot" class="form-select form-select-lg">
-                                    <option value="">Select preferred time slot</option>
-                                    <option value="06:00 AM - 09:00 AM">06:00 AM - 09:00 AM</option>
-                                    <option value="09:00 AM - 12:00 PM">09:00 AM - 12:00 PM</option>
-                                    <option value="12:00 PM - 03:00 PM">12:00 PM - 03:00 PM</option>
-                                    <option value="03:00 PM - 06:00 PM">03:00 PM - 06:00 PM</option>
-                                    <option value="06:00 PM - 09:00 PM">06:00 PM - 09:00 PM</option>
-                                    <option value="Custom">Custom</option>
-                                </select>
+                                <label class="form-label">Start Time</label>
+                                <input type="time" name="start_time" id="startTimeInput" class="form-control form-control-lg" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">End Time</label>
+                                <input type="time" name="end_time" id="endTimeInput" class="form-control form-control-lg" required>
+                                <small class="text-muted">Duration is calculated automatically from this time range.</small>
+                                <small id="durationPreview" class="d-block text-info mt-1">Selected duration: --</small>
                             </div>
 
                             <div class="mb-3">
@@ -100,10 +91,45 @@
 
 <script>
     (function () {
+        const bookingForm = document.getElementById('bookingForm');
         const serviceSelect = document.getElementById('serviceSelect');
         const amountInput = document.getElementById('amountInput');
+        const startTimeInput = document.getElementById('startTimeInput');
+        const endTimeInput = document.getElementById('endTimeInput');
+        const durationPreview = document.getElementById('durationPreview');
 
-        if (!serviceSelect || !amountInput) return;
+        if (!bookingForm || !serviceSelect || !amountInput || !startTimeInput || !endTimeInput || !durationPreview) return;
+
+        function updateDurationPreview() {
+            const startValue = startTimeInput.value;
+            const endValue = endTimeInput.value;
+
+            if (!startValue || !endValue) {
+                durationPreview.textContent = 'Selected duration: --';
+                durationPreview.classList.remove('text-danger');
+                durationPreview.classList.add('text-info');
+                return true;
+            }
+
+            const [startHour, startMinute] = startValue.split(':').map(Number);
+            const [endHour, endMinute] = endValue.split(':').map(Number);
+            const startMinutes = (startHour * 60) + startMinute;
+            const endMinutes = (endHour * 60) + endMinute;
+
+            if (endMinutes <= startMinutes) {
+                durationPreview.textContent = 'End time must be later than start time';
+                durationPreview.classList.remove('text-info');
+                durationPreview.classList.add('text-danger');
+                return false;
+            }
+
+            const totalMinutes = endMinutes - startMinutes;
+            const roundedHours = Math.max(1, Math.ceil(totalMinutes / 60));
+            durationPreview.textContent = `Selected duration: ${roundedHours} hr${roundedHours === 1 ? '' : 's'}`;
+            durationPreview.classList.remove('text-danger');
+            durationPreview.classList.add('text-info');
+            return true;
+        }
 
         serviceSelect.addEventListener('change', function () {
             const selected = serviceSelect.options[serviceSelect.selectedIndex];
@@ -112,6 +138,17 @@
                 amountInput.value = price;
             }
         });
+
+        startTimeInput.addEventListener('change', updateDurationPreview);
+        endTimeInput.addEventListener('change', updateDurationPreview);
+
+        bookingForm.addEventListener('submit', function (event) {
+            if (!updateDurationPreview()) {
+                event.preventDefault();
+            }
+        });
+
+        updateDurationPreview();
     })();
 </script>
 {% endblock %}

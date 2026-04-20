@@ -16,7 +16,7 @@ from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
 import json
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from studios.models import Studio, Portfolio, Review, Service
 from django.db.models import Q 
 from .models import StudioPreference, UserPreference
@@ -43,8 +43,15 @@ def studio_payment(request):
 
     unpaid_bookings = BookingRequest.objects.filter(
         user=request.user,
-        payment_status='Unpaid'
-    ).exclude(status='Cancelled').select_related('studio').order_by('date', 'time')
+        payment_status='Unpaid',
+        status='Confirmed',
+    ).select_related('studio').order_by('date', 'time')
+
+    pending_payment_bookings = BookingRequest.objects.filter(
+        user=request.user,
+        payment_status='Unpaid',
+        status='Pending',
+    ).select_related('studio').order_by('date', 'time')
 
     selected_booking_id = request.POST.get('booking_id') or request.GET.get('booking_id')
     selected_booking = None
@@ -55,7 +62,7 @@ def studio_payment(request):
 
     if request.method == 'POST':
         if not selected_booking:
-            messages.error(request, 'Please select a valid unpaid booking first')
+            messages.error(request, 'Please select a confirmed booking first.')
             return redirect('studio_payment')
 
         payment_method = request.POST.get('payment_method', '').strip()
@@ -101,7 +108,7 @@ def studio_payment(request):
             selected_booking.payment_status = 'Paid'
             selected_booking.save(update_fields=['payment_status', 'updated_at'])
 
-            messages.success(request, 'Payment successful. Booking is now confirmed for payment.')
+            messages.success(request, 'Payment successful.')
             return redirect('payments:payment_detail', payment_id=payment.id)
         except Exception as exc:
             messages.error(request, f'Unable to process payment: {exc}')
@@ -127,6 +134,7 @@ def studio_payment(request):
 
     context = {
         'unpaid_bookings': unpaid_bookings[:12],
+        'pending_payment_bookings': pending_payment_bookings[:12],
         'selected_booking': selected_booking,
         'upi_payload': upi_payload,
         'payment_methods': Payment.PAYMENT_METHOD_CHOICES,
@@ -154,9 +162,9 @@ def studio_booking(request):
         messages.info(request, 'Please select a studio from Explore or Studio Detail to start booking.')
         return redirect('explore_studios')
 
-    selected_studio = Studio.objects.filter(id=selected_studio_id).first()
+    selected_studio = Studio.objects.filter(id=selected_studio_id, is_verified=True).first()
     if not selected_studio:
-        messages.error(request, 'Selected studio was not found.')
+        messages.error(request, 'Selected studio is not available for booking right now.')
         return redirect('explore_studios')
 
     services_queryset = Service.objects.filter(studio=selected_studio).order_by('service_name')
@@ -164,15 +172,15 @@ def studio_booking(request):
     if request.method == 'POST':
         event_type = request.POST.get('event_type', '').strip()
         booking_date = request.POST.get('date')
-        time_slot = request.POST.get('time_slot', '').strip()
+        start_time_raw = request.POST.get('start_time', '').strip()
+        end_time_raw = request.POST.get('end_time', '').strip()
         location = request.POST.get('location', '').strip()
         special_requirements = request.POST.get('special_requirements', '').strip()
         service_id = request.POST.get('service_id')
         camera_option = request.POST.get('camera_option', 'none').strip()
-        duration_raw = request.POST.get('duration_hours', '').strip()
 
-        if not event_type or not booking_date:
-            messages.error(request, 'Event type and booking date are required')
+        if not event_type or not booking_date or not start_time_raw or not end_time_raw:
+            messages.error(request, 'Event type, booking date, start time, and end time are required')
             return redirect(f"{request.path}?studio_id={selected_studio.id}")
 
         service = None
@@ -180,12 +188,25 @@ def studio_booking(request):
             service = Service.objects.filter(id=service_id, studio=selected_studio).first()
 
         try:
-            duration_hours = int(duration_raw or 2)
-            if duration_hours <= 0 or duration_hours > 24:
-                raise ValueError
+            start_time_obj = datetime.strptime(start_time_raw, '%H:%M').time()
+            end_time_obj = datetime.strptime(end_time_raw, '%H:%M').time()
         except ValueError:
-            messages.error(request, 'Duration must be between 1 and 24 hours')
+            messages.error(request, 'Please enter valid start and end times')
             return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        start_minutes = (start_time_obj.hour * 60) + start_time_obj.minute
+        end_minutes = (end_time_obj.hour * 60) + end_time_obj.minute
+        if end_minutes <= start_minutes:
+            messages.error(request, 'End time must be later than start time')
+            return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        duration_minutes = end_minutes - start_minutes
+        duration_hours = max(1, (duration_minutes + 59) // 60)
+        if duration_hours > 24:
+            messages.error(request, 'Booking duration cannot exceed 24 hours')
+            return redirect(f"{request.path}?studio_id={selected_studio.id}")
+
+        time_slot = f"{start_time_obj.strftime('%I:%M %p')} - {end_time_obj.strftime('%I:%M %p')}"
 
         if camera_option not in camera_price_map:
             camera_option = 'none'
@@ -222,7 +243,10 @@ def studio_booking(request):
             event_type=event_type,
             date=booking_date,
             booking_date=booking_date,
+            time=start_time_obj,
             time_slot=time_slot,
+            start_time=start_time_obj,
+            end_time=end_time_obj,
             duration_hours=duration_hours,
             location=location or selected_studio.location,
             special_requirements=final_notes,
@@ -250,7 +274,7 @@ def user_dashboard(request):
     from recommendations.models import StudioRecommendation
     from studios.models import Review
 
-    featured_studios = Studio.objects.order_by('-is_featured', '-is_verified', '-created_at')[:4]
+    featured_studios = Studio.objects.filter(is_verified=True).order_by('-is_featured', '-is_verified', '-created_at')[:4]
     user_bookings = BookingRequest.objects.filter(user=request.user)
     recent_bookings = user_bookings.select_related('studio').order_by('-created_at')[:4]
     upcoming_booking = user_bookings.exclude(status='Cancelled').order_by('date', 'time').first()
@@ -262,14 +286,14 @@ def user_dashboard(request):
     recent_notifications = notifications[:4]
     unread_notifications = notifications.filter(is_read=False)
 
-    price_insights = Studio.objects.aggregate(
+    price_insights = Studio.objects.filter(is_verified=True).aggregate(
         min_price=Min('price_per_hour'),
         max_price=Max('price_per_hour'),
         avg_price=Avg('price_per_hour'),
     )
 
     trending_categories = (
-        Studio.objects
+        Studio.objects.filter(is_verified=True)
         .exclude(category__isnull=True)
         .values('category__name')
         .annotate(total=Count('id'))
@@ -467,7 +491,7 @@ def user_bookings(request):
 @role_required(['USER'])
 def user_recommendations(request):
     from recommendations.models import StudioRecommendation
-    recommendations = StudioRecommendation.objects.filter(user=request.user).order_by('-score')[:12]
+    recommendations = StudioRecommendation.objects.filter(user=request.user, studio__is_verified=True).order_by('-score')[:12]
     return render(request, 'user/dashboard/user_recommendations.html', {'recommendations': recommendations})
 
 
@@ -479,7 +503,10 @@ def explore_studios(request):
     category = request.GET.get('category')
     sort = request.GET.get('sort')
 
-    studios = Studio.objects.all()
+    studios = Studio.objects.filter(is_verified=True).annotate(
+        avg_rating=Avg('reviews__rating'),
+        review_count=Count('reviews', distinct=True),
+    )
 
    # 🔍 SMART SEARCH (FIX)
     if query:
@@ -499,14 +526,44 @@ def explore_studios(request):
 
     # 🔥 Sorting options
     if sort == 'rating':
-        studios = sorted(studios, key=lambda s: s.average_rating(), reverse=True)
+        studios = studios.order_by('-avg_rating', '-review_count', '-is_verified', '-created_at')
     elif sort == 'experience':
         studios = studios.order_by('-experience_years')
     elif sort == 'new':
         studios = studios.order_by('-created_at')
 
-    # 🌟 Featured Studios
-    featured_studios = Studio.objects.filter(is_featured=True)
+    # 🌟 Featured/Trending Studios (dynamic)
+    featured_limit = 6
+    manual_featured = Studio.objects.filter(is_featured=True, is_verified=True).annotate(
+        avg_rating=Avg('reviews__rating'),
+        review_count=Count('reviews', distinct=True),
+    ).order_by('-is_verified', '-avg_rating', '-review_count', '-created_at')
+
+    featured_studios = list(manual_featured[:featured_limit])
+    featured_ids = {studio.id for studio in featured_studios}
+
+    dynamic_candidates = Studio.objects.filter(is_verified=True).exclude(id__in=featured_ids).annotate(
+        avg_rating=Avg('reviews__rating'),
+        review_count=Count('reviews', distinct=True),
+        confirmed_booking_count=Count(
+            'booking_requests',
+            filter=Q(booking_requests__status__in=['Confirmed', 'Completed']),
+            distinct=True,
+        ),
+    ).order_by(
+        '-is_verified',
+        '-avg_rating',
+        '-confirmed_booking_count',
+        '-review_count',
+        '-created_at',
+    )
+
+    if len(featured_studios) < featured_limit:
+        needed = featured_limit - len(featured_studios)
+        featured_studios.extend(list(dynamic_candidates[:needed]))
+
+    featured_section_title = 'Featured Studios' if manual_featured.exists() else 'Trending Studios'
+    featured_section_hint = 'Pinned by platform + live ranking' if manual_featured.exists() else 'Auto-ranked by rating, trust, and booking activity'
 
     # 📂 Categories (for filter buttons)
     from studios.models import Category
@@ -515,6 +572,8 @@ def explore_studios(request):
     context = {
         'studios': studios,
         'featured_studios': featured_studios,
+        'featured_section_title': featured_section_title,
+        'featured_section_hint': featured_section_hint,
         'categories': categories,
         'selected_category': category,
         'selected_sort': sort,
@@ -538,7 +597,8 @@ def _user_can_review_studio(user, studio):
     return BookingRequest.objects.filter(
         user=user,
         studio=studio,
-        status__in=['Confirmed', 'Completed']
+    ).filter(
+        Q(status__in=['Confirmed', 'Completed']) | Q(payment_status='Paid')
     ).exists()
 
 
@@ -559,17 +619,17 @@ def add_review(request, studio_id):
 
         if not rating_raw or not comment:
             messages.error(request, 'Rating and comment are required.')
-            return redirect('add_review', studio_id=studio.id)
+            return redirect('dashboard_add_review', studio_id=studio.id)
 
         try:
             rating = int(rating_raw)
         except ValueError:
             messages.error(request, 'Invalid rating value.')
-            return redirect('add_review', studio_id=studio.id)
+            return redirect('dashboard_add_review', studio_id=studio.id)
 
         if rating < 1 or rating > 5:
             messages.error(request, 'Rating must be between 1 and 5.')
-            return redirect('add_review', studio_id=studio.id)
+            return redirect('dashboard_add_review', studio_id=studio.id)
 
         if existing_review:
             existing_review.rating = rating
@@ -816,7 +876,7 @@ def studio_dashboard_live(request):
         },
         'today_bookings': [
             {
-                'time': b.time.strftime('%I:%M %p') if b.time else (b.time_slot or '--'),
+                'time': b.time_window_display,
                 'event_type': b.event_type or 'Shoot Session',
                 'client': b.user.get_full_name() or b.user.username,
             }
@@ -1242,12 +1302,42 @@ def studio_profile(request):
     else:
         form = UserUpdateForm(instance=request.user)
 
+    verification_checklist = [
+        {
+            'label': 'License document uploaded',
+            'done': bool(request.user.license),
+        },
+        {
+            'label': 'Portfolio document uploaded',
+            'done': bool(request.user.portfolio),
+        },
+        {
+            'label': 'Studio name and location set',
+            'done': bool((studio.studio_name or '').strip() and (studio.location or '').strip()),
+        },
+        {
+            'label': 'Studio description added',
+            'done': bool((studio.description or '').strip()),
+        },
+        {
+            'label': 'Studio contact phone and email set',
+            'done': bool((studio.phone or '').strip() and (studio.email or '').strip()),
+        },
+        {
+            'label': 'At least one service listed',
+            'done': studio.services.exists(),
+        },
+    ]
+    verification_completed = sum(1 for item in verification_checklist if item['done'])
+
     return render(request, 'studio/dashboard/studio_profile.html', {
         'studio': studio,
         'studio_services': studio.services.all().order_by('service_name'),
         'form': form,
         'user': request.user,
         'preferences': preferences,
+        'verification_checklist': verification_checklist,
+        'verification_completed': verification_completed,
     })
 
 

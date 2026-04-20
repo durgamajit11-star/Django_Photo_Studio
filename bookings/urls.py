@@ -10,7 +10,6 @@ urlpatterns = [
     path('cancel/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
     
     # Studio owner views
-    path('studio/', views.studio_bookings, name='studio_bookings'),
     path('approve/<int:booking_id>/', views.approve_booking, name='approve_booking'),
     path('reject/<int:booking_id>/', views.reject_booking, name='reject_booking'),
 ]

@@ -14,6 +14,7 @@ urlpatterns = [
     path('studios/reject/<int:id>/', views.reject_studio, name='reject_studio'),
     path('studios/notify/<int:id>/', views.notify_studio, name='notify_studio'),
     path('studios/notify-selected/', views.notify_selected_studios, name='notify_selected_studios'),
+    path('studios/<int:id>/', views.studio_review, name='studio_review'),
     path('bookings/', views.admin_bookings, name='admin_bookings'),
     path('bookings/cancel/<int:id>/', views.admin_cancel_booking, name='admin_cancel_booking'),
     path('payments/', views.admin_payments, name='admin_payments'),

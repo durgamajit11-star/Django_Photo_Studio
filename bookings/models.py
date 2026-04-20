@@ -28,6 +28,8 @@ class BookingRequest(models.Model):
     time = models.TimeField(blank=True, null=True)
     booking_date = models.DateField(blank=True, null=True)
     time_slot = models.CharField(max_length=80, blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
     duration_hours = models.PositiveIntegerField(default=2, help_text="Duration in hours")
     location = models.TextField(blank=True, null=True, help_text="Shooting location")
     special_requirements = models.TextField(blank=True, null=True)
@@ -60,11 +62,34 @@ class BookingRequest(models.Model):
             self.booking_date = self.date
         if self.date is None and self.booking_date:
             self.date = self.booking_date
+        if self.time is None and self.start_time:
+            self.time = self.start_time
+        if self.start_time is None and self.time:
+            self.start_time = self.time
+        if self.start_time and self.end_time and not self.time_slot:
+            self.time_slot = f"{self.start_time.strftime('%I:%M %p')} - {self.end_time.strftime('%I:%M %p')}"
         if self.total_price is None and self.amount is not None:
             self.total_price = self.amount
         if self.amount is None and self.total_price is not None:
             self.amount = self.total_price
         super().save(*args, **kwargs)
+
+    @property
+    def time_window_display(self):
+        if self.start_time and self.end_time:
+            return f"{self.start_time.strftime('%I:%M %p')} - {self.end_time.strftime('%I:%M %p')}"
+        if self.time_slot:
+            return self.time_slot
+        if self.time:
+            return self.time.strftime('%I:%M %p')
+        return "Not selected"
+
+    @property
+    def duration_display(self):
+        value = int(self.duration_hours or 0)
+        if value <= 0:
+            return "0 hrs"
+        return "1 hr" if value == 1 else f"{value} hrs"
 
 
 class BookingNote(models.Model):

@@ -205,7 +205,7 @@ def manage_studios(request):
     query = request.GET.get('q', '').strip()
     status = request.GET.get('status', '').strip()
 
-    studios = Studio.objects.select_related('user').order_by('-created_at')
+    studios = Studio.objects.select_related('user', 'category').order_by('-created_at')
     if query:
         studios = studios.filter(
             Q(studio_name__icontains=query)
@@ -229,6 +229,56 @@ def manage_studios(request):
             'total_studios': studios.count(),
             'verified_count': studios.filter(is_verified=True).count(),
             'pending_count': studios.filter(is_verified=False).count(),
+        },
+    )
+
+
+@login_required
+@role_required(['ADMIN'])
+def studio_review(request, id):
+    studio = get_object_or_404(
+        Studio.objects.select_related('user', 'category').prefetch_related('services', 'portfolios', 'studio_images', 'reviews'),
+        id=id,
+    )
+
+    verification_items = [
+        {
+            'label': 'License uploaded',
+            'done': bool(getattr(studio.user, 'license', None)),
+            'value': studio.user.license.url if getattr(studio.user, 'license', None) else None,
+        },
+        {
+            'label': 'Studio profile image',
+            'done': bool(studio.profile_image),
+            'value': studio.profile_image.url if studio.profile_image else None,
+        },
+        {
+            'label': 'Owner contact details',
+            'done': bool(studio.user.email or studio.user.phone or studio.phone),
+            'value': studio.user.email or studio.user.phone or studio.phone,
+        },
+        {
+            'label': 'Business address provided',
+            'done': bool(studio.user.address or studio.location),
+            'value': studio.user.address or studio.location,
+        },
+    ]
+
+    return render(
+        request,
+        'admin/dashboard/studio_review.html',
+        {
+            'studio': studio,
+            'owner': studio.user,
+            'verification_items': verification_items,
+            'services': studio.services.all(),
+            'portfolios': studio.portfolios.all(),
+            'studio_images': studio.studio_images.all(),
+            'reviews': studio.reviews.select_related('user').all()[:6],
+            'portfolio_count': studio.portfolios.count(),
+            'gallery_count': studio.studio_images.count(),
+            'service_count': studio.services.count(),
+            'review_count': studio.reviews.count(),
         },
     )
 

@@ -38,6 +38,53 @@ body.studio-dashboard-page .studio-main {
     background: rgba(15, 23, 42, 0.55);
 }
 
+.verification-banner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.7rem;
+    align-items: start;
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.verification-banner i {
+    font-size: 1.05rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.verification-banner strong {
+    display: block;
+    font-size: 0.92rem;
+}
+
+.verification-banner p {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: #b8c7da;
+}
+
+.verification-banner-success {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+.verification-banner-success i,
+.verification-banner-success strong {
+    color: #34d399;
+}
+
+.verification-banner-pending {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.33);
+}
+
+.verification-banner-pending i,
+.verification-banner-pending strong {
+    color: #fbbf24;
+}
+
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

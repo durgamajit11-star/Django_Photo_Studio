@@ -4,11 +4,18 @@
 {% block title %}Admin Panel{% endblock %}
 
 {% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/admin/admin.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
+
+<div class="dashboard-bg-orb dashboard-orb-a" aria-hidden="true"></div>
+<div class="dashboard-bg-orb dashboard-orb-b" aria-hidden="true"></div>
+<div class="dashboard-bg-grid" aria-hidden="true"></div>
 
 <header class="admin-header">
     <div class="admin-header-content">

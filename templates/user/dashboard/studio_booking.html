@@ -1,59 +1,11 @@
 {% extends "user/dashboard/user_base.html" %}
+{% load static %}
 
 {% block title %}Book {{ selected_studio.studio_name }} | StudioSync{% endblock %}
 
 {% block content %}
 {% now "Y-m-d" as today_date %}
-<style>
-.booking-shell {
-    background: radial-gradient(circle at 12% -8%, rgba(245, 158, 11, 0.22), transparent 44%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
-    border: 1px solid rgba(148, 163, 184, 0.26);
-    border-radius: 24px;
-    padding: 1.4rem;
-}
-
-.booking-grid {
-    display: grid;
-    grid-template-columns: 1.25fr 0.95fr;
-    gap: 1rem;
-}
-
-.panel {
-    background: rgba(2, 6, 23, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 16px;
-    padding: 1rem;
-}
-
-.bill-row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
-    padding: 0.4rem 0;
-}
-
-.bill-row:last-child {
-    border-bottom: none;
-}
-
-.recent-card {
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 10px;
-    background: rgba(30, 41, 59, 0.5);
-    padding: 0.6rem;
-    margin-bottom: 0.5rem;
-}
-
-.recent-card:last-child {
-    margin-bottom: 0;
-}
-
-@media (max-width: 960px) {
-    .booking-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/user/dashboard/studio_booking.css' %}">
 
 <section class="booking-shell">
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
@@ -97,19 +49,17 @@
                         <input type="date" name="date" class="form-control" min="{{ today_date }}" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Time Slot</label>
-                        <select name="time_slot" class="form-select">
-                            <option value="">Select preferred slot</option>
-                            <option>06:00 AM - 09:00 AM</option>
-                            <option>09:00 AM - 12:00 PM</option>
-                            <option>12:00 PM - 03:00 PM</option>
-                            <option>03:00 PM - 06:00 PM</option>
-                            <option>06:00 PM - 09:00 PM</option>
-                        </select>
+                        <label class="form-label">Start Time <span class="text-warning">*</span></label>
+                        <input type="time" name="start_time" id="startTimeInput" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Duration (hours)</label>
-                        <input type="number" name="duration_hours" id="durationInput" class="form-control" min="1" max="24" value="2">
+                        <label class="form-label">End Time <span class="text-warning">*</span></label>
+                        <input type="time" name="end_time" id="endTimeInput" class="form-control" required>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="small text-secondary">Duration is auto-calculated from start and end time.</div>
+                        <input type="hidden" name="duration_hours" id="durationInput" value="2">
                     </div>
 
                     <div class="col-md-6">
@@ -156,7 +106,7 @@
 
             <div class="bill-row"><span>Studio</span><strong>{{ selected_studio.studio_name }}</strong></div>
             <div class="bill-row"><span>Base Rate (per hour)</span><strong id="baseRateLabel">₹ {{ selected_studio.price_per_hour|default:0 }}</strong></div>
-            <div class="bill-row"><span>Duration</span><strong><span id="durationLabel">2</span> hrs</strong></div>
+            <div class="bill-row"><span>Duration (auto)</span><strong><span id="durationLabel">2</span> hrs</strong></div>
             <div class="bill-row"><span>Base Booking Price</span><strong id="basePriceLabel">₹ 0.00</strong></div>
             <div class="bill-row"><span>Service Price</span><strong id="servicePriceLabel">₹ 0.00</strong></div>
             <div class="bill-row"><span>Camera Price</span><strong id="cameraPriceLabel">₹ 0.00</strong></div>
@@ -182,6 +132,8 @@
 
 <script>
 (function () {
+    const startTimeInput = document.getElementById('startTimeInput');
+    const endTimeInput = document.getElementById('endTimeInput');
     const durationInput = document.getElementById('durationInput');
     const serviceSelect = document.getElementById('serviceSelect');
     const cameraSelect = document.getElementById('cameraSelect');
@@ -202,8 +154,39 @@
         return Number(option ? option.getAttribute('data-price') || 0 : 0);
     }
 
+    function getDurationHours() {
+        const startValue = startTimeInput.value;
+        const endValue = endTimeInput.value;
+
+        if (!startValue || !endValue) {
+            return 2;
+        }
+
+        try {
+            const [startHour, startMinute] = startValue.split(':').map(Number);
+            const [endHour, endMinute] = endValue.split(':').map(Number);
+            
+            if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+                return 2;
+            }
+            
+            const startMinutes = (startHour * 60) + startMinute;
+            const endMinutes = (endHour * 60) + endMinute;
+
+            if (endMinutes <= startMinutes) {
+                return 2;
+            }
+
+            const totalMinutes = endMinutes - startMinutes;
+            const durationHours = Math.ceil(totalMinutes / 60);
+            return Math.max(1, durationHours);
+        } catch (e) {
+            return 2;
+        }
+    }
+
     function refreshBill() {
-        const duration = Math.max(1, Number(durationInput.value || 1));
+        const duration = getDurationHours();
         const servicePrice = selectedPrice(serviceSelect);
         const cameraPrice = selectedPrice(cameraSelect);
 
@@ -213,15 +196,21 @@
         const total = subtotal + gst;
 
         durationLabel.textContent = duration;
-        basePriceLabel.textContent = `₹ ${basePrice.toFixed(2)}`;
-        servicePriceLabel.textContent = `₹ ${servicePrice.toFixed(2)}`;
-        cameraPriceLabel.textContent = `₹ ${cameraPrice.toFixed(2)}`;
+    startTimeInput.addEventListener('input', refreshBill);
+    endTimeInput.addEventListener('change', refreshBill);
+    endTimeInput.addEventListener('input', refreshBill);
+    serviceSelect.addEventListener('change', refreshBill);
+    cameraSelect.addEventListener('change', refreshBill);
+
+    // Initial calculation on page load
+    window.addEventListener('load', refreshBill);        cameraPriceLabel.textContent = `₹ ${cameraPrice.toFixed(2)}`;
         subtotalLabel.textContent = `₹ ${subtotal.toFixed(2)}`;
         gstLabel.textContent = `₹ ${gst.toFixed(2)}`;
         totalLabel.textContent = `₹ ${total.toFixed(2)}`;
     }
 
-    durationInput.addEventListener('input', refreshBill);
+    startTimeInput.addEventListener('change', refreshBill);
+    endTimeInput.addEventListener('change', refreshBill);
     serviceSelect.addEventListener('change', refreshBill);
     cameraSelect.addEventListener('change', refreshBill);
 

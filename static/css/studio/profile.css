@@ -125,6 +125,89 @@
     color: #9eb0cb;
 }
 
+.profile-verification-note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    margin-bottom: 14px;
+    border: 1px solid rgba(245, 158, 11, 0.38);
+    background: rgba(245, 158, 11, 0.12);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: #fde68a;
+}
+
+.profile-verification-note i {
+    font-size: 1rem;
+    margin-top: 2px;
+}
+
+.profile-verification-note strong {
+    color: #fbbf24;
+}
+
+.verification-checklist {
+    margin-bottom: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(30, 41, 59, 0.44);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.verification-checklist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.verification-checklist-header h5 {
+    margin: 0;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verification-checklist-header span {
+    font-size: 0.78rem;
+    color: #9fb2cc;
+}
+
+.verification-checklist-items {
+    display: grid;
+    gap: 8px;
+}
+
+.verification-checklist-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.88rem;
+}
+
+.verification-checklist-item.done {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: rgba(16, 185, 129, 0.1);
+    color: #bbf7d0;
+}
+
+.verification-checklist-item.todo {
+    border-color: rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.08);
+    color: #fde68a;
+}
+
+.verification-checklist-item i {
+    margin-top: 2px;
+}
+
 .display-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

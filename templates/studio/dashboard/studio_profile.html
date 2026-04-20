@@ -52,8 +52,42 @@
                         <h4>{{ studio.studio_name|default:user.username }}</h4>
                         <p>{{ studio.location|default:'Location not set' }}</p>
                         <span class="badge bg-primary">Studio Owner</span>
+                        {% if studio.is_verified %}
+                        <span class="badge bg-success ms-2"><i class="bi bi-patch-check"></i> Verified</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark ms-2"><i class="bi bi-hourglass-split"></i> Pending Verification</span>
+                        {% endif %}
                     </div>
                 </div>
+
+                {% if not studio.is_verified %}
+                <div class="profile-verification-note" role="status" aria-live="polite">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <div>
+                        <strong>Visibility Notice:</strong> Users cannot see or book this studio until admin verification is complete.
+                        Upload your latest license and portfolio documents to speed up approval.
+                    </div>
+                </div>
+
+                <div class="verification-checklist" aria-label="Verification checklist">
+                    <div class="verification-checklist-header">
+                        <h5><i class="bi bi-list-check"></i> Verification Checklist</h5>
+                        <span>{{ verification_completed }}/{{ verification_checklist|length }} completed</span>
+                    </div>
+                    <div class="verification-checklist-items">
+                        {% for item in verification_checklist %}
+                        <div class="verification-checklist-item {% if item.done %}done{% else %}todo{% endif %}">
+                            {% if item.done %}
+                            <i class="bi bi-check-circle-fill"></i>
+                            {% else %}
+                            <i class="bi bi-circle"></i>
+                            {% endif %}
+                            <span>{{ item.label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
 
                 <div id="studioProfileDisplay" class="display-grid">
                     <div class="display-item"><span class="label">Username</span><p>{{ user.username }}</p></div>

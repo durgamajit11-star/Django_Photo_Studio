@@ -21,11 +21,13 @@ def auth_view(request):
     login_form = StyledAuthenticationForm()
     user_form = UserRegisterForm()
     studio_form = StudioRegisterForm()
+    active_tab = 'login'
 
     if request.method == 'POST':
 
         # ================= LOGIN =================
         if 'login_submit' in request.POST:
+            active_tab = 'login'
             login_form = StyledAuthenticationForm(request, data=request.POST)
 
             if login_form.is_valid():
@@ -43,6 +45,7 @@ def auth_view(request):
 
         # ================= USER REGISTER =================
         elif 'user_register_submit' in request.POST:
+            active_tab = 'user'
             user_form = UserRegisterForm(request.POST)
 
             if user_form.is_valid():
@@ -52,6 +55,7 @@ def auth_view(request):
 
         # ================= STUDIO REGISTER =================
         elif 'studio_register_submit' in request.POST:
+            active_tab = 'studio'
             studio_form = StudioRegisterForm(request.POST, request.FILES)  # 🔥 IMPORTANT
 
             if studio_form.is_valid():
@@ -62,7 +66,8 @@ def auth_view(request):
     return render(request, 'accounts/auth.html', {
         'login_form': login_form,
         'user_form': user_form,
-        'studio_form': studio_form
+        'studio_form': studio_form,
+        'active_tab': active_tab,
     })
 
 

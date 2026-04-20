@@ -1,0 +1,48 @@
+.booking-shell {
+    background: radial-gradient(circle at 12% -8%, rgba(245, 158, 11, 0.22), transparent 44%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    border-radius: 24px;
+    padding: 1.4rem;
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.95fr;
+    gap: 1rem;
+}
+
+.panel {
+    background: rgba(2, 6, 23, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.bill-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+    padding: 0.4rem 0;
+}
+
+.bill-row:last-child {
+    border-bottom: none;
+}
+
+.recent-card {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    background: rgba(30, 41, 59, 0.5);
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.recent-card:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 960px) {
+    .booking-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -4,41 +4,7 @@
 {% block title %}Review {{ studio.studio_name }} - StudioSync{% endblock %}
 
 {% block extra_css %}
-<style>
-    .review-form {
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(99, 102, 241, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 30px;
-    }
-
-    .rating-input {
-        display: flex;
-        gap: 10px;
-        font-size: 2rem;
-    }
-
-    .rating-input input {
-        display: none;
-    }
-
-    .rating-input label {
-        cursor: pointer;
-        transition: all 0.2s;
-        opacity: 0.5;
-    }
-
-    .rating-input label:hover {
-        opacity: 1;
-        transform: scale(1.2);
-    }
-
-    .rating-input input:checked~label,
-    .rating-input label:hover~label {
-        opacity: 1;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/studios/add_review.css' %}">
 {% endblock %}
 
 {% block content %}

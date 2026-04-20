@@ -70,6 +70,10 @@ def create_payment(request, booking_id):
     if booking.status == 'Cancelled':
         messages.error(request, 'Cancelled bookings cannot be paid')
         return redirect('booking_detail', booking_id=booking_id)
+
+    if booking.status != 'Confirmed':
+        messages.warning(request, 'Payment is available only after the studio approves your booking.')
+        return redirect('booking_detail', booking_id=booking_id)
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
@@ -109,9 +113,8 @@ def create_payment(request, booking_id):
             payment.completed_at = timezone.now()
             payment.save()
 
-            # Update booking payment status
             booking.payment_status = 'Paid'
-            booking.save()
+            booking.save(update_fields=['payment_status', 'updated_at'])
 
             messages.success(request, 'Payment successful!')
             return redirect('payment_detail', payment_id=payment.id)

@@ -4,6 +4,9 @@
 {% block title %}Studio Dashboard{% endblock %}
 
 {% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/studio/studio.css' %}">
 <link rel="stylesheet" href="{% static 'css/studio/studio_dashboard_enhanced.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,11 +15,23 @@
 
 {% block content %}
 
+<div class="dashboard-bg-orb dashboard-orb-a" aria-hidden="true"></div>
+<div class="dashboard-bg-orb dashboard-orb-b" aria-hidden="true"></div>
+<div class="dashboard-bg-grid" aria-hidden="true"></div>
+
 <!-- ===== HEADER ===== -->
 <header class="studio-header">
     <div class="studio-header-content">
-        <div class="studio-logo">
-            <i class="bi bi-camera"></i> Studio Panel
+        <div class="studio-header-left">
+            <button class="mobile-studio-sidebar-toggle" id="mobileStudioSidebarToggle" type="button" title="Toggle Menu" aria-label="Open sidebar">
+                <i class="bi bi-list"></i>
+            </button>
+            <button class="desktop-studio-sidebar-toggle" id="studioSidebarToggleBtn" type="button" title="Collapse Sidebar" aria-label="Toggle sidebar">
+                <i class="bi bi-layout-sidebar-inset" id="studioSidebarToggleIcon"></i>
+            </button>
+            <div class="logo">
+                <i class="bi bi-camera"></i> Studio Panel
+            </div>
         </div>
 
         <div class="studio-header-right">
@@ -40,11 +55,6 @@
     <!-- ===== SIDEBAR ===== -->
     <aside class="studio-sidebar" id="studioSidebar">
 
-        <a href="#" onclick="toggleStudioSidebar()">
-            <i class="bi bi-list fs-4"></i>
-            <span>Menu</span>
-        </a>
-
         <a href="{% url 'studio_dashboard' %}"
             class="{% if request.resolver_match.url_name == 'studio_dashboard' %}active{% endif %}">
             <i class="bi bi-speedometer2"></i>
@@ -58,7 +68,7 @@
         </a>
 
         <a href="{% url 'studio_bookings' %}"
-            class="{% if request.resolver_match.url_name == 'studio_bookings' or request.resolver_match.url_name == 'approve_booking' or request.resolver_match.url_name == 'cancel_booking' %}active{% endif %}">
+            class="{% if request.resolver_match.url_name == 'studio_bookings' or request.resolver_match.url_name == 'studio_approve_booking' or request.resolver_match.url_name == 'studio_cancel_booking' %}active{% endif %}">
             <i class="bi bi-calendar-event"></i>
             <span>Bookings</span>
         </a>
@@ -69,7 +79,7 @@
             <span>Earnings</span>
         </a>
 
-        <a href="{% url 'dashboard_studio_reviews' %}"
+        <a href="{% url 'studio_reviews' %}"
             class="{% if request.resolver_match.url_name == 'studio_reviews' %}active{% endif %}">
             <i class="bi bi-star-half"></i>
             <span>Reviews</span>

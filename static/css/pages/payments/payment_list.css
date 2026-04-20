@@ -1,0 +1,16 @@
+    .payment-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    .payment-status {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+    .status-completed { background: #22c55e; color: #fff; }
+    .status-pending { background: #eab308; color: #000; }
+    .status-failed { background: #ef4444; color: #fff; }

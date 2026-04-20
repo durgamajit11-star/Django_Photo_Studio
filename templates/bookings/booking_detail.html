@@ -1,57 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Booking Details | StudioSync{% endblock %}
 
 {% block extra_css %}
-<style>
-.booking-detail-shell {
-    max-width: 1000px;
-    margin: 2rem auto;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 22px;
-    padding: 1.4rem;
-}
-
-.detail-card {
-    background: rgba(2, 6, 23, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 14px;
-    padding: 1rem;
-}
-
-.info-line {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.7rem;
-    padding: 0.45rem 0;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
-}
-
-.info-line:last-child {
-    border-bottom: none;
-}
-
-.note-item {
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 10px;
-    padding: 0.7rem;
-    margin-bottom: 0.5rem;
-    background: rgba(30, 41, 59, 0.45);
-}
-
-.status-badge {
-    border-radius: 999px;
-    padding: 0.35rem 0.8rem;
-    font-size: 0.78rem;
-    font-weight: 700;
-}
-
-.st-pending { background: rgba(245, 158, 11, 0.2); color: #facc15; }
-.st-confirmed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
-.st-completed { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
-.st-cancelled { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/bookings/booking_detail.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -63,7 +16,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             <span class="status-badge st-{{ booking.status|lower }}">{{ booking.status }}</span>
-            <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-light btn-sm">All Bookings</a>
+            <a href="{% url 'user_bookings' %}" class="btn btn-outline-light btn-sm">All Bookings</a>
         </div>
     </div>
 
@@ -80,12 +33,18 @@
             <div class="detail-card h-100">
                 <h5 class="mb-3">Booking Information</h5>
                 <div class="info-line"><span>Date</span><strong>{{ booking.date|date:"d M Y" }}</strong></div>
-                <div class="info-line"><span>Time</span><strong>{{ booking.time_slot|default:booking.time|default:"Not specified" }}</strong></div>
+                <div class="info-line"><span>Time</span><strong>{{ booking.time_window_display }}</strong></div>
+                <div class="info-line"><span>Duration</span><strong>{{ booking.duration_display }}</strong></div>
                 <div class="info-line"><span>Location</span><strong>{{ booking.location|default:booking.studio.location }}</strong></div>
                 <div class="info-line"><span>Service</span><strong>{{ booking.service.service_name|default:"General Session" }}</strong></div>
                 <div class="info-line"><span>Amount</span><strong>₹ {{ booking.amount }}</strong></div>
                 <div class="info-line"><span>Payment Status</span><strong>{{ booking.payment_status }}</strong></div>
                 <div class="info-line"><span>Created</span><strong>{{ booking.created_at|date:"d M Y, h:i A" }}</strong></div>
+                {% if booking.status == 'Pending' %}
+                <div class="alert alert-warning mt-3 mb-0">
+                    Payment is locked until the studio approves this booking. This keeps your payment safe until the request is confirmed.
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -93,8 +52,10 @@
             <div class="detail-card mb-3">
                 <h6 class="mb-2">Quick Actions</h6>
                 <div class="d-grid gap-2">
-                    {% if booking.payment_status == 'Unpaid' and booking.status != 'Cancelled' %}
+                    {% if booking.payment_status == 'Unpaid' and booking.status == 'Confirmed' %}
                     <a href="{% url 'payments:create_payment' booking.id %}" class="btn btn-success btn-sm">Pay Now</a>
+                    {% elif booking.payment_status == 'Unpaid' and booking.status == 'Pending' %}
+                    <button type="button" class="btn btn-outline-warning btn-sm" disabled>Awaiting Studio Approval</button>
                     {% endif %}
                     {% if booking.status == 'Pending' and booking.user == request.user %}
                     <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Cancel this booking?');">Cancel Booking</a>
