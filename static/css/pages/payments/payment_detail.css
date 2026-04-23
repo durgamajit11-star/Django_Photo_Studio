@@ -1,15 +1,15 @@
 .receipt-shell {
     max-width: 920px;
     margin: 0 auto;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.92));
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--theme-surface) 90%, var(--theme-bg)), color-mix(in srgb, var(--theme-surface-2) 90%, var(--theme-bg)));
+    border: 1px solid var(--theme-border);
     border-radius: 22px;
     padding: 1.4rem;
 }
 
 .receipt-card {
-    background: rgba(2, 6, 23, 0.65);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: color-mix(in srgb, var(--theme-surface) 84%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 16px;
     padding: 1rem;
 }
@@ -17,7 +17,7 @@
 .line {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+    border-bottom: 1px dashed var(--theme-border);
     padding: 0.45rem 0;
     font-size: 0.94rem;
 }

@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from bookings.models import BookingRequest
 from studios.models import Review, Studio
+from studios.models import Service
 
 
 class UserReviewFlowTests(TestCase):
@@ -35,6 +36,7 @@ class UserReviewFlowTests(TestCase):
 			location='Nagpur',
 			description='Test studio',
 			price_per_hour=1000,
+			is_verified=True,
 		)
 
 	def _create_booking(self, status='Confirmed'):
@@ -143,3 +145,118 @@ class UserReviewFlowTests(TestCase):
 		followed = self.client.get(f"{reverse('studios:studio_detail', args=[self.studio.id])}?open_review=1")
 		self.assertContains(followed, 'id="reviewModal"')
 		self.assertContains(followed, 'reviewModal.show();')
+
+
+class UserDashboardPriceRenderingTests(TestCase):
+	def setUp(self):
+		user_model = get_user_model()
+		self.user = user_model.objects.create_user(
+			username='dashuser',
+			password='Pass123!@#',
+			role='USER',
+			email='dashuser@example.com',
+		)
+
+		self.owner_one = user_model.objects.create_user(
+			username='ownerone',
+			password='Pass123!@#',
+			role='STUDIO',
+			email='ownerone@example.com',
+		)
+		self.owner_two = user_model.objects.create_user(
+			username='ownertwo',
+			password='Pass123!@#',
+			role='STUDIO',
+			email='ownertwo@example.com',
+		)
+
+		self.hourly_studio = Studio.objects.create(
+			user=self.owner_one,
+			studio_name='Hourly Studio',
+			location='Nagpur',
+			price_per_hour=6000,
+			is_verified=True,
+		)
+		self.service_fallback_studio = Studio.objects.create(
+			user=self.owner_two,
+			studio_name='Service Fallback Studio',
+			location='Amravati',
+			price_per_hour=0,
+			is_verified=True,
+		)
+		Service.objects.create(
+			studio=self.service_fallback_studio,
+			service_name='Portrait Package',
+			price=2000,
+		)
+
+	def test_dashboard_shows_hourly_price_when_available(self):
+		self.client.login(username='dashuser', password='Pass123!@#')
+
+		response = self.client.get(reverse('user_dashboard'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '6000/hr')
+
+	def test_dashboard_shows_service_fallback_price_when_hourly_missing(self):
+		self.client.login(username='dashuser', password='Pass123!@#')
+
+		response = self.client.get(reverse('user_dashboard'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'From ₹ 2000')
+
+
+class StudioBookingCompletionFlowTests(TestCase):
+	def setUp(self):
+		user_model = get_user_model()
+		self.studio_owner = user_model.objects.create_user(
+			username='studio_complete_owner',
+			password='Pass123!@#',
+			role='STUDIO',
+			email='studio_complete@example.com',
+		)
+		self.user = user_model.objects.create_user(
+			username='studio_complete_user',
+			password='Pass123!@#',
+			role='USER',
+			email='studio_complete_user@example.com',
+		)
+
+		self.studio = Studio.objects.create(
+			user=self.studio_owner,
+			studio_name='Completion Studio',
+			location='Nagpur',
+			price_per_hour=1500,
+			is_verified=True,
+		)
+
+		self.booking = BookingRequest.objects.create(
+			studio=self.studio,
+			user=self.user,
+			event_type='Portrait Session',
+			date=date.today(),
+			booking_date=date.today(),
+			amount=3000,
+			total_price=3000,
+			status='Confirmed',
+			payment_status='Paid',
+		)
+
+	def test_studio_can_mark_confirmed_booking_completed(self):
+		self.client.login(username='studio_complete_owner', password='Pass123!@#')
+		response = self.client.post(reverse('studio_complete_booking', args=[self.booking.id]))
+
+		self.assertRedirects(response, reverse('studio_bookings'))
+		self.booking.refresh_from_db()
+		self.assertEqual(self.booking.status, 'Completed')
+
+	def test_completed_status_reflects_on_user_bookings_page(self):
+		self.client.login(username='studio_complete_owner', password='Pass123!@#')
+		self.client.post(reverse('studio_complete_booking', args=[self.booking.id]))
+
+		self.client.login(username='studio_complete_user', password='Pass123!@#')
+		response = self.client.get(reverse('user_bookings'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Completed')

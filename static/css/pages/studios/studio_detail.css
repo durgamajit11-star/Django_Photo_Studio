@@ -1,6 +1,6 @@
 .detail-shell {
-    background: radial-gradient(circle at 8% -8%, rgba(245, 158, 11, 0.24), transparent 42%), radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.18), transparent 45%), linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.9));
-    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: radial-gradient(circle at 8% -8%, color-mix(in srgb, var(--theme-primary) 22%, transparent), transparent 42%), radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--theme-accent) 16%, transparent), transparent 45%), linear-gradient(145deg, color-mix(in srgb, var(--theme-surface) 92%, var(--theme-bg)), color-mix(in srgb, var(--theme-surface-2) 90%, var(--theme-bg)));
+    border: 1px solid var(--theme-border);
     border-radius: 24px;
     padding: 1.2rem;
 }
@@ -9,9 +9,9 @@
     height: clamp(220px, 38vh, 320px);
     border-radius: 16px;
     overflow: hidden;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--theme-border);
     position: relative;
-    background: rgba(2, 6, 23, 0.7);
+    background: color-mix(in srgb, var(--theme-surface) 90%, var(--theme-bg));
 }
 
 .hero img {
@@ -23,17 +23,17 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.32));
+    background: linear-gradient(0deg, color-mix(in srgb, var(--theme-bg) 92%, transparent), color-mix(in srgb, var(--theme-bg) 28%, transparent));
     display: flex;
     align-items: flex-end;
     padding: 1rem;
 }
 
 .badge-soft {
-    border: 1px solid rgba(148, 163, 184, 0.35);
+    border: 1px solid var(--theme-border);
     border-radius: 999px;
     padding: 0.26rem 0.74rem;
-    background: rgba(15, 23, 42, 0.62);
+    background: color-mix(in srgb, var(--theme-surface) 88%, var(--theme-bg));
     font-size: 0.8rem;
 }
 
@@ -44,8 +44,8 @@
 }
 
 .panel {
-    background: rgba(2, 6, 23, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: color-mix(in srgb, var(--theme-surface) 86%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 14px;
     padding: 0.9rem;
 }
@@ -63,7 +63,7 @@
 }
 
 .stat-card {
-    background: rgba(30, 41, 59, 0.52);
+    background: color-mix(in srgb, var(--theme-surface-2) 82%, var(--theme-bg));
     border-radius: 12px;
     padding: 0.65rem;
 }
@@ -77,8 +77,8 @@
 .review-item,
 .related-item,
 .portfolio-item {
-    background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: color-mix(in srgb, var(--theme-surface-2) 82%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 12px;
 }
 
@@ -99,7 +99,7 @@
 .meta-line {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.24);
+    border-bottom: 1px dashed var(--theme-border);
     padding: 0.35rem 0;
 }
 
@@ -114,7 +114,18 @@
 .booking-badge {
     font-size: 0.72rem;
     letter-spacing: 0.2px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--theme-border);
+}
+
+.panel-title,
+.service-item,
+.review-item,
+.related-item,
+.portfolio-item,
+.stat-card,
+.badge-soft,
+.meta-line {
+    color: var(--theme-text);
 }
 
 #reviewModal .modal-content {

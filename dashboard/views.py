@@ -274,7 +274,33 @@ def user_dashboard(request):
     from recommendations.models import StudioRecommendation
     from studios.models import Review
 
-    featured_studios = Studio.objects.filter(is_verified=True).order_by('-is_featured', '-is_verified', '-created_at')[:4]
+    featured_studios_qs = (
+        Studio.objects.filter(is_verified=True)
+        .annotate(min_service_price=Min('services__price'))
+        .order_by('-is_featured', '-is_verified', '-created_at')
+    )
+    featured_studios = list(featured_studios_qs[:4])
+    for studio in featured_studios:
+        hourly_price = studio.price_per_hour if studio.price_per_hour and studio.price_per_hour > 0 else None
+        fallback_price = studio.min_service_price if studio.min_service_price and studio.min_service_price > 0 else None
+        effective_price = hourly_price or fallback_price
+
+        if effective_price:
+            amount = int(effective_price)
+            studio.display_price = f"₹ {amount}/hr" if hourly_price else f"From ₹ {amount}"
+            if effective_price < 1000:
+                studio.price_bucket = 'low'
+            elif effective_price < 3000:
+                studio.price_bucket = 'mid'
+            else:
+                studio.price_bucket = 'high'
+        elif studio.price_range:
+            studio.display_price = studio.price_range
+            studio.price_bucket = 'mid'
+        else:
+            studio.display_price = 'Contact for pricing'
+            studio.price_bucket = 'mid'
+
     user_bookings = BookingRequest.objects.filter(user=request.user)
     recent_bookings = user_bookings.select_related('studio').order_by('-created_at')[:4]
     upcoming_booking = user_bookings.exclude(status='Cancelled').order_by('date', 'time').first()
@@ -1441,5 +1467,29 @@ def cancel_booking(request, booking_id):
     booking.status = "Cancelled"
     booking.save()
     messages.success(request, 'Booking cancelled!')
+
+    return redirect('studio_bookings')
+
+
+@login_required
+@role_required(['STUDIO'])
+@require_POST
+def complete_booking(request, booking_id):
+    studio = Studio.objects.filter(user=request.user).first()
+
+    if not studio:
+        messages.error(request, 'Studio profile not found')
+        return redirect('studio_dashboard')
+
+    from bookings.models import BookingRequest
+    booking = get_object_or_404(BookingRequest, id=booking_id, studio=studio)
+
+    if booking.status != 'Confirmed':
+        messages.warning(request, 'Only confirmed bookings can be marked as completed.')
+        return redirect('studio_bookings')
+
+    booking.status = 'Completed'
+    booking.save(update_fields=['status', 'updated_at'])
+    messages.success(request, 'Booking marked as completed!')
 
     return redirect('studio_bookings')

@@ -37,11 +37,6 @@
         <div class="studio-header-right">
             <span>Welcome, <strong>{{ user.username }}</strong></span>
 
-            <button type="button" class="theme-toggle-btn" data-theme-toggle>
-                <i class="bi bi-sun-fill" data-theme-icon></i>
-                <span data-theme-text>Light Mode</span>
-            </button>
-
             <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light ms-3">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </a>

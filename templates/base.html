@@ -16,9 +16,10 @@
     <meta name="theme-color" content="#4f46e5">
     <script>
         (function () {
-            const savedTheme = localStorage.getItem('studiosync_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            const lockedTheme = 'dark';
+            localStorage.setItem('studiosync_theme', lockedTheme);
+            document.documentElement.setAttribute('data-theme', lockedTheme);
+            document.documentElement.setAttribute('data-bs-theme', lockedTheme);
         })();
     </script>
 
@@ -48,11 +49,6 @@
     <!-- ================= MAIN CONTENT ================= -->
     {% block content %}
     {% endblock %}
-
-    <button type="button" class="theme-toggle-btn theme-floating-toggle" data-theme-toggle>
-        <i class="bi bi-sun-fill" data-theme-icon></i>
-        <span data-theme-text>Light Mode</span>
-    </button>
 
     {% if request.resolver_match.url_name != 'password_reset' and request.resolver_match.url_name != 'password_reset_done' and request.resolver_match.url_name != 'password_reset_confirm' and request.resolver_match.url_name != 'password_reset_complete' %}
     {% include "includes/chatbot.html" %}

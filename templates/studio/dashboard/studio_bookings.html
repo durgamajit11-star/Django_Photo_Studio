@@ -113,7 +113,7 @@
                         <td>{{ booking.created_at|date:"M d, Y" }}</td>
                         <td>{{ booking.date|date:"M d, Y" }}</td>
                         <td>{{ booking.time_window_display }}</td>
-                        <td class="fw-bold">?{{ booking.total_price|default:booking.amount }}</td>
+                        <td class="fw-bold">₹{{ booking.total_price|default:booking.amount }}</td>
                         <td>
                             <span class="badge {% if booking.status == 'Confirmed' %}bg-success{% elif booking.status == 'Pending' %}bg-warning{% elif booking.status == 'Completed' %}bg-info{% else %}bg-danger{% endif %}">
                                 {{ booking.status }}
@@ -140,6 +140,13 @@
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this booking?')">
                                         <i class="bi bi-x"></i> Reject
+                                    </button>
+                                </form>
+                                {% elif booking.status == 'Confirmed' %}
+                                <form method="POST" action="{% url 'studio_complete_booking' booking.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Mark this booking as completed?')">
+                                        <i class="bi bi-check2-circle"></i> Complete
                                     </button>
                                 </form>
                                 {% endif %}
@@ -194,7 +201,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <strong>Amount:</strong> ?{{ booking.total_price|default:booking.amount }}
+                        <strong>Amount:</strong> ₹{{ booking.total_price|default:booking.amount }}
                     </div>
                     <div class="col-md-6">
                         <strong>Status:</strong> <span class="badge bg-warning">{{ booking.status }}</span>

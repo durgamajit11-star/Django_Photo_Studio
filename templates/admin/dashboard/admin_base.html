@@ -34,10 +34,6 @@
 
         <nav class="header-nav">
             <span class="welcome-text">Admin: <strong>{{ user.username }}</strong></span>
-            <button type="button" class="theme-toggle-btn" data-theme-toggle>
-                <i class="bi bi-sun-fill" data-theme-icon></i>
-                <span data-theme-text>Light Mode</span>
-            </button>
             <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-danger">
                 <i class="bi bi-box-arrow-right me-1"></i>Logout
             </a>

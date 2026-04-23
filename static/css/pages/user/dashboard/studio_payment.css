@@ -55,7 +55,7 @@
 }
 
 .qr-box {
-    background: #ffffff;
+    background: var(--theme-surface);
     border-radius: 12px;
     padding: 0.85rem;
     text-align: center;

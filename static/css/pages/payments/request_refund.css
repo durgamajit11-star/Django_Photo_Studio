@@ -1,15 +1,20 @@
 .refund-shell {
     max-width: 820px;
     margin: 0 auto;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(51, 65, 85, 0.9));
-    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--theme-surface) 92%, var(--theme-bg)), color-mix(in srgb, var(--theme-surface-2) 90%, var(--theme-bg)));
+    border: 1px solid var(--theme-border);
     border-radius: 20px;
     padding: 1.3rem;
 }
 
 .refund-card {
-    background: rgba(2, 6, 23, 0.62);
+    background: color-mix(in srgb, var(--theme-surface) 86%, var(--theme-bg));
     border-radius: 14px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--theme-border);
     padding: 1rem;
+}
+
+.refund-shell,
+.refund-card {
+    color: var(--theme-text);
 }

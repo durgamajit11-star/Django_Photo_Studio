@@ -37,7 +37,7 @@
             </div>
             <div class="stat-content">
                 <span class="stat-label">Total Earnings</span>
-                <h2 class="stat-value">?{{ total_earnings|default:0 }}</h2>
+                <h2 class="stat-value">₹{{ total_earnings|default:0 }}</h2>
                 <small class="stat-trend">📈 +15% vs last month</small>
             </div>
         </div>
@@ -50,7 +50,7 @@
             </div>
             <div class="stat-content">
                 <span class="stat-label">Pending Payment</span>
-                <h2 class="stat-value">?{{ pending_amount|default:0 }}</h2>
+                <h2 class="stat-value">₹{{ pending_amount|default:0 }}</h2>
                 <small class="stat-trend">⏳ Awaiting completion</small>
             </div>
         </div>
@@ -125,11 +125,11 @@
                 <div class="metrics-list">
                     <div class="metric-row">
                         <span class="metric-label">Average Booking Value</span>
-                        <span class="metric-value">?{{ avg_booking_value|floatformat:2 }}</span>
+                        <span class="metric-value">₹{{ avg_booking_value|floatformat:2 }}</span>
                     </div>
                     <div class="metric-row">
                         <span class="metric-label">Monthly Average</span>
-                        <span class="metric-value">?{{ monthly_average|floatformat:2 }}</span>
+                        <span class="metric-value">₹{{ monthly_average|floatformat:2 }}</span>
                     </div>
                     <div class="metric-row">
                         <span class="metric-label">Payment Completion Rate</span>
@@ -156,7 +156,7 @@
                         <div class="service-rank">{{ forloop.counter }}</div>
                         <div class="service-details">
                             <span class="service-name">{{ service.service__service_name|default:'General Session' }}</span>
-                            <small class="text-muted">{{ service.bookings_count }} bookings • ?{{ service.revenue|floatformat:2 }}</small>
+                            <small class="text-muted">{{ service.bookings_count }} bookings • ₹{{ service.revenue|floatformat:2 }}</small>
                         </div>
                     </div>
                     {% empty %}
@@ -200,7 +200,7 @@
                             <span>{{ payment.booking.event_type }}</span>
                             <small class="d-block text-muted">{{ payment.booking.date|date:"M d, Y" }}</small>
                         </td>
-                        <td class="fw-bold">?{{ payment.amount }}</td>
+                        <td class="fw-bold">₹{{ payment.amount }}</td>
                         <td>
                             <span class="badge {% if payment.status == 'Completed' %}bg-success{% elif payment.status == 'Pending' %}bg-warning{% else %}bg-danger{% endif %}">
                                 {{ payment.status }}

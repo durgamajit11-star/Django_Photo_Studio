@@ -114,7 +114,7 @@ def studio_detail(request, studio_id):
 @login_required
 def user_studios_list(request):
     """Users can browse and filter studios"""
-    return studio_list(request)
+    return redirect('explore_studios')
 
 
 @login_required

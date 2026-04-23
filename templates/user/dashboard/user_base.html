@@ -15,9 +15,10 @@
 
     <script>
         (function () {
-            const savedTheme = localStorage.getItem('studiosync_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            const lockedTheme = 'dark';
+            localStorage.setItem('studiosync_theme', lockedTheme);
+            document.documentElement.setAttribute('data-theme', lockedTheme);
+            document.documentElement.setAttribute('data-bs-theme', lockedTheme);
         })();
     </script>
 
@@ -57,10 +58,6 @@
             </div>
             <nav class="header-nav">
                 <span class="welcome-text">Welcome, <strong>{{ user.username }}</strong></span>
-                <button class="theme-toggle-btn" type="button" data-theme-toggle>
-                    <i class="bi bi-sun-fill" data-theme-icon></i>
-                    <span data-theme-text>Light Mode</span>
-                </button>
                 <a href="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger btn-sm">
@@ -124,7 +121,7 @@
                 <a href="{% url 'dashboard_user_reviews' %}"
                     data-label="Reviews"
                     title="Reviews"
-                    class="menu-item {% if request.resolver_match.url_name == 'user_reviews' %}active{% endif %}">
+                    class="menu-item {% if request.resolver_match.url_name == 'user_reviews' or request.resolver_match.url_name == 'dashboard_user_reviews' %}active{% endif %}">
                     <i class="bi bi-star"></i>
                     <span>Reviews</span>
                 </a>

@@ -49,9 +49,9 @@ def add_note(request, booking_id):
                 message=message
             )
             messages.success(request, 'Note added successfully!')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
-    return redirect('booking_detail', booking_id=booking_id)
+    return redirect('bookings:booking_detail', booking_id=booking_id)
 
 
 @login_required
@@ -65,12 +65,12 @@ def cancel_booking(request, booking_id):
     
     if booking.status != 'Pending':
         messages.error(request, 'Only pending bookings can be cancelled')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     booking.status = 'Cancelled'
     booking.save()
     messages.success(request, 'Booking cancelled successfully!')
-    return redirect('booking_detail', booking_id=booking_id)
+    return redirect('bookings:booking_detail', booking_id=booking_id)
 
 
 @login_required
@@ -85,7 +85,7 @@ def approve_booking(request, booking_id):
     booking.status = 'Confirmed'
     booking.save()
     messages.success(request, 'Booking approved successfully!')
-    return redirect('booking_detail', booking_id=booking_id)
+    return redirect('bookings:booking_detail', booking_id=booking_id)
 
 
 @login_required
@@ -100,4 +100,4 @@ def reject_booking(request, booking_id):
     booking.status = 'Cancelled'
     booking.save()
     messages.success(request, 'Booking rejected!')
-    return redirect('booking_detail', booking_id=booking_id)
+    return redirect('bookings:booking_detail', booking_id=booking_id)

@@ -32,9 +32,9 @@
 
                     <select id="priceFilter" class="search-select">
                         <option value="">Any Price</option>
-                        <option value="low">₹ Budget</option>
-                        <option value="mid">₹₹ Standard</option>
-                        <option value="high">₹₹₹ Premium</option>
+                        <option value="low">Budget</option>
+                        <option value="mid">Standard</option>
+                        <option value="high">Premium</option>
                     </select>
 
                     <button class="btn btn-primary search-btn" onclick="applyFilters()">
@@ -106,7 +106,7 @@
         <h5 class="mb-3">🌟 Featured Studios</h5>
         <div class="studios-grid">
             {% for studio in featured_studios %}
-            <div class="col studio-item" data-city="{{ studio.location|lower }}" data-type="{{ studio.specializations|default:''|lower }}" data-rating="{{ studio.rating|default:0 }}" data-price="{{ studio.price_range|default:''|lower }}">
+            <div class="col studio-item" data-city="{{ studio.location|lower }}" data-type="{{ studio.specializations|default:''|lower }}" data-rating="{{ studio.rating|default:0 }}" data-price="{{ studio.price_bucket }}">
                 <div class="studio-card">
                     <div class="studio-image-wrapper">
                         {% if studio.profile_image %}
@@ -123,7 +123,7 @@
                         <p class="location">📍 {{ studio.location }}</p>
                         <div class="rating-price">
                             <span class="rating">⭐ {{ studio.average_rating|floatformat:1 }}</span>
-                            <span class="price">{{ studio.price_range|default:'₹₹' }}</span>
+                            <span class="price">{{ studio.display_price }}</span>
                         </div>
                         <div class="d-grid gap-2 mt-2">
                             <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-light btn-sm w-100">View Details</a>

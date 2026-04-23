@@ -1,15 +1,15 @@
 .booking-detail-shell {
     max-width: 1000px;
     margin: 2rem auto;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--theme-surface) 92%, var(--theme-bg)), color-mix(in srgb, var(--theme-surface-2) 90%, var(--theme-bg)));
+    border: 1px solid var(--theme-border);
     border-radius: 22px;
     padding: 1.4rem;
 }
 
 .detail-card {
-    background: rgba(2, 6, 23, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: color-mix(in srgb, var(--theme-surface) 86%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 14px;
     padding: 1rem;
 }
@@ -19,7 +19,7 @@
     justify-content: space-between;
     gap: 0.7rem;
     padding: 0.45rem 0;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+    border-bottom: 1px dashed var(--theme-border);
 }
 
 .info-line:last-child {
@@ -27,11 +27,18 @@
 }
 
 .note-item {
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid var(--theme-border);
     border-radius: 10px;
     padding: 0.7rem;
     margin-bottom: 0.5rem;
-    background: rgba(30, 41, 59, 0.45);
+    background: color-mix(in srgb, var(--theme-surface-2) 82%, var(--theme-bg));
+}
+
+.booking-detail-shell,
+.detail-card,
+.note-item,
+.info-line {
+    color: var(--theme-text);
 }
 
 .status-badge {

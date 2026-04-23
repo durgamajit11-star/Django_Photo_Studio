@@ -5,9 +5,9 @@
 }
 
 .glass-panel {
-    background: linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.26);
+    background: linear-gradient(150deg, color-mix(in srgb, var(--theme-surface) 90%, transparent), color-mix(in srgb, var(--theme-surface-2) 76%, transparent));
+    border: 1px solid var(--theme-border);
+    box-shadow: var(--theme-card-shadow);
     border-radius: 16px;
     padding: 1rem;
 }
@@ -27,8 +27,8 @@
 }
 
 .stats-grid .stat-card {
-    background: rgba(8, 23, 40, 0.62);
-    border: 1px solid rgba(108, 230, 219, 0.18);
+    background: color-mix(in srgb, var(--theme-surface) 86%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 12px;
     padding: 0.75rem;
 }
@@ -40,24 +40,24 @@
 }
 
 .quick-link {
-    border: 1px solid rgba(108, 230, 219, 0.18);
+    border: 1px solid var(--theme-border);
     border-radius: 12px;
     padding: 0.65rem;
     text-decoration: none;
     color: inherit;
-    background: rgba(9, 25, 44, 0.45);
+    background: color-mix(in srgb, var(--theme-surface) 82%, var(--theme-bg));
 }
 
 .quick-link:hover {
-    border-color: rgba(108, 230, 219, 0.72);
-    background: rgba(108, 230, 219, 0.1);
+    border-color: var(--theme-primary);
+    background: color-mix(in srgb, var(--theme-primary) 12%, var(--theme-surface));
     color: inherit;
 }
 
 .mini-item {
-    border: 1px solid rgba(108, 230, 219, 0.16);
+    border: 1px solid var(--theme-border);
     border-radius: 10px;
-    background: rgba(9, 25, 44, 0.45);
+    background: color-mix(in srgb, var(--theme-surface) 84%, var(--theme-bg));
     padding: 0.6rem;
     margin-bottom: 0.5rem;
 }
@@ -76,8 +76,8 @@
     gap: 0.35rem;
     padding: 0.25rem 0.7rem;
     border-radius: 999px;
-    background: rgba(108, 230, 219, 0.16);
-    color: #d9f3ff;
+    background: color-mix(in srgb, var(--theme-primary) 16%, transparent);
+    color: var(--theme-text);
     font-size: 0.8rem;
 }
 
@@ -98,21 +98,21 @@
 }
 
 .dashboard-tabs {
-    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    border-bottom: 1px solid var(--theme-border);
     gap: 0.45rem;
 }
 
 .dashboard-tabs .nav-link {
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    color: rgba(226, 232, 240, 0.92);
-    background: rgba(30, 41, 59, 0.45);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text);
+    background: color-mix(in srgb, var(--theme-surface) 82%, var(--theme-bg));
     border-radius: 10px;
     font-weight: 600;
     padding: 0.5rem 0.9rem;
 }
 
 .dashboard-tabs .nav-link.active {
-    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-accent));
     border-color: transparent;
     color: #ffffff;
 }
@@ -124,8 +124,8 @@
 }
 
 .panel-section {
-    background: rgba(15, 23, 42, 0.52);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: color-mix(in srgb, var(--theme-surface) 88%, var(--theme-bg));
+    border: 1px solid var(--theme-border);
     border-radius: 14px;
     padding: 0.85rem;
 }
@@ -133,6 +133,7 @@
 .panel-section h6 {
     margin-bottom: 0.7rem;
     font-weight: 700;
+    color: var(--theme-text);
 }
 
 .panel-list {

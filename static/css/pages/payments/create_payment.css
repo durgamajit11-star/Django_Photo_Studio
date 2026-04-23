@@ -32,7 +32,7 @@
 
 .qr-box {
     text-align: center;
-    background: #ffffff;
+    background: var(--theme-surface);
     border-radius: 14px;
     padding: 0.9rem;
 }

@@ -148,14 +148,21 @@ function applyFilters() {
 
     studios.forEach(studio => {
         const studioCity = studio.dataset.city || '';
-        const studioType = studio.dataset.type || '';
+        const studioType = (studio.dataset.type || '').toLowerCase();
         const studioRating = parseFloat(studio.dataset.rating) || 0;
         const studioPrice = studio.dataset.price || '';
 
         let visible = true;
 
         if (city && !studioCity.toLowerCase().includes(city)) visible = false;
-        if (type && studioType !== type) visible = false;
+        if (type) {
+            const normalizedTypes = studioType
+                .split(',')
+                .map(value => value.trim())
+                .filter(Boolean);
+            const typeMatch = normalizedTypes.some(value => value.includes(type)) || studioType.includes(type);
+            if (!typeMatch) visible = false;
+        }
         if (rating && studioRating < parseFloat(rating)) visible = false;
         if (price && studioPrice !== price) visible = false;
 

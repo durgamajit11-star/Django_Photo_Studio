@@ -1,21 +1,19 @@
 (function () {
     const STORAGE_KEY = 'studiosync_theme';
+    const LOCKED_THEME = 'dark';
 
     function getSavedTheme() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark') {
-            return saved;
-        }
-        return 'dark';
+        return LOCKED_THEME;
     }
 
     function applyTheme(theme) {
+        const resolvedTheme = LOCKED_THEME;
         const root = document.documentElement;
-        root.setAttribute('data-theme', theme);
-        root.setAttribute('data-bs-theme', theme);
-        localStorage.setItem(STORAGE_KEY, theme);
-        updateToggleButtons(theme);
-        document.dispatchEvent(new CustomEvent('studiosync:theme-changed', { detail: { theme: theme } }));
+        root.setAttribute('data-theme', resolvedTheme);
+        root.setAttribute('data-bs-theme', resolvedTheme);
+        localStorage.setItem(STORAGE_KEY, resolvedTheme);
+        updateToggleButtons(resolvedTheme);
+        document.dispatchEvent(new CustomEvent('studiosync:theme-changed', { detail: { theme: resolvedTheme } }));
     }
 
     function updateToggleButtons(theme) {
@@ -25,20 +23,18 @@
             const text = btn.querySelector('[data-theme-text]');
 
             if (icon) {
-                icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+                icon.className = 'bi bi-moon-stars-fill';
             }
             if (text) {
-                text.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+                text.textContent = 'Dark Mode';
             }
-            btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-            btn.setAttribute('title', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+            btn.setAttribute('aria-label', 'Dark mode enabled');
+            btn.setAttribute('title', 'Dark mode enabled');
         });
     }
 
     function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme') || getSavedTheme();
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
+        applyTheme(LOCKED_THEME);
     }
 
     function initializeTheme() {
@@ -58,7 +54,7 @@
 
         document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                toggleTheme();
+                applyTheme(LOCKED_THEME);
             });
         });
     });
