@@ -6,11 +6,32 @@ class ChatMessage(models.Model):
     """Store chatbot conversation messages"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='chat_messages')
 
+    ROLE_CHOICES = (
+        ('USER', 'User'),
+        ('STUDIO', 'Studio'),
+        ('ADMIN', 'Admin'),
+        ('UNKNOWN', 'Unknown'),
+    )
+
+    RESPONSE_MODE_CHOICES = (
+        ('legacy', 'Legacy'),
+        ('intent_answer', 'Intent Answer'),
+        ('faq_hit', 'FAQ Hit'),
+        ('fallback', 'Fallback'),
+        ('guardrail', 'Guardrail'),
+        ('admin_safe', 'Admin Safe'),
+        ('standard', 'Standard'),
+    )
+
     # New schema-friendly fields
     message = models.TextField(blank=True, null=True)
     response = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_user = models.BooleanField(default=True)
+    role_at_message_time = models.CharField(max_length=10, choices=ROLE_CHOICES, default='UNKNOWN')
+    policy_blocked = models.BooleanField(default=False)
+    blocked_reason = models.TextField(blank=True, null=True)
+    response_mode = models.CharField(max_length=20, choices=RESPONSE_MODE_CHOICES, default='legacy')
 
     # Legacy compatibility fields used by older parts of the project
     user_message = models.TextField(blank=True, null=True)
@@ -55,10 +76,18 @@ class ChatSession(models.Model):
 
 class ChatbotFAQ(models.Model):
     """FAQ entries for the chatbot"""
+    ROLE_SCOPE_CHOICES = (
+        ('ALL', 'All Roles'),
+        ('USER', 'User'),
+        ('STUDIO', 'Studio'),
+        ('ADMIN', 'Admin'),
+    )
+
     question = models.CharField(max_length=300)
     answer = models.TextField()
     category = models.CharField(max_length=100, blank=True, null=True)
     keywords = models.TextField(help_text="Comma-separated keywords for matching")
+    role_scope = models.CharField(max_length=10, choices=ROLE_SCOPE_CHOICES, default='ALL')
     
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

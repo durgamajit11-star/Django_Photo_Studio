@@ -3,116 +3,87 @@
 
 {% block title %}My Reviews | StudioSync{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/user/dashboard/user_reviews.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'css/pages/user/dashboard/user_reviews.css' %}">
-
-<div class="container-fluid">
-
-    <!-- HEADER -->
-    <div class="row mb-4 review-header">
-        <div class="col-md-6">
-            <h3>⭐ My Reviews</h3>
-            <p style="color: #9aa4ff;">Your feedback & ratings</p>
+<div class="reviews-shell">
+    <section class="reviews-hero">
+        <div class="reviews-hero-content">
+            <span class="hero-chip">Feedback Hub</span>
+            <h1>My Reviews</h1>
+            <p>Track your ratings, update your feedback, and manage studio reviews from one place.</p>
         </div>
-
-        <!-- SEARCH -->
-        <div class="col-md-6 text-end">
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search by studio...">
+        <div class="reviews-hero-actions">
+            <div class="summary-pill">
+                <span class="summary-label">Total Reviews</span>
+                <strong>{{ reviews|length }}</strong>
+            </div>
+            <div class="search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="search-box" placeholder="Search by studio name, comment, location">
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- SUCCESS MESSAGE -->
     {% if messages %}
-    <div class="alert alert-success alert-dismissible fade show">
+    <div class="message-stack">
         {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-0" role="alert">
             {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {% endfor %}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endif %}
 
     {% if reviews %}
-    <div class="row g-4" id="reviewContainer">
-
+    <section class="reviews-grid" id="reviewContainer">
         {% for review in reviews %}
-        <div class="col-md-6 review-item fade-in">
-            <div class="review-card">
-
-                <!-- TITLE + RATING -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5>{{ review.studio.studio_name }}</h5>
-                    <span class="rating-badge">{{ review.rating }}/5 ⭐</span>
+        <article class="review-item review-card" style="animation-delay: {{ forloop.counter0 }}0ms;">
+            <header class="review-head">
+                <div>
+                    <h2>{{ review.studio.studio_name }}</h2>
+                    <p class="location-line"><i class="bi bi-geo-alt"></i> {{ review.studio.location }}</p>
                 </div>
+                <span class="rating-badge">{{ review.rating }}/5</span>
+            </header>
 
-                <!-- STARS -->
-                <div class="mb-2">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= review.rating %}
-                            <span class="star">★</span>
-                        {% else %}
-                            <span class="star text-secondary">☆</span>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-                <!-- LOCATION -->
-                <p class="small text-muted mb-2">
-                    <i class="bi bi-geo-alt"></i> {{ review.studio.location }}
-                </p>
-
-                <!-- COMMENT -->
-                <p class="mb-3">{{ review.comment }}</p>
-
-                <!-- FOOTER -->
-                <div class="d-flex justify-content-between align-items-center">
-
-                    <small class="text-secondary">
-                        <i class="bi bi-calendar"></i> {{ review.created_at|date:"M d, Y" }}
-                    </small>
-
-                    <div class="d-flex gap-2">
-
-                        <!-- VIEW -->
-                        <a href="{% url 'studios:studio_detail' review.studio.id %}"
-                           class="btn btn-sm btn-outline-primary btn-custom">
-                            View
-                        </a>
-
-                        <!-- EDIT -->
-                        <a href="{% url 'edit_review' review.id %}"
-                           class="btn btn-sm btn-edit btn-custom">
-                            Edit
-                        </a>
-
-                        <!-- DELETE -->
-                                                <form method="POST" action="{% url 'delete_review' review.id %}" class="d-inline"
-                                                            onsubmit="return confirm('Delete this review?');">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-delete btn-custom">Delete</button>
-                                                </form>
-
-                    </div>
-                </div>
-
+            <div class="stars-row" aria-label="Rating {{ review.rating }} out of 5">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                    <i class="bi bi-star-fill star active"></i>
+                    {% else %}
+                    <i class="bi bi-star star"></i>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </div>
+
+            <p class="comment-text">{{ review.comment }}</p>
+
+            <footer class="review-foot">
+                <small class="date-line"><i class="bi bi-calendar-event"></i> {{ review.created_at|date:"M d, Y" }}</small>
+                <div class="actions-row">
+                    <a href="{% url 'studios:studio_detail' review.studio.id %}" class="btn btn-view btn-sm">View</a>
+                    <a href="{% url 'edit_review' review.id %}" class="btn btn-edit btn-sm">Edit</a>
+                    <form method="POST" action="{% url 'delete_review' review.id %}" class="d-inline" onsubmit="return confirm('Delete this review?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-delete btn-sm">Delete</button>
+                    </form>
+                </div>
+            </footer>
+        </article>
         {% endfor %}
-
-    </div>
-
+    </section>
     {% else %}
-
-    <!-- EMPTY STATE -->
-    <div class="text-center empty-box">
-        <i class="bi bi-star" style="font-size: 3rem;"></i>
-        <h5 class="mt-3">No Reviews Yet</h5>
-        <p >Start exploring and share your experience!</p>
-        <a href="{% url 'explore_studios' %}" class="btn btn-primary rounded-pill px-4">
-            Browse Studios
-        </a>
-    </div>
-
+    <section class="empty-box text-center">
+        <i class="bi bi-chat-square-heart"></i>
+        <h5>No Reviews Yet</h5>
+        <p>Start exploring studios and share your first review.</p>
+        <a href="{% url 'explore_studios' %}" class="btn btn-browse">Browse Studios</a>
+    </section>
     {% endif %}
 </div>
 
@@ -124,7 +95,7 @@ document.getElementById("searchInput").addEventListener("keyup", function() {
 
     items.forEach(item => {
         let text = item.innerText.toLowerCase();
-        item.style.display = text.includes(value) ? "block" : "none";
+        item.style.display = text.includes(value) ? "" : "none";
     });
 });
 </script>

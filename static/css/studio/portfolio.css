@@ -382,3 +382,59 @@ html[data-theme='light'] .layout-switch button {
 html[data-theme='light'] .portfolio-preview-modal {
     background: #ffffff;
 }
+
+/* ===== PREMIUM OVERRIDES ===== */
+body.studio-dashboard-page .portfolio-header h1,
+body.studio-dashboard-page .panel-header h5,
+body.studio-dashboard-page .portfolio-stat-card .stat-value,
+body.studio-dashboard-page .gallery-caption,
+body.studio-dashboard-page .gallery-chip {
+    color: #f3f8f4;
+}
+
+body.studio-dashboard-page .portfolio-header p,
+body.studio-dashboard-page .portfolio-stat-card small,
+body.studio-dashboard-page .panel-header small,
+body.studio-dashboard-page .upload-dropzone small,
+body.studio-dashboard-page .gallery-card-info small,
+body.studio-dashboard-page .stat-head {
+    color: #91a499;
+}
+
+body.studio-dashboard-page .portfolio-stat-card,
+body.studio-dashboard-page .portfolio-panel,
+body.studio-dashboard-page .upload-dropzone,
+body.studio-dashboard-page .gallery-card,
+body.studio-dashboard-page .empty-state,
+body.studio-dashboard-page .portfolio-preview-modal {
+    background: linear-gradient(165deg, rgba(7, 27, 21, 0.94), rgba(4, 15, 11, 0.94));
+    border-color: rgba(217, 170, 67, 0.14) !important;
+}
+
+body.studio-dashboard-page .portfolio-stat-card,
+body.studio-dashboard-page .portfolio-panel,
+body.studio-dashboard-page .gallery-card,
+body.studio-dashboard-page .empty-state {
+    border: 1px solid rgba(217, 170, 67, 0.14);
+}
+
+body.studio-dashboard-page .mini-progress span,
+body.studio-dashboard-page .layout-switch button.active,
+body.studio-dashboard-page .gallery-chip-category {
+    background: linear-gradient(135deg, #d9ab45, #f0c45f);
+    color: #000;
+}
+
+body.studio-dashboard-page .layout-switch button {
+    background: rgba(6, 20, 16, 0.9);
+    color: #dce8df;
+    border-color: rgba(217, 170, 67, 0.18);
+}
+
+body.studio-dashboard-page .quick-upload-form .btn-primary,
+body.studio-dashboard-page .panel-body .btn-primary,
+body.studio-dashboard-page .gallery-overlay .btn-primary {
+    background: linear-gradient(135deg, #d9ab45, #f0c45f);
+    color: #000;
+    border: 0;
+}

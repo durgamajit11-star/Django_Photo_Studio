@@ -28,13 +28,14 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/premium-unified.css' %}">
     <link rel="stylesheet" href="{% static 'css/user/dashboard.css' %}">
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
 
-<body data-role="{{ user.role|default:'' }}">
+<body data-role="{{ user.role|default:'' }}" data-perf-endpoint="{% url 'web_vitals_ingest' %}">
 
     <div class="dashboard-bg-orb dashboard-orb-a" aria-hidden="true"></div>
     <div class="dashboard-bg-orb dashboard-orb-b" aria-hidden="true"></div>
@@ -226,10 +227,9 @@
     {% include "includes/chatbot.html" %}
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/global.js' %}"></script>
-    <script src="{% static 'js/dashboard.js' %}"></script>
-    <script src="{% static 'js/core/chatbot.js' %}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="{% static 'js/global.js' %}"></script>
+    <script defer src="{% static 'js/dashboard.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

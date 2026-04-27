@@ -1,9 +1,12 @@
+import csv
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Count, Avg
 from django.db import transaction
 from django.db.models.functions import TruncMonth
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.utils import timezone
@@ -14,6 +17,7 @@ from studios.models import Studio
 from bookings.models import BookingRequest
 from payments.models import Payment
 from notifications.models import Notification
+from chatbot.models import ChatMessage
 
 
 User = get_user_model()
@@ -70,6 +74,48 @@ def admin_dashboard(request):
         labels.append(item['month'].strftime('%b %Y'))
         revenue_data.append(float(item['total']))
 
+    bot_messages = ChatMessage.objects.filter(is_user=False)
+    blocked_by_role = {
+        'USER': 0,
+        'STUDIO': 0,
+        'ADMIN': 0,
+        'UNKNOWN': 0,
+    }
+    blocked_role_rows = (
+        bot_messages.filter(policy_blocked=True)
+        .values('role_at_message_time')
+        .annotate(total=Count('id'))
+    )
+    for row in blocked_role_rows:
+        blocked_by_role[row['role_at_message_time']] = row['total']
+
+    faq_hits = bot_messages.filter(response_mode='faq_hit').count()
+    fallback_count = bot_messages.filter(response_mode='fallback').count()
+    faq_fallback_total = faq_hits + fallback_count
+    faq_hit_rate = round((faq_hits * 100.0) / faq_fallback_total, 1) if faq_fallback_total else 0.0
+    fallback_rate = round((fallback_count * 100.0) / faq_fallback_total, 1) if faq_fallback_total else 0.0
+
+    one_week_ago = timezone.now() - timedelta(days=7)
+    weekly_blocked_count = bot_messages.filter(policy_blocked=True, timestamp__gte=one_week_ago).count()
+    weekly_total_bot_messages = bot_messages.filter(timestamp__gte=one_week_ago).count()
+
+    today = timezone.localdate()
+    policy_trend_labels = []
+    blocked_trend_data = []
+    faq_hit_rate_trend_data = []
+    for offset in range(6, -1, -1):
+        day = today - timedelta(days=offset)
+        day_messages = bot_messages.filter(timestamp__date=day)
+        day_blocked = day_messages.filter(policy_blocked=True).count()
+        day_faq_hits = day_messages.filter(response_mode='faq_hit').count()
+        day_fallback = day_messages.filter(response_mode='fallback').count()
+        day_denom = day_faq_hits + day_fallback
+        day_faq_rate = round((day_faq_hits * 100.0) / day_denom, 1) if day_denom else 0.0
+
+        policy_trend_labels.append(day.strftime('%d %b'))
+        blocked_trend_data.append(day_blocked)
+        faq_hit_rate_trend_data.append(day_faq_rate)
+
     context = {
         'total_users': total_users,
         'total_studios': total_studios,
@@ -87,8 +133,79 @@ def admin_dashboard(request):
         'payment_snapshot': payment_snapshot,
         'revenue_labels': labels,
         'revenue_data': revenue_data,
+        'blocked_by_role': blocked_by_role,
+        'total_blocked_intents': sum(blocked_by_role.values()),
+        'faq_hits': faq_hits,
+        'fallback_count': fallback_count,
+        'faq_hit_rate': faq_hit_rate,
+        'fallback_rate': fallback_rate,
+        'weekly_blocked_count': weekly_blocked_count,
+        'weekly_total_bot_messages': weekly_total_bot_messages,
+        'policy_trend_labels': policy_trend_labels,
+        'blocked_trend_data': blocked_trend_data,
+        'faq_hit_rate_trend_data': faq_hit_rate_trend_data,
     }
     return render(request, 'admin/dashboard/admin_dashboard.html', context)
+
+
+@login_required
+@role_required(['ADMIN'])
+def export_weekly_policy_report(request):
+    now = timezone.now()
+    window_start = now - timedelta(days=7)
+    weekly_bot_messages = ChatMessage.objects.filter(is_user=False, timestamp__gte=window_start, timestamp__lte=now)
+    weekly_blocked = weekly_bot_messages.filter(policy_blocked=True).select_related('user').order_by('-timestamp')
+
+    blocked_by_role = {
+        'USER': weekly_blocked.filter(role_at_message_time='USER').count(),
+        'STUDIO': weekly_blocked.filter(role_at_message_time='STUDIO').count(),
+        'ADMIN': weekly_blocked.filter(role_at_message_time='ADMIN').count(),
+        'UNKNOWN': weekly_blocked.filter(role_at_message_time='UNKNOWN').count(),
+    }
+
+    weekly_faq_hits = weekly_bot_messages.filter(response_mode='faq_hit').count()
+    weekly_fallback_count = weekly_bot_messages.filter(response_mode='fallback').count()
+    total_for_rates = weekly_faq_hits + weekly_fallback_count
+    faq_hit_rate = round((weekly_faq_hits * 100.0) / total_for_rates, 1) if total_for_rates else 0.0
+    fallback_rate = round((weekly_fallback_count * 100.0) / total_for_rates, 1) if total_for_rates else 0.0
+
+    filename = f'weekly_policy_report_{now.strftime("%Y%m%d")}.csv'
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(['StudioSync Weekly Moderation Policy Report'])
+    writer.writerow(['Generated At', now.strftime('%Y-%m-%d %H:%M:%S %Z')])
+    writer.writerow(['Window Start', window_start.strftime('%Y-%m-%d %H:%M:%S %Z')])
+    writer.writerow(['Window End', now.strftime('%Y-%m-%d %H:%M:%S %Z')])
+    writer.writerow([])
+
+    writer.writerow(['Summary Metrics'])
+    writer.writerow(['Weekly Bot Messages', weekly_bot_messages.count()])
+    writer.writerow(['Weekly Blocked Intents', weekly_blocked.count()])
+    writer.writerow(['Blocked USER', blocked_by_role['USER']])
+    writer.writerow(['Blocked STUDIO', blocked_by_role['STUDIO']])
+    writer.writerow(['Blocked ADMIN', blocked_by_role['ADMIN']])
+    writer.writerow(['Blocked UNKNOWN', blocked_by_role['UNKNOWN']])
+    writer.writerow(['FAQ Hits', weekly_faq_hits])
+    writer.writerow(['Fallbacks', weekly_fallback_count])
+    writer.writerow(['FAQ Hit Rate (%)', faq_hit_rate])
+    writer.writerow(['Fallback Rate (%)', fallback_rate])
+    writer.writerow([])
+
+    writer.writerow(['Blocked Message Details'])
+    writer.writerow(['Timestamp', 'Username', 'Role', 'Response Mode', 'Blocked Reason', 'Bot Response'])
+    for row in weekly_blocked:
+        writer.writerow([
+            timezone.localtime(row.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
+            row.user.username,
+            row.role_at_message_time,
+            row.response_mode,
+            row.blocked_reason or '',
+            (row.message or '').replace('\n', ' ').strip(),
+        ])
+
+    return response
 
 
 @login_required

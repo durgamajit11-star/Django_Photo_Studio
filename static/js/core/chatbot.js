@@ -2,7 +2,7 @@
 // SHARED CHATBOT WIDGET
 // ===============================
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeChatbotWidget() {
     const container = document.getElementById('chatbot-container');
     const chatWindow = document.getElementById('chatWindow');
     const chatToggle = document.getElementById('chatToggle');
@@ -16,10 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const messagesUrl = container.dataset.chatbotUrl || '/chatbot/messages/';
+    if (container.dataset.chatbotInitialized === '1') {
+        return;
+    }
+    container.dataset.chatbotInitialized = '1';
+
+    const role = (container.dataset.chatbotRole || document.body?.dataset?.role || 'USER').toUpperCase();
+    const messagesUrlByRole = {
+        USER: container.dataset.chatbotUserUrl || '/chatbot/messages/user/',
+        STUDIO: container.dataset.chatbotStudioUrl || '/chatbot/messages/studio/',
+        ADMIN: container.dataset.chatbotAdminUrl || '/chatbot/messages/admin/'
+    };
+    const messagesUrl = messagesUrlByRole[role] || container.dataset.chatbotUrl || '/chatbot/messages/';
     const clearUrl = container.dataset.chatbotClearUrl || '/chatbot/clear/';
     let historyLoaded = false;
     let sending = false;
+
+    const roleSuggestions = {
+        USER: [
+            'What can I do on this platform?',
+            'How do bookings work?',
+            'How do payments and refunds work?'
+        ],
+        STUDIO: [
+            'How do I manage my portfolio and studio profile?',
+            'How do I handle booking approvals and schedule updates?',
+            'How can I track earnings and client reviews?'
+        ],
+        ADMIN: [
+            'How do I verify and moderate studio accounts?',
+            'How can I monitor bookings and payment flow?',
+            'What are key admin dashboard actions today?'
+        ]
+    };
 
     function getCsrfToken() {
         const cookie = document.cookie.split('; ').find((row) => row.startsWith('csrftoken='));
@@ -83,25 +112,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function addSuggestionButtons(prompts) {
+        const suggestions = document.createElement('div');
+        suggestions.className = 'chat-suggestions mt-2 d-flex flex-wrap gap-2';
+        prompts.forEach((prompt) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-sm btn-outline-secondary chat-suggestion';
+            button.dataset.prompt = prompt;
+            button.textContent = prompt;
+            suggestions.appendChild(button);
+        });
+        chatBody.appendChild(suggestions);
+    }
+
     function renderHistory(messages) {
         chatBody.innerHTML = '';
         if (!messages.length) {
             chatBody.appendChild(createMessageElement('bot-message', '👋 Hello! Ask me anything about StudioSync.'));
-            const suggestions = document.createElement('div');
-            suggestions.className = 'chat-suggestions mt-2 d-flex flex-wrap gap-2';
-            [
-                'What can I do on this platform?',
-                'How do bookings work?',
-                'How do payments and refunds work?'
-            ].forEach((prompt) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'btn btn-sm btn-outline-secondary chat-suggestion';
-                button.dataset.prompt = prompt;
-                button.textContent = prompt;
-                suggestions.appendChild(button);
-            });
-            chatBody.appendChild(suggestions);
+            addSuggestionButtons(roleSuggestions[role] || roleSuggestions.USER);
             scrollToBottom();
             return;
         }
@@ -158,6 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             appendMessage('bot-message', data.bot_response || 'I am here to help with StudioSync.');
+            if (data.policy_notice) {
+                appendMessage('bot-policy-message', data.policy_notice);
+            }
             historyLoaded = true;
         } catch (error) {
             removeTyping();
@@ -209,4 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     chatClearBtn?.addEventListener('click', clearHistory);
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeChatbotWidget, { once: true });
+} else {
+    initializeChatbotWidget();
+}

@@ -1,7 +1,14 @@
+{% load static %}
 <!-- ================= GLOBAL CHATBOT ================= -->
+{% with active_role=user.role|default:'USER'|upper %}
 <div id="chatbot-container"
     data-chatbot-url="{% url 'chatbot:chatbot_messages' %}"
-    data-chatbot-clear-url="{% url 'chatbot:clear_chat_history' %}">
+    data-chatbot-user-url="{% url 'chatbot:chatbot_messages_user' %}"
+    data-chatbot-studio-url="{% url 'chatbot:chatbot_messages_studio' %}"
+    data-chatbot-admin-url="{% url 'chatbot:chatbot_messages_admin' %}"
+    data-chatbot-role="{{ active_role }}"
+    data-chatbot-clear-url="{% url 'chatbot:clear_chat_history' %}"
+    data-chatbot-script="{% static 'js/core/chatbot.js' %}">
 
     <!-- Chat Toggle Button -->
     <div class="chat-toggle" id="chatToggle" title="Open Chat">
@@ -16,8 +23,21 @@
             <div>
                 <div class="fw-semibold">
                     <i class="bi bi-robot"></i> StudioSync AI Assistant
+                    {% if active_role == 'ADMIN' %}
+                    <span class="chat-role-badge chat-role-admin">Role: Admin</span>
+                    {% elif active_role == 'STUDIO' %}
+                    <span class="chat-role-badge chat-role-studio">Role: Studio</span>
+                    {% else %}
+                    <span class="chat-role-badge chat-role-user">Role: User</span>
+                    {% endif %}
                 </div>
-                <div class="small text-secondary">Ask about bookings, payments, reviews, dashboards, and studio features.</div>
+                {% if active_role == 'ADMIN' %}
+                <div class="small text-secondary">Admin assistant for moderation, studio verification, booking oversight, and payment monitoring.</div>
+                {% elif active_role == 'STUDIO' %}
+                <div class="small text-secondary">Studio assistant for portfolio, bookings, reviews, profile setup, and earnings workflows.</div>
+                {% else %}
+                <div class="small text-secondary">User assistant for exploring studios, bookings, payments, reviews, and dashboard guidance.</div>
+                {% endif %}
             </div>
             <div class="d-flex align-items-center gap-2">
                 <button class="chat-close-btn btn btn-sm btn-outline-light" id="chatClearBtn" type="button" title="Clear Chat">
@@ -33,9 +53,19 @@
         <div class="chat-body" id="chatBody">
             <div class="bot-message">👋 Hello! Ask me anything about StudioSync.</div>
             <div class="chat-suggestions mt-2 d-flex flex-wrap gap-2">
+                {% if active_role == 'ADMIN' %}
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do I verify and moderate studio accounts?">Studio moderation</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How can I monitor bookings and payment flow?">Ops monitoring</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="What are key admin dashboard actions today?">Admin checklist</button>
+                {% elif active_role == 'STUDIO' %}
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do I manage my portfolio and studio profile?">Portfolio setup</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do I handle booking approvals and schedule updates?">Booking operations</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How can I track earnings and client reviews?">Earnings and reviews</button>
+                {% else %}
                 <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="What can I do on this platform?">Platform help</button>
                 <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do bookings work?">Bookings</button>
                 <button type="button" class="btn btn-sm btn-outline-secondary chat-suggestion" data-prompt="How do payments and refunds work?">Payments</button>
+                {% endif %}
             </div>
         </div>
 
@@ -50,3 +80,4 @@
     </div>
 
 </div>
+{% endwith %}

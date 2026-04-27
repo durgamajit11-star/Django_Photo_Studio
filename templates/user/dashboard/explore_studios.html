@@ -1,201 +1,192 @@
 {% extends "user/dashboard/user_base.html" %}
+{% load static %}
 
 {% block title %}Explore Studios | StudioSync{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/studios/studio_list.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<div class="container-fluid">
+<div class="explore-bg-grid" aria-hidden="true"></div>
 
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h3 class="fw-bold">🎥 Explore Studios</h3>
-            <p class="text-muted">
-                Discover top-rated photography studios
-            </p>
+<div class="explore-shell">
+    <section class="explore-hero">
+        <div class="explore-hero-content">
+            <span class="hero-chip">Discover Premium Spaces</span>
+            <h1 class="hero-title">Explore Studios Crafted for Professional Shoots</h1>
+            <p class="hero-subtitle">Filter by style, location, and expertise to book a studio that fits your exact creative vision.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong>{{ studios|length }}</strong>
+                    <span>Verified Studios</span>
+                </div>
+                <div class="hero-stat">
+                    <strong>{{ featured_studios|length }}</strong>
+                    <span>{{ featured_section_title|default:"Featured" }}</span>
+                </div>
+                <div class="hero-stat">
+                    <strong>{{ categories|length }}</strong>
+                    <span>Categories</span>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- 🔍 Search + Filters -->
-    <form method="GET" class="row g-2 mb-4">
+    <section class="filter-panel">
+        <form method="GET" class="filter-grid" aria-label="Search and filter studios">
+            <label class="filter-field">
+                <span class="field-icon"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search studios, themes, services" value="{{ request.GET.q }}">
+            </label>
 
-        <div class="col-md-4">
-            <input type="text" name="q" class="form-control"
-                   placeholder="Search studios..."
-                   value="{{ request.GET.q }}">
-        </div>
+            <label class="filter-field">
+                <span class="field-icon"><i class="bi bi-geo-alt"></i></span>
+                <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request.GET.location }}">
+            </label>
 
-        <div class="col-md-3">
-            <input type="text" name="location" class="form-control"
-                   placeholder="Location..."
-                   value="{{ request.GET.location }}">
-        </div>
+            <label class="filter-field filter-select-wrap">
+                <span class="field-icon"><i class="bi bi-funnel"></i></span>
+                <select name="sort" class="form-select" aria-label="Sort studios">
+                    <option value="">Sort By</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                    <option value="experience" {% if selected_sort == 'experience' %}selected{% endif %}>Most Experienced</option>
+                    <option value="new" {% if selected_sort == 'new' %}selected{% endif %}>Newest</option>
+                </select>
+            </label>
 
-        <div class="col-md-3">
-            <select name="sort" class="form-select">
-                <option value="">Sort By</option>
-                <option value="rating">Top Rated</option>
-                <option value="experience">Most Experienced</option>
-                <option value="new">Newest</option>
-            </select>
-        </div>
+            {% if selected_category %}
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            {% endif %}
 
-        <div class="col-md-2">
-            <button class="btn btn-primary w-100">
-                <i class="bi bi-search"></i> Apply
+            <button class="btn btn-apply" type="submit">
+                <i class="bi bi-search"></i>
+                Apply
             </button>
+            <a href="{% url 'explore_studios' %}" class="btn btn-reset">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Reset
+            </a>
+        </form>
+
+        <div class="category-row" role="group" aria-label="Studio categories">
+            <a href="{% url 'explore_studios' %}{% if request.GET.q or request.GET.location or request.GET.sort %}?{% endif %}{% if request.GET.q %}q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.location %}{% if request.GET.q %}&{% endif %}location={{ request.GET.location|urlencode }}{% endif %}{% if request.GET.sort %}{% if request.GET.q or request.GET.location %}&{% endif %}sort={{ request.GET.sort|urlencode }}{% endif %}"
+               class="category-chip {% if not selected_category %}active{% endif %}">
+                All
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'explore_studios' %}?category={{ cat.id }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location|urlencode }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort|urlencode }}{% endif %}"
+               class="category-chip {% if selected_category == cat.id|stringformat:'s' %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section-block">
+        <div class="section-head">
+            <div>
+                <h2>{{ featured_section_title|default:"Featured Studios" }}</h2>
+                <p>{{ featured_section_hint }}</p>
+            </div>
         </div>
 
-    </form>
+        <div class="featured-grid">
+            {% for studio in featured_studios %}
+            <article class="studio-card premium-card">
+                <div class="studio-media">
+                    {% if studio.profile_image %}
+                    <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="studio-image">
+                    {% else %}
+                    <div class="studio-fallback">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
+                    {% endif %}
 
-    <!-- 🎯 Categories -->
-    <div class="mb-4">
-        <h5>Categories</h5>
-        {% for cat in categories %}
-        <a href="?category={{ cat.id }}"
-           class="btn btn-outline-info btn-sm m-1">
-            {{ cat.name }}
-        </a>
-        {% endfor %}
-    </div>
-
-    <!-- 🌟 Featured/Trending Studios -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-        <h4 class="fw-bold mb-0">🌟 {{ featured_section_title|default:"Featured Studios" }}</h4>
-        <small class="text-muted">{{ featured_section_hint }}</small>
-    </div>
-
-    <div class="row g-4">
-        {% for studio in featured_studios %}
-        <div class="col-md-4">
-
-            <div class="card border-0 shadow-sm">
-
-                {% if studio.profile_image %}
-                <img src="{{ studio.profile_image.url }}"
-                     style="height:200px; object-fit:cover;">
-                {% else %}
-                <div style="height:200px; background: linear-gradient(135deg,#667eea,#764ba2);"
-                     class="d-flex align-items-center justify-content-center">
-                    <i class="bi bi-camera-fill fs-1"></i>
-                </div>
-                {% endif %}
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-                        <h5>{{ studio.studio_name }}</h5>
-
+                    <div class="media-badges">
                         {% if studio.is_featured %}
-                        <span class="badge bg-dark">Pinned</span>
+                        <span class="badge-chip badge-pinned">Pinned</span>
                         {% else %}
-                        <span class="badge bg-info text-dark">Trending</span>
+                        <span class="badge-chip badge-trending">Trending</span>
                         {% endif %}
-
                         {% if studio.is_verified %}
-                        <span class="badge bg-success">✔ Verified</span>
+                        <span class="badge-chip badge-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
                         {% endif %}
                     </div>
-
-                    <p>
-                        📍 {{ studio.location }}
-                    </p>
-
-                    <p class="small">
-                        {{ studio.specializations }}
-                    </p>
-
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-warning">
-                            ⭐ {{ studio.avg_rating|default_if_none:0|floatformat:1 }}
-                        </span>
-                        <span class="small">
-                            {{ studio.experience_years }} yrs
-                        </span>
-                    </div>
-
-                    <p class="small mb-1">
-                        💰 Base: ₹ {{ studio.price_per_hour }}/hour
-                    </p>
-                    <p class="small text-muted mb-0">
-                        Services: {{ studio.services.count }} available
-                    </p>
-
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'studios:studio_detail' studio.id %}"
-                           class="btn btn-primary w-100">
-                            View Studio
-                        </a>
-                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}"
-                           class="btn btn-outline-warning w-100">
-                            <i class="bi bi-calendar-check"></i> Book Studio
-                        </a>
-                    </div>
-
                 </div>
-            </div>
 
-        </div>
-        {% empty %}
-        <p class="text-muted">No studios available right now. Try clearing filters.</p>
-        {% endfor %}
-    </div>
+                <div class="studio-body">
+                    <h3>{{ studio.studio_name }}</h3>
+                    <p class="meta-line"><i class="bi bi-geo-alt"></i> {{ studio.location }}</p>
+                    <p class="specialization">{{ studio.specializations|default:"Multiple styles and setup options"|truncatechars:95 }}</p>
 
-    <!-- 🏢 All Studios -->
-    <hr class="my-5">
-
-    <h4 class="fw-bold mb-3">🏢 All Studios</h4>
-
-    <div class="row g-4">
-        {% for studio in studios %}
-        <div class="col-md-3">
-
-            <div class="card border-0 h-100">
-
-                {% if studio.profile_image %}
-                <img src="{{ studio.profile_image.url }}"
-                     style="height:180px; object-fit:cover;">
-                {% endif %}
-
-                <div class="card-body">
-
-                    <h6>{{ studio.studio_name }}</h6>
-
-                    <p class="small text-muted">
-                        📍 {{ studio.location }}
-                    </p>
-
-                    <p class="text-warning small">
-                        ⭐ {{ studio.avg_rating|default_if_none:0|floatformat:1 }}
-                    </p>
-
-                    <p class="small mb-1">
-                        💰 Base: ₹ {{ studio.price_per_hour }}/hour
-                    </p>
-                    <p class="small text-muted mb-0">
-                        Services: {{ studio.services.count }} available
-                    </p>
-
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'studios:studio_detail' studio.id %}"
-                           class="btn btn-outline-secondary btn-sm w-100">
-                            View
-                        </a>
-                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}"
-                           class="btn btn-warning btn-sm w-100">
-                            <i class="bi bi-calendar-check"></i> Book Studio
-                        </a>
+                    <div class="meta-grid">
+                        <span class="meta-pill"><i class="bi bi-star-fill"></i> {{ studio.avg_rating|default_if_none:0|floatformat:1 }}</span>
+                        <span class="meta-pill"><i class="bi bi-briefcase"></i> {{ studio.experience_years }} yrs</span>
+                        <span class="meta-pill"><i class="bi bi-collection"></i> {{ studio.services.count }} services</span>
                     </div>
 
+                    <div class="price-row">
+                        <span class="price-label">Base Price</span>
+                        <strong>₹ {{ studio.price_per_hour }}/hour</strong>
+                    </div>
+
+                    <div class="cta-row">
+                        <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-view">View Studio</a>
+                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-book"><i class="bi bi-calendar-check"></i> Book</a>
+                    </div>
                 </div>
-            </div>
-
+            </article>
+            {% empty %}
+            <div class="empty-state">No studios are available right now. Try adjusting filters.</div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <p class="text-center">No studios found</p>
-        {% endfor %}
-    </div>
+    </section>
 
+    <section class="section-block compact-section">
+        <div class="section-head">
+            <div>
+                <h2>All Studios</h2>
+                <p>Browse complete studio inventory and compare options side by side.</p>
+            </div>
+        </div>
+
+        <div class="all-grid">
+            {% for studio in studios %}
+            <article class="studio-card compact-card">
+                <div class="studio-media compact-media">
+                    {% if studio.profile_image %}
+                    <img src="{{ studio.profile_image.url }}" alt="{{ studio.studio_name }}" class="studio-image">
+                    {% else %}
+                    <div class="studio-fallback compact-fallback">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="studio-body compact-body">
+                    <h3>{{ studio.studio_name }}</h3>
+                    <p class="meta-line"><i class="bi bi-geo-alt"></i> {{ studio.location }}</p>
+
+                    <div class="meta-grid compact-meta-grid">
+                        <span class="meta-pill"><i class="bi bi-star-fill"></i> {{ studio.avg_rating|default_if_none:0|floatformat:1 }}</span>
+                        <span class="meta-pill">₹ {{ studio.price_per_hour }}/hr</span>
+                    </div>
+
+                    <p class="small-note">{{ studio.services.count }} services available</p>
+
+                    <div class="cta-row compact-cta-row">
+                        <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-view">View</a>
+                        <a href="{% url 'studio_booking' %}?studio_id={{ studio.id }}" class="btn btn-book"><i class="bi bi-calendar-check"></i> Book</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">No studios found for the selected filters.</div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 
 {% endblock %}

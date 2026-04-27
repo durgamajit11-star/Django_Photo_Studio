@@ -1,0 +1,218 @@
+:root {
+    --premium-bg: #020d0a;
+    --premium-surface: #071b15;
+    --premium-surface-2: #0b241c;
+    --premium-text: #eaf4ed;
+    --premium-muted: #90a499;
+    --premium-border: rgba(217, 170, 67, 0.22);
+    --premium-border-soft: rgba(217, 170, 67, 0.14);
+    --premium-gold: #d9ab45;
+    --premium-gold-strong: #f0c45f;
+    --premium-heading-edge: rgba(243, 197, 109, 0.42);
+    --premium-heading-glow: rgba(243, 197, 109, 0.2);
+    --ui-motion-fast: 180ms;
+    --ui-motion-base: 260ms;
+    --ui-motion-slow: 420ms;
+    --ui-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-theme='dark'] body,
+body {
+    color: var(--premium-text);
+}
+
+/* Unified premium tone for commonly reused surfaces */
+.card,
+.panel,
+.glass,
+.glass-panel,
+.dashboard-card,
+.admin-panel,
+.review-form,
+.pay-card,
+.receipt-card,
+.empty-box,
+.hero-box,
+.notification-item,
+.setting-item,
+.preference-item,
+.studio-card {
+    border-color: var(--premium-border-soft) !important;
+}
+
+.text-muted,
+.text-secondary,
+.small.text-secondary {
+    color: var(--premium-muted) !important;
+}
+
+/* Global gold-action button style with black text */
+.btn-warning,
+.btn-outline-warning,
+.btn-gold,
+.btn.btn-gold {
+    border-color: transparent !important;
+    background: linear-gradient(135deg, var(--premium-gold), var(--premium-gold-strong)) !important;
+    color: #000000 !important;
+}
+
+.btn-warning:hover,
+.btn-outline-warning:hover,
+.btn-gold:hover,
+.btn.btn-gold:hover {
+    color: #000000 !important;
+}
+
+/* Remove inner gap around main content areas without killing sidebar offsets */
+.content-wrapper,
+.main-content,
+.admin-main,
+.studio-main {
+    padding: 0 !important;
+}
+
+/* Preserve each dashboard's own horizontal offset rules */
+
+/* Prevent container side gutters from reintroducing gaps */
+.main-content > .container,
+.main-content > .container-fluid,
+.content-wrapper > .container,
+.content-wrapper > .container-fluid,
+.admin-main > .container,
+.admin-main > .container-fluid,
+.studio-main > .container,
+.studio-main > .container-fluid {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+@media (max-width: 992px) {
+    .studio-main,
+    .studio-sidebar.collapsed + .studio-main {
+        margin-left: 0 !important;
+    }
+}
+
+/* Premium highlighted section headings across templates */
+:is(.main-content, .admin-main, .studio-main, .dashboard-shell, .container, .container-fluid)
+    :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .widget, .stats-card, .list-group-item)
+    :is(h4, h5, h6),
+.panel-header :is(h4, h5, h6),
+.section-title,
+.block-title {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+    padding: 0.36rem 0.82rem;
+    border-radius: 999px;
+    border: 1px solid var(--premium-heading-edge);
+    color: color-mix(in srgb, var(--premium-text) 84%, #5d3d06);
+    letter-spacing: 0.01em;
+    background: linear-gradient(105deg, rgba(253, 240, 214, 0.28), rgba(255, 224, 172, 0.18), rgba(253, 240, 214, 0.28));
+    background-size: 190% 100%;
+    box-shadow: 0 8px 18px var(--premium-heading-glow), inset 0 1px 0 rgba(255, 248, 234, 0.55);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-position 0.35s ease, border-color 0.25s ease;
+}
+
+:is(.main-content, .admin-main, .studio-main, .dashboard-shell, .container, .container-fluid)
+    :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .widget, .stats-card, .list-group-item)
+    :is(h4, h5, h6)::after,
+.panel-header :is(h4, h5, h6)::after,
+.section-title::after,
+.block-title::after {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff8d8, #e7af4d 65%, #a66a0a);
+    box-shadow: 0 0 0.65rem rgba(239, 192, 106, 0.46);
+}
+
+@media (hover: hover) {
+    :is(.main-content, .admin-main, .studio-main, .dashboard-shell, .container, .container-fluid)
+        :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .widget, .stats-card, .list-group-item)
+        :is(h4, h5, h6):hover,
+    .panel-header :is(h4, h5, h6):hover,
+    .section-title:hover,
+    .block-title:hover {
+        transform: translateY(-1px);
+        border-color: rgba(243, 197, 109, 0.66);
+        background-position: 100% 0;
+        box-shadow: 0 12px 24px rgba(243, 197, 109, 0.28), inset 0 1px 0 rgba(255, 248, 234, 0.82);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :is(.main-content, .admin-main, .studio-main, .dashboard-shell, .container, .container-fluid)
+        :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .widget, .stats-card, .list-group-item)
+        :is(h4, h5, h6),
+    .panel-header :is(h4, h5, h6),
+    .section-title,
+    .block-title {
+        transition: none;
+    }
+}
+
+/* Lightweight interaction motion across cards, sections, and controls */
+:is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .mini-item, .stat-card) {
+    transition: transform var(--ui-motion-base) var(--ui-ease-standard), box-shadow var(--ui-motion-base) var(--ui-ease-standard), border-color var(--ui-motion-fast) ease, background-color var(--ui-motion-fast) ease;
+}
+
+:is(.btn, button, [role='button'], .quick-link, .menu-item, .studio-sidebar a, .admin-sidebar a, .nav-link) {
+    transition: transform var(--ui-motion-fast) var(--ui-ease-standard), box-shadow var(--ui-motion-fast) ease, filter var(--ui-motion-fast) ease, background-color var(--ui-motion-fast) ease, border-color var(--ui-motion-fast) ease;
+}
+
+@media (hover: hover) {
+    :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .mini-item, .stat-card):hover {
+        transform: translateY(-3px);
+        border-color: color-mix(in srgb, var(--premium-gold) 44%, var(--premium-border-soft)) !important;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(240, 196, 95, 0.12) inset;
+    }
+
+    :is(.btn, button, [role='button'], .quick-link, .menu-item, .studio-sidebar a, .admin-sidebar a, .nav-link):hover {
+        transform: translateY(-1px);
+        filter: saturate(1.06);
+    }
+
+    :is(.btn, button, [role='button']):active {
+        transform: translateY(0);
+    }
+}
+
+/* Viewport reveal classes are toggled by global.js */
+.ui-reveal {
+    opacity: 0;
+    transform: translateY(14px) scale(0.995);
+    transition: opacity var(--ui-motion-slow) var(--ui-ease-standard), transform var(--ui-motion-slow) var(--ui-ease-standard);
+    transition-delay: var(--ui-reveal-delay, 0ms);
+}
+
+.ui-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Reduce main-thread paint/layout cost for offscreen panels where supported */
+@supports (content-visibility: auto) {
+    :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .table-responsive, .list-group-item) {
+        content-visibility: auto;
+        contain-intrinsic-size: 1px 280px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :is(.card, .panel, .glass, .glass-panel, .dashboard-card, .admin-panel, .studio-card, .review-form, .pay-card, .receipt-card, .empty-box, .hero-box, .notification-item, .setting-item, .preference-item, .panel-section, .mini-item, .stat-card),
+    :is(.btn, button, [role='button'], .quick-link, .menu-item, .studio-sidebar a, .admin-sidebar a, .nav-link),
+    .ui-reveal,
+    .ui-reveal.is-visible {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}

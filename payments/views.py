@@ -65,15 +65,15 @@ def create_payment(request, booking_id):
     # Check if payment already exists
     if hasattr(booking, 'payment'):
         messages.warning(request, 'Payment already exists for this booking')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
 
     if booking.status == 'Cancelled':
         messages.error(request, 'Cancelled bookings cannot be paid')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
 
     if booking.status != 'Confirmed':
         messages.warning(request, 'Payment is available only after the studio approves your booking.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
@@ -84,16 +84,16 @@ def create_payment(request, booking_id):
         
         if not payment_method or payment_method not in valid_methods:
             messages.error(request, 'Please select a payment method')
-            return redirect('create_payment', booking_id=booking_id)
+            return redirect('payments:create_payment', booking_id=booking_id)
 
         if payment_method == 'UPI':
             if payer_upi_id and not UPI_ID_PATTERN.match(payer_upi_id):
                 messages.error(request, 'Please enter a valid UPI ID (example: name@bank)')
-                return redirect('create_payment', booking_id=booking_id)
+                return redirect('payments:create_payment', booking_id=booking_id)
 
             if not upi_reference or len(upi_reference) < 8:
                 messages.error(request, 'Please enter a valid UPI reference/UTR (minimum 8 characters)')
-                return redirect('create_payment', booking_id=booking_id)
+                return redirect('payments:create_payment', booking_id=booking_id)
         
         try:
             payment = Payment.objects.create(
@@ -117,10 +117,10 @@ def create_payment(request, booking_id):
             booking.save(update_fields=['payment_status', 'updated_at'])
 
             messages.success(request, 'Payment successful!')
-            return redirect('payment_detail', payment_id=payment.id)
+            return redirect('payments:payment_detail', payment_id=payment.id)
         except Exception as e:
             messages.error(request, f'Error processing payment: {str(e)}')
-            return redirect('booking_detail', booking_id=booking_id)
+            return redirect('bookings:booking_detail', booking_id=booking_id)
 
     upi_payload = build_upi_payload(booking.amount, booking.id)
     context = {
@@ -153,11 +153,11 @@ def request_refund(request, payment_id):
     # Check if refund already exists
     if payment.status == 'Refunded':
         messages.warning(request, 'This payment has already been refunded')
-        return redirect('payment_detail', payment_id=payment_id)
+        return redirect('payments:payment_detail', payment_id=payment_id)
 
     if payment.status != 'Completed':
         messages.error(request, 'Refund can only be requested for completed payments')
-        return redirect('payment_detail', payment_id=payment_id)
+        return redirect('payments:payment_detail', payment_id=payment_id)
     
     if request.method == 'POST':
         reason = request.POST.get('reason')
@@ -165,21 +165,21 @@ def request_refund(request, payment_id):
         
         if not reason:
             messages.error(request, 'Please provide a reason for refund')
-            return redirect('request_refund', payment_id=payment_id)
+            return redirect('payments:request_refund', payment_id=payment_id)
 
         try:
             amount = Decimal(str(amount_raw))
             if amount <= 0 or amount > payment.amount:
                 messages.error(request, 'Refund amount must be greater than 0 and not exceed paid amount')
-                return redirect('request_refund', payment_id=payment_id)
+                return redirect('payments:request_refund', payment_id=payment_id)
         except (InvalidOperation, TypeError):
             messages.error(request, 'Please enter a valid refund amount')
-            return redirect('request_refund', payment_id=payment_id)
+            return redirect('payments:request_refund', payment_id=payment_id)
 
         existing = PaymentRefund.objects.filter(payment=payment, status__in=['Requested', 'Approved']).exists()
         if existing:
             messages.warning(request, 'A refund request is already in progress for this payment')
-            return redirect('payment_detail', payment_id=payment_id)
+            return redirect('payments:payment_detail', payment_id=payment_id)
         
         try:
             refund = PaymentRefund.objects.create(
@@ -190,10 +190,10 @@ def request_refund(request, payment_id):
                 status='Requested'
             )
             messages.success(request, 'Refund request submitted!')
-            return redirect('payment_detail', payment_id=payment_id)
+            return redirect('payments:payment_detail', payment_id=payment_id)
         except Exception as e:
             messages.error(request, f'Error submitting refund: {str(e)}')
-            return redirect('payment_detail', payment_id=payment_id)
+            return redirect('payments:payment_detail', payment_id=payment_id)
     
     context = {'payment': payment}
     return render(request, 'payments/request_refund.html', context)

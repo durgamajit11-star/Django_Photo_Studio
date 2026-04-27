@@ -3,6 +3,12 @@
 {% block page_title %}Executive Overview{% endblock %}
 {% block page_description %}Track growth, quality, and operational health from one command center.{% endblock %}
 
+{% block page_actions %}
+<a href="{% url 'admin_weekly_policy_report' %}" class="btn btn-outline-warning">
+    <i class="bi bi-download me-2"></i>Weekly Policy Report
+</a>
+{% endblock %}
+
 {% block admin_content %}
 
 <div class="row g-4 mb-4">
@@ -47,6 +53,105 @@
             </div>
             <h3 class="fw-bold mb-1">₹ {{ total_revenue }}</h3>
             <p class="small text-primary mb-0">Revenue from confirmed bookings</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="admin-panel p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Chatbot Policy Guardrail Metrics</h5>
+                    <p class="text-muted mb-0">Blocked-intent counts by user role for moderation and abuse triage.</p>
+                </div>
+                <span class="metric-tag">Policy</span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Blocked USER</h6>
+                        <h3 class="mb-1">{{ blocked_by_role.USER }}</h3>
+                        <p class="small text-muted mb-0">General account boundary violations</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Blocked STUDIO</h6>
+                        <h3 class="mb-1">{{ blocked_by_role.STUDIO }}</h3>
+                        <p class="small text-muted mb-0">Studio account guardrail triggers</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Blocked ADMIN</h6>
+                        <h3 class="mb-1">{{ blocked_by_role.ADMIN }}</h3>
+                        <p class="small text-muted mb-0">Admin scope restriction events</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card h-100">
+                        <h6 class="text-muted">Total Blocked</h6>
+                        <h3 class="mb-1">{{ total_blocked_intents }}</h3>
+                        <p class="small text-warning mb-0">All-time blocked-intent volume</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-panel p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">FAQ vs Fallback</h5>
+                <span class="metric-tag">Intent Quality</span>
+            </div>
+
+            <div class="stat-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small text-muted">FAQ Hit Rate</span>
+                    <strong>{{ faq_hit_rate }}%</strong>
+                </div>
+                <div class="progress" role="progressbar" aria-label="FAQ Hit Rate" aria-valuenow="{{ faq_hit_rate }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+                    <div class="progress-bar bg-success" style="width: {{ faq_hit_rate }}%;"></div>
+                </div>
+                <div class="small text-muted mt-2">FAQ Hits: {{ faq_hits }}</div>
+            </div>
+
+            <div class="stat-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small text-muted">Fallback Rate</span>
+                    <strong>{{ fallback_rate }}%</strong>
+                </div>
+                <div class="progress" role="progressbar" aria-label="Fallback Rate" aria-valuenow="{{ fallback_rate }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+                    <div class="progress-bar bg-warning" style="width: {{ fallback_rate }}%;"></div>
+                </div>
+                <div class="small text-muted mt-2">Fallback Responses: {{ fallback_count }}</div>
+            </div>
+
+            <div class="small text-muted">
+                Weekly moderation traffic: <strong>{{ weekly_blocked_count }}</strong> blocked messages out of <strong>{{ weekly_total_bot_messages }}</strong> bot responses.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="admin-panel p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">7-Day Chatbot Policy Trend</h5>
+                    <p class="text-muted mb-0">Track blocked-intent volume and FAQ quality trend for moderation planning.</p>
+                </div>
+                <span class="metric-tag">7 Days</span>
+            </div>
+            <div class="chart-shell" style="min-height: 320px;">
+                <canvas id="policyTrendChart"></canvas>
+            </div>
+            {{ policy_trend_labels|json_script:"policy-trend-labels" }}
+            {{ blocked_trend_data|json_script:"policy-trend-blocked" }}
+            {{ faq_hit_rate_trend_data|json_script:"policy-trend-faq-rate" }}
         </div>
     </div>
 </div>

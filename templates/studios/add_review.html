@@ -12,55 +12,71 @@
     {% include 'includes/sidebar.html' %}
 
     <main class="studio-main">
-        <div class="container">
-            <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-secondary mb-4">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
-
-            <div class="row">
-                <div class="col-md-8 mx-auto">
-                    <h1 class="h3 mb-4">
+        <div class="container review-page-shell">
+            <section class="review-page-hero mb-3">
+                <div class="hero-left">
+                    <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-back btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back to Studio
+                    </a>
+                    <h1>
                         {% if existing_review %}
                         Update Your Review
                         {% else %}
                         Write a Review
                         {% endif %}
                     </h1>
+                    <p>Share your experience for <strong>{{ studio.studio_name }}</strong> to help other creators choose better.</p>
+                </div>
+                <div class="hero-meta">
+                    <span class="meta-chip"><i class="bi bi-building"></i> {{ studio.studio_name }}</span>
+                    {% if studio.location %}<span class="meta-chip"><i class="bi bi-geo-alt"></i> {{ studio.location }}</span>{% endif %}
+                </div>
+            </section>
 
-                    <div class="review-form">
-                        <h5 class="mb-3">{{ studio.studio_name }}</h5>
+            {% if messages %}
+            <div class="message-stack mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-0" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-                        <form method="POST">
+            <div class="row">
+                <div class="col-lg-8 col-xl-7 mx-auto">
+                    <section class="review-form">
+                        <form method="POST" class="premium-form">
                             {% csrf_token %}
 
                             <div class="mb-4">
                                 <label class="form-label">Rating</label>
-                                <div class="rating-input">
+                                <div class="rating-input" role="radiogroup" aria-label="Select rating">
                                     {% for i in "54321" %}
-                                    <input type="radio" name="rating" value="{{ i }}" id="rating{{ i }}" {% if existing_review and existing_review.rating == i|add:"0" %}checked{% endif %}>
-                                    <label for="rating{{ i }}">⭐</label>
+                                    <input type="radio" name="rating" value="{{ i }}" id="rating{{ i }}" {% if existing_review and existing_review.rating == i|add:"0" %}checked{% endif %} required>
+                                    <label for="rating{{ i }}" aria-label="Rate {{ i }} stars"><i class="bi bi-star-fill"></i></label>
                                     {% endfor %}
                                 </div>
+                                <small class="form-hint">Select a rating from 1 to 5 stars.</small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Your Review</label>
-                                <textarea name="comment" class="form-control form-control-lg" rows="5"
-                                    placeholder="Share your experience with this studio..."
-                                    required>{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
+                                <textarea name="comment" class="form-control form-control-lg" rows="6" placeholder="Tell us about your shoot experience, setup quality, support, and final results..." required>{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg">
+                            <div class="d-grid gap-2 mt-4 action-stack">
+                                <button type="submit" class="btn btn-submit btn-lg">
                                     <i class="bi bi-check-circle"></i>
                                     {% if existing_review %}Update Review{% else %}Post Review{% endif %}
                                 </button>
-                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-outline-secondary">
+                                <a href="{% url 'studios:studio_detail' studio.id %}" class="btn btn-cancel">
                                     Cancel
                                 </a>
                             </div>
                         </form>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>

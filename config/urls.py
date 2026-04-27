@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from dashboard.views import landing_page, landing_explore_studio
+from config.views import ingest_web_vitals
 
 urlpatterns = [
     path('', landing_page, name='landing'),   # 👈 ROOT URL
@@ -34,6 +35,7 @@ urlpatterns = [
     path('recommendations/', include('recommendations.urls')),
     path('chatbot/', include(('chatbot.urls', 'chatbot'), namespace='chatbot')),
     path('api/', include('api.urls')),
+    path('api/perf/web-vitals/', ingest_web_vitals, name='web_vitals_ingest'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

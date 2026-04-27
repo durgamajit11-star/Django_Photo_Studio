@@ -125,6 +125,137 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const policyTrendCanvas = document.getElementById('policyTrendChart');
+    const policyTrendLabelsEl = document.getElementById('policy-trend-labels');
+    const policyTrendBlockedEl = document.getElementById('policy-trend-blocked');
+    const policyTrendFaqRateEl = document.getElementById('policy-trend-faq-rate');
+
+    if (
+        policyTrendCanvas &&
+        policyTrendLabelsEl &&
+        policyTrendBlockedEl &&
+        policyTrendFaqRateEl &&
+        typeof Chart !== 'undefined'
+    ) {
+        const labels = JSON.parse(policyTrendLabelsEl.textContent);
+        const blockedSeries = JSON.parse(policyTrendBlockedEl.textContent);
+        const faqRateSeries = JSON.parse(policyTrendFaqRateEl.textContent);
+
+        function getPolicyTrendThemeColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            return {
+                gridColor: isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(18, 34, 56, 0.10)',
+                tickColor: isDark ? '#dbe5f3' : '#31445f',
+                blockedColor: isDark ? 'rgba(251, 191, 36, 0.75)' : 'rgba(217, 119, 6, 0.75)',
+                faqRateColor: isDark ? 'rgba(52, 211, 153, 0.95)' : 'rgba(5, 150, 105, 0.95)',
+            };
+        }
+
+        const colors = getPolicyTrendThemeColors();
+        const policyTrendChart = new Chart(policyTrendCanvas, {
+            data: {
+                labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Blocked Intents',
+                        data: blockedSeries,
+                        yAxisID: 'y',
+                        backgroundColor: colors.blockedColor,
+                        borderRadius: 7,
+                        borderSkipped: false,
+                    },
+                    {
+                        type: 'line',
+                        label: 'FAQ Hit Rate %',
+                        data: faqRateSeries,
+                        yAxisID: 'y1',
+                        borderColor: colors.faqRateColor,
+                        backgroundColor: colors.faqRateColor,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
+                        tension: 0.35,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: colors.tickColor,
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: colors.tickColor,
+                        },
+                        grid: {
+                            color: colors.gridColor,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            color: colors.tickColor,
+                        },
+                        grid: {
+                            color: colors.gridColor,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Blocked Intents',
+                            color: colors.tickColor,
+                        },
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        max: 100,
+                        position: 'right',
+                        ticks: {
+                            color: colors.tickColor,
+                            callback: function (value) {
+                                return `${value}%`;
+                            },
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        title: {
+                            display: true,
+                            text: 'FAQ Hit Rate %',
+                            color: colors.tickColor,
+                        },
+                    },
+                },
+            },
+        });
+
+        document.addEventListener('studiosync:theme-changed', function () {
+            const next = getPolicyTrendThemeColors();
+            policyTrendChart.data.datasets[0].backgroundColor = next.blockedColor;
+            policyTrendChart.data.datasets[1].borderColor = next.faqRateColor;
+            policyTrendChart.data.datasets[1].backgroundColor = next.faqRateColor;
+            policyTrendChart.options.plugins.legend.labels.color = next.tickColor;
+            policyTrendChart.options.scales.x.ticks.color = next.tickColor;
+            policyTrendChart.options.scales.y.ticks.color = next.tickColor;
+            policyTrendChart.options.scales.y1.ticks.color = next.tickColor;
+            policyTrendChart.options.scales.y.title.color = next.tickColor;
+            policyTrendChart.options.scales.y1.title.color = next.tickColor;
+            policyTrendChart.options.scales.x.grid.color = next.gridColor;
+            policyTrendChart.options.scales.y.grid.color = next.gridColor;
+            policyTrendChart.update('none');
+        });
+    }
+
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.forEach(function (tooltipTriggerEl) {
         new bootstrap.Tooltip(tooltipTriggerEl);

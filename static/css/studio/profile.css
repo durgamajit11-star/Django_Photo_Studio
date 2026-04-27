@@ -437,3 +437,61 @@ html[data-theme='light'] .danger-delete-card input.form-control {
     color: #172235;
     border-color: rgba(220, 38, 38, 0.4);
 }
+
+body.studio-dashboard-page .studio-profile-header h1,
+body.studio-dashboard-page .card-header h3,
+body.studio-dashboard-page .summary-content h4,
+body.studio-dashboard-page .display-item p,
+body.studio-dashboard-page .verification-checklist-header h5 {
+    color: #f3f8f4;
+}
+
+body.studio-dashboard-page .studio-profile-header p,
+body.studio-dashboard-page .summary-content p,
+body.studio-dashboard-page .profile-verification-note,
+body.studio-dashboard-page .display-item .label,
+body.studio-dashboard-page .verification-checklist-header span,
+body.studio-dashboard-page .profile-card .text-muted {
+    color: #91a499;
+}
+
+body.studio-dashboard-page .profile-card,
+body.studio-dashboard-page .verification-checklist,
+body.studio-dashboard-page .display-item,
+body.studio-dashboard-page .editor-grid,
+body.studio-dashboard-page .profile-verification-note,
+body.studio-dashboard-page .service-row,
+body.studio-dashboard-page .pref-item,
+body.studio-dashboard-page .danger-guard,
+body.studio-dashboard-page .danger-action-card {
+    background: linear-gradient(165deg, rgba(7, 27, 21, 0.94), rgba(4, 15, 11, 0.94));
+    border-color: rgba(217, 170, 67, 0.14) !important;
+}
+
+body.studio-dashboard-page .profile-card,
+body.studio-dashboard-page .verification-checklist,
+body.studio-dashboard-page .display-item,
+body.studio-dashboard-page .profile-verification-note,
+body.studio-dashboard-page .service-row,
+body.studio-dashboard-page .pref-item,
+body.studio-dashboard-page .danger-guard,
+body.studio-dashboard-page .danger-action-card {
+    border: 1px solid rgba(217, 170, 67, 0.14);
+}
+
+body.studio-dashboard-page .section-toggle-btn,
+body.studio-dashboard-page .btn-upload,
+body.studio-dashboard-page .btn-primary,
+body.studio-dashboard-page .verification-checklist-item.done,
+body.studio-dashboard-page .btn-danger {
+    background: linear-gradient(135deg, #d9ab45, #f0c45f) !important;
+    color: #000 !important;
+    border-color: transparent !important;
+}
+
+body.studio-dashboard-page .section-toggle-btn:hover,
+body.studio-dashboard-page .btn-upload:hover,
+body.studio-dashboard-page .btn-primary:hover,
+body.studio-dashboard-page .btn-danger:hover {
+    color: #000 !important;
+}

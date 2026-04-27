@@ -598,3 +598,82 @@ html[data-theme='light'] .dashboard-bg-orb {
         font-size: 1.35rem;
     }
 }
+
+/* ===== PREMIUM OVERRIDES ===== */
+.admin-wrapper {
+    gap: 0;
+}
+
+.admin-main {
+    padding: 0 !important;
+}
+
+.admin-main > .container,
+.admin-main > .container-fluid {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.page-intro,
+.stat-card,
+.admin-panel,
+.mobile-toggle,
+.theme-toggle-btn {
+    background: linear-gradient(165deg, rgba(7, 27, 21, 0.94), rgba(4, 15, 11, 0.94)) !important;
+    border-color: rgba(217, 170, 67, 0.14) !important;
+    color: #eaf4ed !important;
+}
+
+.page-title,
+.admin-logo,
+.admin-panel .table td,
+.admin-panel .table th,
+.stat-card,
+.header-nav,
+.welcome-text {
+    color: #eaf4ed !important;
+}
+
+.text-muted,
+.page-description,
+.page-intro .text-muted,
+.admin-panel .table thead th {
+    color: #91a499 !important;
+}
+
+.admin-sidebar {
+    background: linear-gradient(180deg, #071b15, #0b241c) !important;
+    border-right-color: rgba(217, 170, 67, 0.14) !important;
+}
+
+.admin-sidebar a:hover {
+    background: rgba(217, 170, 67, 0.1) !important;
+}
+
+.admin-sidebar a.active {
+    background: linear-gradient(135deg, #d9ab45, #f0c45f) !important;
+    color: #000 !important;
+    box-shadow: none !important;
+}
+
+.metric-tag,
+.btn-primary,
+.btn-outline-primary,
+.btn-success,
+.btn-outline-success,
+.btn-warning,
+.btn-outline-warning {
+    background: linear-gradient(135deg, #d9ab45, #f0c45f) !important;
+    color: #000 !important;
+    border-color: transparent !important;
+}
+
+.btn-outline-danger,
+.btn-danger {
+    border-color: rgba(217, 76, 88, 0.55) !important;
+    background: rgba(217, 76, 88, 0.18) !important;
+    color: #ffd6db !important;
+}
